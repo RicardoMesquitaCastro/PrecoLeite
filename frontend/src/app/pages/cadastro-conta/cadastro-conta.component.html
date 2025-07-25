@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>PreçoLeite</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-text color="medium">
+    <h2 style="margin-top: 24px;">Cadastro</h2>
+  </ion-text>
+
+  <ion-item>
+    <ion-input [(ngModel)]="name" placeholder="Nome Completo"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input [(ngModel)]="email" placeholder="E-mail"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input [(ngModel)]="password" type="password" placeholder="Senha"></ion-input>
+  </ion-item>
+
+  <ion-button color="primary" expand="full" (click)="cadastrarConta()">Cadastrar</ion-button>
+  <p style="color:red">{{ erro }}</p>
+</ion-content>

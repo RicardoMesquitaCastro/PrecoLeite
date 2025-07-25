@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>PreçoLeite</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- WIDGET CEPEA RESPONSIVO -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>COTAÇÃO ATUAL</ion-card-title>
+    </ion-card-header>
+    <ion-card-content style="overflow-x: auto;">
+      <div style="min-width: 100%; overflow-x: auto;">
+        <iframe
+          srcdoc='
+            <html>
+              <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  body {
+                    margin: 16px;
+                    background: #1e1e1e;
+                    font-family: Arial, sans-serif;
+                  }
+                  table.imagenet-widget-tabela {
+                    background: #1e1e1e;
+                    color: #b9fbc0;
+                    border-radius: 16px;
+                    border-collapse: collapse;
+                    box-shadow: 0 0 20px rgba(0,255,128,0.2);
+                    margin: 0 auto;
+                    font-size: 14px;
+                    width: 100%;
+                  }
+                  th, td {
+                    padding: 8px 12px;
+                  }
+                </style>
+              </head>
+              <body>
+                <script type="text/javascript"
+                  src="https://www.cepea.org.br/br/widgetproduto.js.php?fonte=arial&tamanho=10&largura=100%25&corfundo=1e1e1e&cortexto=b9fbc0&corlinha=00ff80&id_indicador[]=leitep">
+                </script>
+              </body>
+            </html>
+          '
+          style="width: 100%; min-width: 100%; max-width: 100%; height: 180px; border: none; background: transparent;"
+          sandbox="allow-scripts"
+        ></iframe>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- GRÁFICO COTAÇÕES -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        LEITE AO PRODUTOR CEPEA/ESALQ (R$/litro) - líquido - Goiás
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <canvas id="cotacoesChart" style="width: 100%; height: 250px;"></canvas>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

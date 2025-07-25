@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nome App</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-text color="medium">
+    <h2 style="margin-top: 24px;">Cadastro da Propriedade</h2>
+  </ion-text>
+
+  <ion-item>
+    <ion-input [(ngModel)]="nomePropriedade" placeholder="Nome da Propriedade"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input [(ngModel)]="municipio" placeholder="Município"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input [(ngModel)]="regiao" placeholder="Região"></ion-input>
+  </ion-item>
+
+  <ion-button color="primary" expand="full" (click)="cadastrarPropriedade()">Salvar</ion-button>
+  <p style="color:red">{{ erro }}</p>
+</ion-content>

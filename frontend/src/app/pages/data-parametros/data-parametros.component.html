@@ -1,0 +1,138 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>PreçoLeite</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="agrupamentoSelecionado" value="nenhum">
+      <!-- <ion-segment-button value="nenhum">Todos</ion-segment-button> -->
+      <ion-segment-button value="laticinio">Por Laticínio</ion-segment-button>
+      <ion-segment-button value="mes">Por Mês</ion-segment-button>
+       <ion-segment-button value="regiao">Por Região</ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+
+
+<ion-content class="ion-padding">
+
+  <!-- Lista agrupada -->
+  <ng-container *ngIf="agrupamentoSelecionado === 'regiao'">
+  <ion-text class="ion-padding" color="medium">
+    <h2 style="margin: 16px 0 8px;">Média de Preço por Região</h2>
+  </ion-text>
+
+  <!-- Cards com médias por região e laticínios -->
+  <ion-card *ngFor="let grupo of dadosPorRegiao; trackBy: trackByLaticinio">
+    <ion-card-header>
+      <ion-card-title>
+        {{ grupo.regiao }} — Média Geral: R$ {{ grupo.mediaPreco | number:'1.2-2' }}
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item *ngFor="let lat of grupo.laticinios; trackBy: trackByFaixa">
+        <ion-label>{{ lat.laticinio }}</ion-label>
+        <ion-note slot="end">R$ {{ lat.mediaPreco | number:'1.2-2' }}</ion-note>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+    <ion-card>
+    <ion-card-header>
+      <ion-card-title>Gráfico Média de Preço por Região</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <canvas #graficoRegiao style="width: 100%; max-width: 600px; height: 300px;"></canvas>
+    </ion-card-content>
+  </ion-card>
+  </ng-container>
+  <!-- Agrupamento por Laticínio com faixas -->
+  <ng-container *ngIf="agrupamentoSelecionado === 'laticinio'">
+     <ion-text class="ion-padding" color="medium">
+    <h2 style="margin: 16px 0 8px;">Média de Preço por Faixas </h2>
+  </ion-text>
+    <ion-card *ngFor="let grupo of dadosPorLaticinioFaixas; trackBy: trackByLaticinio">
+      <ion-card-header>
+        <ion-card-title>Laticínio: {{ grupo.laticinio }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item *ngFor="let faixa of grupo.faixas; trackBy: trackByFaixa">
+          <ion-label>
+            Litros: {{ faixa.faixa }} - Média Preço: R$ {{ faixa.mediaPreco | number:'1.2-2' }}
+          </ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+     <ion-card>
+    <ion-card-header>
+      <ion-card-title>COMPARATIVO INTERVALO E PREÇOS</ion-card-title>
+    </ion-card-header>
+     <ion-card-content>
+<canvas id="graficoLitrosPreco" style="width: 100%; max-width: 600px; height: 300px;"></canvas>
+     </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <!-- Agrupamento por Mês (igual seu exemplo) -->
+<ng-container *ngIf="agrupamentoSelecionado === 'mes'">
+    <ion-text class="ion-padding" color="medium">
+    <h2 style="margin: 16px 0 8px;">Média de Preço por Mês </h2>
+  </ion-text>
+  <ion-card *ngFor="let grupo of dadosPorMes; trackBy: trackByLaticinio">
+    <ion-card-header>
+      <ion-card-title>
+        {{ grupo.mes }}
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item *ngFor="let item of grupo.items; trackBy: trackByFaixa">
+        <ion-label>
+          {{ item.laticinio }}<br>
+          Média Geral: R$ {{ item.mediaPrecoDoLaticinio | number:'1.2-2' }}
+        </ion-label>
+        <ion-note slot="end">
+          R$ {{ item.precoLitro | number:'1.2-2' }}
+        </ion-note>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+</ng-container>
+
+  <!-- Agrupamento padrão (todos) -->
+  <!-- <ng-container *ngIf="agrupamentoSelecionado === 'nenhum'">
+
+    <ion-card *ngFor="let dados of dadosList; trackBy: trackByFaixa">
+      <ion-card-header>
+        <ion-card-title>{{ dados.laticinio }} - Mês {{ dados.mesReferencia }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label>Litros</ion-label>
+          <ion-note slot="end">{{ dados.producaoLitros }}</ion-note>
+        </ion-item>
+        <ion-item>
+          <ion-label>Preço/L</ion-label>
+          <ion-note slot="end">R$ {{ dados.precoLitro }}</ion-note>
+        </ion-item>
+        <ion-item>
+          <ion-label>CCS</ion-label>
+          <ion-note slot="end">{{ dados.ccs }}</ion-note>
+        </ion-item>
+        <ion-item>
+          <ion-label>CBT</ion-label>
+          <ion-note slot="end">{{ dados.cbt }}</ion-note>
+        </ion-item>
+        <ion-item>
+          <ion-label>Gordura</ion-label>
+          <ion-note slot="end">{{ dados.gordura }}%</ion-note>
+        </ion-item>
+        <ion-item>
+          <ion-label>Proteína</ion-label>
+          <ion-note slot="end">{{ dados.proteina }}%</ion-note>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </ng-container> -->
+
+</ion-content>

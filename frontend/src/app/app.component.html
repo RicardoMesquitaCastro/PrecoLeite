@@ -1,0 +1,21 @@
+<ion-app>
+  <!-- MENU LATERAL GLOBAL -->
+  <ion-menu content-id="main-content" side="end">
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Menu</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list>
+        <ion-item routerLink="/home" ionMenuToggle>Início</ion-item>
+        <ion-item routerLink="/data-parametros" ionMenuToggle>Estatísticas</ion-item>
+        <ion-item routerLink="/login" ionMenuToggle>Login</ion-item>
+
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <ion-router-outlet id="main-content"></ion-router-outlet>
+</ion-app>
