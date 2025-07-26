@@ -9,109 +9,118 @@
 
 <ion-content class="ion-padding">
 
-  <!-- Seletor de Município -->
-  <ion-item>
-    <ion-label>Município</ion-label>
-    <ion-select [(ngModel)]="municipioSelecionado" placeholder="Selecione o município" interface="popover">
-      <ion-select-option *ngFor="let m of municipiosDisponiveis" [value]="m">{{ m }}</ion-select-option>
-    </ion-select>
-  </ion-item>
+  <!-- 🔍 Filtros -->
+  <ion-card>
+    <ion-card-content>
 
-  <!-- Mostrar segment apenas após seleção de município -->
-  <ng-container *ngIf="municipioSelecionado">
-    <ion-toolbar>
-      <ion-segment [(ngModel)]="agrupamentoSelecionado">
-        <ion-segment-button value="laticinio">Por Laticínio</ion-segment-button>
-        <ion-segment-button value="mes">Por Mês</ion-segment-button>
-        <ion-segment-button value="regiao">Por Região</ion-segment-button>
+      <!-- Filtro de Município -->
+      <ion-item>
+        <ion-label position="stacked">Filtro por Município</ion-label>
+        <ion-select [(ngModel)]="municipioSelecionado" placeholder="Selecione" interface="popover">
+          <ion-select-option value="geral">Todos os Municípios</ion-select-option>
+          <ion-select-option *ngFor="let m of municipiosDisponiveis" [value]="m">{{ m }}</ion-select-option>
+        </ion-select>
+      </ion-item>
 
-      </ion-segment>
-    </ion-toolbar>
+      <!-- Segmento de agrupamento -->
+      <ng-container *ngIf="municipioSelecionado">
+        <ion-segment [(ngModel)]="agrupamentoSelecionado" class="ion-margin-top">
+          <ion-segment-button value="laticinio">
+            <ion-label>Laticínio</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="mes">
+            <ion-label>Mês</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="regiao">
+            <ion-label>Região</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </ng-container>
 
-    <!-- Agrupamento por Região -->
-    <ng-container *ngIf="agrupamentoSelecionado === 'regiao'">
-      <ion-text class="ion-padding" color="medium">
-        <h2 style="margin: 16px 0 8px;">Média de Preço por Região</h2>
-      </ion-text>
+    </ion-card-content>
+  </ion-card>
 
-      <ion-card *ngFor="let grupo of dadosPorRegiao; trackBy: trackByLaticinio">
-        <ion-card-header>
-          <ion-card-title>
-            {{ grupo.regiao }} — Média Geral: R$ {{ grupo.mediaPreco | number:'1.2-2' }}
-          </ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item *ngFor="let lat of grupo.laticinios; trackBy: trackByFaixa">
-            <ion-label>{{ lat.laticinio }}</ion-label>
-            <ion-note slot="end">R$ {{ lat.mediaPreco | number:'1.2-2' }}</ion-note>
-          </ion-item>
-        </ion-card-content>
-      </ion-card>
+  <!-- 👇 Conteúdo dinâmico baseado no agrupamento -->
 
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Gráfico Média de Preço por Região</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <canvas #graficoRegiao style="width: 100%; max-width: 600px; height: 300px;"></canvas>
-        </ion-card-content>
-      </ion-card>
-    </ng-container>
+  <!-- Por Região -->
+  <ng-container *ngIf="agrupamentoSelecionado === 'regiao'">
+    <ion-text color="medium">
+      <h2 style="margin: 16px 0 8px;">Média de Preço por Região</h2>
+    </ion-text>
 
-    <!-- Agrupamento por Laticínio com faixas -->
-    <ng-container *ngIf="agrupamentoSelecionado === 'laticinio'">
-      <ion-text class="ion-padding" color="medium">
-        <h2 style="margin: 16px 0 8px;">Média de Preço por Faixas</h2>
-      </ion-text>
+    <ion-card *ngFor="let grupo of dadosPorRegiao; trackBy: trackByLaticinio">
+      <ion-card-header>
+        <ion-card-title>
+          {{ grupo.regiao }} — Média Geral: R$ {{ grupo.mediaPreco | number:'1.2-2' }}
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item *ngFor="let lat of grupo.laticinios; trackBy: trackByFaixa">
+          <ion-label>{{ lat.laticinio }}</ion-label>
+          <ion-note slot="end">R$ {{ lat.mediaPreco | number:'1.2-2' }}</ion-note>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
 
-      <ion-card *ngFor="let grupo of dadosPorLaticinioFaixas; trackBy: trackByLaticinio">
-        <ion-card-header>
-          <ion-card-title>Laticínio: {{ grupo.laticinio }}</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item *ngFor="let faixa of grupo.faixas; trackBy: trackByFaixa">
-            <ion-label>
-              Litros: {{ faixa.faixa }} - Média Preço: R$ {{ faixa.mediaPreco | number:'1.2-2' }}
-            </ion-label>
-          </ion-item>
-        </ion-card-content>
-      </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Gráfico Média de Preço por Região</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <canvas #graficoRegiao style="width: 100%; max-width: 600px; height: 300px;"></canvas>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
 
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>COMPARATIVO INTERVALO E PREÇOS</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <canvas id="graficoLitrosPreco" style="width: 100%; max-width: 600px; height: 300px;"></canvas>
-        </ion-card-content>
-      </ion-card>
-    </ng-container>
+  <!-- Por Laticínio -->
+  <ng-container *ngIf="agrupamentoSelecionado === 'laticinio'">
+    <ion-text color="medium">
+      <h2 style="margin: 16px 0 8px;">Média de Preço por Faixas</h2>
+    </ion-text>
 
-    <!-- Agrupamento por Mês -->
-    <ng-container *ngIf="agrupamentoSelecionado === 'mes'">
-      <ion-text class="ion-padding" color="medium">
-        <h2 style="margin: 16px 0 8px;">Média de Preço por Mês</h2>
-      </ion-text>
+    <ion-card *ngFor="let grupo of dadosPorLaticinioFaixas; trackBy: trackByLaticinio">
+      <ion-card-header>
+        <ion-card-title>Laticínio: {{ grupo.laticinio }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item *ngFor="let faixa of grupo.faixas; trackBy: trackByFaixa">
+          <ion-label>
+            Litros: {{ faixa.faixa }} — Média Preço: R$ {{ faixa.mediaPreco | number:'1.2-2' }}
+          </ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
 
-      <ion-card *ngFor="let grupo of dadosPorMes; trackBy: trackByLaticinio">
-        <ion-card-header>
-          <ion-card-title>{{ grupo.mes }}</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item *ngFor="let item of grupo.items; trackBy: trackByFaixa">
-            <ion-label>
-              {{ item.laticinio }}<br>
-              Média Geral: R$ {{ item.mediaPrecoDoLaticinio | number:'1.2-2' }}
-            </ion-label>
-            <ion-note slot="end">
-              R$ {{ item.precoLitro | number:'1.2-2' }}
-            </ion-note>
-          </ion-item>
-        </ion-card-content>
-      </ion-card>
-    </ng-container>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Comparativo Intervalo e Preços</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <canvas id="graficoLitrosPreco" style="width: 100%; max-width: 600px; height: 300px;"></canvas>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
 
+  <!-- Por Mês -->
+  <ng-container *ngIf="agrupamentoSelecionado === 'mes'">
+    <ion-text color="medium">
+      <h2 style="margin: 16px 0 8px;">Média de Preço por Mês</h2>
+    </ion-text>
 
+    <ion-card *ngFor="let grupo of dadosPorMes; trackBy: trackByLaticinio">
+      <ion-card-header>
+        <ion-card-title>{{ grupo.mes }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item *ngFor="let item of grupo.items; trackBy: trackByFaixa">
+          <ion-label>
+            {{ item.laticinio }}<br>
+            Média Geral: R$ {{ item.mediaPrecoDoLaticinio | number:'1.2-2' }}
+          </ion-label>
+          <ion-note slot="end">R$ {{ item.precoLitro | number:'1.2-2' }}</ion-note>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
   </ng-container>
 
 </ion-content>
