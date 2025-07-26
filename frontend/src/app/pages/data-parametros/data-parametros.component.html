@@ -10,49 +10,54 @@
 <ion-content class="ion-padding">
 
   <!-- 🔍 Filtros -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtros</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
+<ion-card>
+  <ion-card-content>
 
-      <!-- Filtro de Município -->
-      <ion-item>
-        <ion-label position="stacked">Município</ion-label>
-        <ion-select [(ngModel)]="municipioSelecionado" placeholder="Selecione" interface="popover">
-          <ion-select-option value="geral">Todos os Municípios</ion-select-option>
-          <ion-select-option *ngFor="let m of municipiosDisponiveis" [value]="m">{{ m }}</ion-select-option>
-        </ion-select>
-      </ion-item>
+    <!-- Filtro de Município -->
+    <ion-item>
+      <ion-label position="stacked">
+        <ion-icon name="location-outline" slot="start" class="ion-margin-end"></ion-icon>
+        Filtro por Município
+      </ion-label>
+      <ion-select [(ngModel)]="municipioSelecionado" placeholder="Selecione" interface="popover">
+        <ion-select-option value="geral">Todos os Municípios</ion-select-option>
+        <ion-select-option *ngFor="let m of municipiosDisponiveis" [value]="m">
+          {{ m }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
 
-      <!-- Filtro de Mês -->
-      <ion-item class="ion-margin-top">
-        <ion-label position="stacked">Mês</ion-label>
-        <ion-select [(ngModel)]="mesReferencia" placeholder="Todos os meses" interface="popover">
-          <ion-select-option [value]="null">Todos os Meses</ion-select-option>
-          <ion-select-option *ngFor="let mes of mesesDisponiveis" [value]="mes.valor">
-            {{ mes.nome }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+    <!-- Filtro de Mês -->
+    <ion-item class="ion-margin-top">
+      <ion-label position="stacked">
+        <ion-icon name="calendar-outline" slot="start" class="ion-margin-end"></ion-icon>
+        Filtro por Mês
+      </ion-label>
+      <ion-select [(ngModel)]="mesReferencia" placeholder="Todos os Meses" interface="popover">
+        <ion-select-option [value]="null">Todos os Meses</ion-select-option>
+        <ion-select-option *ngFor="let mes of mesesDisponiveis" [value]="mes.valor">
+          {{ mes.nome }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
 
-      <!-- Segmento de agrupamento -->
-      <ng-container *ngIf="municipioSelecionado">
-        <ion-segment [(ngModel)]="agrupamentoSelecionado" class="ion-margin-top">
-          <ion-segment-button value="laticinio">
-            <ion-label>Laticínio</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="mes">
-            <ion-label>Mês</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="regiao">
-            <ion-label>Região</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-      </ng-container>
+    <!-- Segmento de agrupamento -->
+    <ng-container *ngIf="municipioSelecionado">
+      <ion-segment [(ngModel)]="agrupamentoSelecionado" class="ion-margin-top">
+        <ion-segment-button value="laticinio">
+          <ion-label>Laticínio</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="mes">
+          <ion-label>Mês</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="regiao">
+          <ion-label>Região</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ng-container>
 
-    </ion-card-content>
-  </ion-card>
+  </ion-card-content>
+</ion-card>
 
   <!-- Por Região -->
   <ng-container *ngIf="agrupamentoSelecionado === 'regiao'">
@@ -74,14 +79,22 @@
       </ion-card-content>
     </ion-card>
 
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Gráfico Média de Preço por Região</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <canvas #graficoRegiao style="width: 100%; max-width: 600px; height: 300px;"></canvas>
-      </ion-card-content>
-    </ion-card>
+   <ion-card>
+  <ion-card-header>
+    <ion-card-title>
+      Gráfico por Região
+      <span *ngIf="municipioSelecionado && municipioSelecionado !== 'geral'">
+        — {{ municipioSelecionado }}
+      </span>
+      <span *ngIf="mesReferencia">
+        ({{ obterNomeMes(mesReferencia) }})
+      </span>
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <canvas #graficoRegiao style="width: 100%; max-width: 600px; height: 300px;"></canvas>
+  </ion-card-content>
+</ion-card>
   </ng-container>
 
   <!-- Por Laticínio -->

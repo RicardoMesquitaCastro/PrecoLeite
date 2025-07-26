@@ -20,6 +20,7 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
 
   municipioSelecionado: string | null = "geral";
 municipiosDisponiveis: string[] = [];
+mesSelecionado: string = 'geral';
 
   laticinio: string = '';
   mesReferencia: number | null = null;
@@ -49,7 +50,7 @@ mesesDisponiveis = [
 
   dadosList = [
   // JL
-  { laticinio: 'JL', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 5, producaoLitros: 90, precoLitro: 4.8, ccs: 6, cbt: 4, gordura: 3.9, proteina: 3.3 },
+  { laticinio: 'JL', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 1, producaoLitros: 90, precoLitro: 4.8, ccs: 6, cbt: 4, gordura: 3.9, proteina: 3.3 },
   { laticinio: 'JL', regiao: 'Taquaral', municipio: 'Pires', mesReferencia: 6, producaoLitros: 160, precoLitro: 4.9, ccs: 5, cbt: 5, gordura: 4.1, proteina: 3.4 },
   { laticinio: 'JL', regiao: 'Apamac', municipio: 'Silvania', mesReferencia: 7, producaoLitros: 220, precoLitro: 5.0, ccs: 4, cbt: 4, gordura: 4.0, proteina: 3.6 },
   { laticinio: 'JL', regiao: 'teste', municipio: 'Orizona', mesReferencia: 8, producaoLitros: 300, precoLitro: 4.7, ccs: 6, cbt: 6, gordura: 3.8, proteina: 3.2 },
@@ -106,51 +107,80 @@ get dadosListFiltrados() {
     }
   }
 
-  montarGraficoRegiao() {
-    const labels = this.dadosPorRegiao.map(g => g.regiao);
-    const data = this.dadosPorRegiao.map(g => g.mediaPreco);
+montarGraficoRegiao() {
+  // 🔁 Filtra por município e mês
+  const dadosFiltrados = this.dadosList.filter(d =>
+  (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
+  (this.mesSelecionado === 'geral' || d.mesReferencia === Number(this.mesSelecionado))
+);
 
-    const backgroundColors = [
-      'rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)',
-      'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)',
-      'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)'
-    ];
-    const borderColors = backgroundColors.map(c => c.replace('0.6', '1'));
+  // Agrupa por região com base nos dados filtrados
+  const dadosAgrupados = this.agruparPorRegiao(dadosFiltrados);
 
-    if (this.graficoRegiao) this.graficoRegiao.destroy();
+  const labels = dadosAgrupados.map(g => g.regiao);
+  const data = dadosAgrupados.map(g => g.mediaPreco);
 
-    this.graficoRegiao = new Chart(this.graficoRegiaoRef.nativeElement, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Média de Preço por Região (R$)',
-          data,
-          backgroundColor: backgroundColors.slice(0, data.length),
-          borderColor: borderColors.slice(0, data.length),
-          borderWidth: 1
-        }]
+  const backgroundColors = [
+    'rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)',
+    'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)',
+    'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)'
+  ];
+  const borderColors = backgroundColors.map(c => c.replace('0.6', '1'));
+
+  if (this.graficoRegiao) this.graficoRegiao.destroy();
+
+  this.graficoRegiao = new Chart(this.graficoRegiaoRef.nativeElement, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Média de Preço por Região (R$)',
+        data,
+        backgroundColor: backgroundColors.slice(0, data.length),
+        borderColor: borderColors.slice(0, data.length),
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false }
+      scales: {
+        y: {
+          beginAtZero: false,
+          min: 1.5,
+          ticks: {
+            stepSize: 0.1,
+            precision: 2,
+            callback: value => typeof value === 'number' ? value.toFixed(2) : value
+          }
         },
-        scales: {
-          y: {
-            beginAtZero: false,
-            min: 1.5,
-            ticks: {
-              stepSize: 0.1,
-              precision: 2,
-              callback: value => typeof value === 'number' ? value.toFixed(2) : value
-            }
-          },
-          x: { ticks: { autoSkip: false } }
-        }
+        x: { ticks: { autoSkip: false } }
       }
-    });
+    }
+  });
+}
+
+agruparPorRegiao(dados: any[]): any[] {
+  const mapa = new Map<string, { regiao: string, laticinios: any[], mediaPreco: number }>();
+
+  for (const item of dados) {
+    if (!mapa.has(item.regiao)) {
+      mapa.set(item.regiao, { regiao: item.regiao, laticinios: [], mediaPreco: 0 });
+    }
+    const grupo = mapa.get(item.regiao)!;
+    grupo.laticinios.push(item);
   }
+
+  // Calcula média de preço por grupo
+  for (const grupo of mapa.values()) {
+    const soma = grupo.laticinios.reduce((acc, cur) => acc + cur.precoLitro, 0);
+    grupo.mediaPreco = grupo.laticinios.length > 0 ? soma / grupo.laticinios.length : 0;
+  }
+
+  return Array.from(mapa.values());
+}
 
   criarGrafico() {
     const cores = ['#FF7400', '#E00809', '#0B5A68', '#0078BD', '#9966FF', '#FF9F40'];
