@@ -8,7 +8,7 @@ import { RegistroService } from 'src/app/services/registro.service';
 @Component({
   selector: 'app-cadastro-propriedade',
   templateUrl: './cadastro-propriedade.component.html',
-  imports: [IonicModule, FormsModule],
+  imports: [IonicModule, FormsModule,],
   styleUrls: ['./cadastro-propriedade.component.scss'],
 })
 export class CadastroPropriedadeComponent {
@@ -20,7 +20,7 @@ export class CadastroPropriedadeComponent {
   constructor(
    // private auth: AuthService,sss
     private router: Router,
-   // private registroService: RegistroService // ✅ injetar
+    private registroService: RegistroService // ✅ injetar
   ) {}
 
   cadastrarPropriedade() {
