@@ -29,32 +29,32 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked {
 
   dadosList = [
   // JL
-  { laticinio: 'JL', regiao: 'Buritizinho', mesReferencia: 5, producaoLitros: 90, precoLitro: 4.8, ccs: 6, cbt: 4, gordura: 3.9, proteina: 3.3 },
-  { laticinio: 'JL', regiao: 'Taquaral', mesReferencia: 6, producaoLitros: 160, precoLitro: 4.9, ccs: 5, cbt: 5, gordura: 4.1, proteina: 3.4 },
-  { laticinio: 'JL', regiao: 'Apamac', mesReferencia: 7, producaoLitros: 220, precoLitro: 5.0, ccs: 4, cbt: 4, gordura: 4.0, proteina: 3.6 },
-  { laticinio: 'JL', regiao: 'teste', mesReferencia: 8, producaoLitros: 300, precoLitro: 4.7, ccs: 6, cbt: 6, gordura: 3.8, proteina: 3.2 },
-  { laticinio: 'JL', regiao: 'Firmeza', mesReferencia: 9, producaoLitros: 410, precoLitro: 4.9, ccs: 5, cbt: 5, gordura: 4.2, proteina: 3.7 },
+  { laticinio: 'JL', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 5, producaoLitros: 90, precoLitro: 4.8, ccs: 6, cbt: 4, gordura: 3.9, proteina: 3.3 },
+  { laticinio: 'JL', regiao: 'Taquaral', municipio: 'Orizona', mesReferencia: 6, producaoLitros: 160, precoLitro: 4.9, ccs: 5, cbt: 5, gordura: 4.1, proteina: 3.4 },
+  { laticinio: 'JL', regiao: 'Apamac', municipio: 'Orizona', mesReferencia: 7, producaoLitros: 220, precoLitro: 5.0, ccs: 4, cbt: 4, gordura: 4.0, proteina: 3.6 },
+  { laticinio: 'JL', regiao: 'teste', municipio: 'Orizona', mesReferencia: 8, producaoLitros: 300, precoLitro: 4.7, ccs: 6, cbt: 6, gordura: 3.8, proteina: 3.2 },
+  { laticinio: 'JL', regiao: 'Firmeza', municipio: 'Orizona', mesReferencia: 9, producaoLitros: 410, precoLitro: 4.9, ccs: 5, cbt: 5, gordura: 4.2, proteina: 3.7 },
 
   // Mega Leite
-  { laticinio: 'Piracanjuba', regiao: 'Taquaral', mesReferencia: 5, producaoLitros: 120, precoLitro: 5.1, ccs: 3, cbt: 4, gordura: 4.0, proteina: 3.5 },
-  { laticinio: 'Piracanjuba', regiao: 'Buritizinho', mesReferencia: 6, producaoLitros: 250, precoLitro: 5.3, ccs: 2, cbt: 3, gordura: 4.3, proteina: 3.6 },
-  { laticinio: 'Piracanjuba', regiao: 'Apamac', mesReferencia: 7, producaoLitros: 320, precoLitro: 5.0, ccs: 4, cbt: 3, gordura: 4.1, proteina: 3.7 },
-  { laticinio: 'Piracanjuba', regiao: 'Firmeza', mesReferencia: 8, producaoLitros: 410, precoLitro: 5.2, ccs: 3, cbt: 3, gordura: 4.4, proteina: 3.8 },
-  { laticinio: 'Piracanjuba', regiao: 'Firmeza', mesReferencia: 9, producaoLitros: 500, precoLitro: 5.4, ccs: 2, cbt: 2, gordura: 4.6, proteina: 3.9 },
+  { laticinio: 'Piracanjuba', regiao: 'Taquaral', municipio: 'Orizona', mesReferencia: 5, producaoLitros: 120, precoLitro: 5.1, ccs: 3, cbt: 4, gordura: 4.0, proteina: 3.5 },
+  { laticinio: 'Piracanjuba', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 6, producaoLitros: 250, precoLitro: 5.3, ccs: 2, cbt: 3, gordura: 4.3, proteina: 3.6 },
+  { laticinio: 'Piracanjuba', regiao: 'Apamac', municipio: 'Orizona', mesReferencia: 7, producaoLitros: 320, precoLitro: 5.0, ccs: 4, cbt: 3, gordura: 4.1, proteina: 3.7 },
+  { laticinio: 'Piracanjuba', regiao: 'Firmeza', municipio: 'Orizona', mesReferencia: 8, producaoLitros: 410, precoLitro: 5.2, ccs: 3, cbt: 3, gordura: 4.4, proteina: 3.8 },
+  { laticinio: 'Piracanjuba', regiao: 'Firmeza', municipio: 'Orizona', mesReferencia: 9, producaoLitros: 500, precoLitro: 5.4, ccs: 2, cbt: 2, gordura: 4.6, proteina: 3.9 },
 
   // Nova Fazenda
-  { laticinio: 'CCPR', regiao: 'Taquaral', mesReferencia: 5, producaoLitros: 80, precoLitro: 4.5, ccs: 5, cbt: 5, gordura: 3.7, proteina: 3.1 },
-  { laticinio: 'CCPR', regiao: 'Buritizinho', mesReferencia: 6, producaoLitros: 140, precoLitro: 4.6, ccs: 6, cbt: 4, gordura: 3.8, proteina: 3.2 },
-  { laticinio: 'CCPR', regiao: 'Firmeza', mesReferencia: 7, producaoLitros: 210, precoLitro: 4.8, ccs: 5, cbt: 5, gordura: 4.0, proteina: 3.4 },
-  { laticinio: 'CCPR', regiao: 'Buritizinho', mesReferencia: 8, producaoLitros: 290, precoLitro: 4.9, ccs: 6, cbt: 6, gordura: 4.1, proteina: 3.5 },
-  { laticinio: 'CCPR', regiao: 'Apamac', mesReferencia: 9, producaoLitros: 380, precoLitro: 5.0, ccs: 5, cbt: 5, gordura: 4.3, proteina: 3.7 },
+  { laticinio: 'CCPR', regiao: 'Taquaral', municipio: 'Orizona', mesReferencia: 5, producaoLitros: 80, precoLitro: 4.5, ccs: 5, cbt: 5, gordura: 3.7, proteina: 3.1 },
+  { laticinio: 'CCPR', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 6, producaoLitros: 140, precoLitro: 4.6, ccs: 6, cbt: 4, gordura: 3.8, proteina: 3.2 },
+  { laticinio: 'CCPR', regiao: 'Firmeza', municipio: 'Orizona', mesReferencia: 7, producaoLitros: 210, precoLitro: 4.8, ccs: 5, cbt: 5, gordura: 4.0, proteina: 3.4 },
+  { laticinio: 'CCPR', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 8, producaoLitros: 290, precoLitro: 4.9, ccs: 6, cbt: 6, gordura: 4.1, proteina: 3.5 },
+  { laticinio: 'CCPR', regiao: 'Apamac', municipio: 'Orizona', mesReferencia: 9, producaoLitros: 380, precoLitro: 5.0, ccs: 5, cbt: 5, gordura: 4.3, proteina: 3.7 },
 
   // Leite Bom
-  { laticinio: 'ITALAC', regiao: 'Taquaral', mesReferencia: 5, producaoLitros: 150, precoLitro: 5.5, ccs: 3, cbt: 3, gordura: 4.4, proteina: 3.8 },
-  { laticinio: 'ITALAC', regiao: 'Taquaral', mesReferencia: 6, producaoLitros: 270, precoLitro: 5.6, ccs: 4, cbt: 3, gordura: 4.5, proteina: 3.9 },
-  { laticinio: 'ITALAC', regiao: 'Buritizinho', mesReferencia: 7, producaoLitros: 350, precoLitro: 5.7, ccs: 3, cbt: 2, gordura: 4.6, proteina: 4.0 },
-  { laticinio: 'ITALAC', regiao: 'Buritizinho', mesReferencia: 8, producaoLitros: 430, precoLitro: 5.8, ccs: 2, cbt: 3, gordura: 4.7, proteina: 4.1 },
-  { laticinio: 'ITALAC', regiao: 'Apamac', mesReferencia: 9, producaoLitros: 520, precoLitro: 5.9, ccs: 2, cbt: 2, gordura: 4.8, proteina: 4.2 },
+  { laticinio: 'ITALAC', regiao: 'Taquaral', municipio: 'Orizona', mesReferencia: 5, producaoLitros: 150, precoLitro: 5.5, ccs: 3, cbt: 3, gordura: 4.4, proteina: 3.8 },
+  { laticinio: 'ITALAC', regiao: 'Taquaral', municipio: 'Orizona', mesReferencia: 6, producaoLitros: 270, precoLitro: 5.6, ccs: 4, cbt: 3, gordura: 4.5, proteina: 3.9 },
+  { laticinio: 'ITALAC', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 7, producaoLitros: 350, precoLitro: 5.7, ccs: 3, cbt: 2, gordura: 4.6, proteina: 4.0 },
+  { laticinio: 'ITALAC', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 8, producaoLitros: 430, precoLitro: 5.8, ccs: 2, cbt: 3, gordura: 4.7, proteina: 4.1 },
+  { laticinio: 'ITALAC', regiao: 'Apamac', municipio: 'Orizona', mesReferencia: 9, producaoLitros: 520, precoLitro: 5.9, ccs: 2, cbt: 2, gordura: 4.8, proteina: 4.2 },
 ];
 
   ngAfterViewInit() {
