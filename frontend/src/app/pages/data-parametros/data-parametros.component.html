@@ -11,14 +11,28 @@
 
   <!-- 🔍 Filtros -->
   <ion-card>
+    <ion-card-header>
+      <ion-card-title>Filtros</ion-card-title>
+    </ion-card-header>
     <ion-card-content>
 
       <!-- Filtro de Município -->
       <ion-item>
-        <ion-label position="stacked">Filtro por Município</ion-label>
+        <ion-label position="stacked">Município</ion-label>
         <ion-select [(ngModel)]="municipioSelecionado" placeholder="Selecione" interface="popover">
           <ion-select-option value="geral">Todos os Municípios</ion-select-option>
           <ion-select-option *ngFor="let m of municipiosDisponiveis" [value]="m">{{ m }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Filtro de Mês -->
+      <ion-item class="ion-margin-top">
+        <ion-label position="stacked">Mês</ion-label>
+        <ion-select [(ngModel)]="mesReferencia" placeholder="Todos os meses" interface="popover">
+          <ion-select-option [value]="null">Todos os Meses</ion-select-option>
+          <ion-select-option *ngFor="let mes of mesesDisponiveis" [value]="mes.valor">
+            {{ mes.nome }}
+          </ion-select-option>
         </ion-select>
       </ion-item>
 
@@ -39,8 +53,6 @@
 
     </ion-card-content>
   </ion-card>
-
-  <!-- 👇 Conteúdo dinâmico baseado no agrupamento -->
 
   <!-- Por Região -->
   <ng-container *ngIf="agrupamentoSelecionado === 'regiao'">

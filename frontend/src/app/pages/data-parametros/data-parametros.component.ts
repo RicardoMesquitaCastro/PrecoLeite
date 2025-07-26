@@ -30,6 +30,23 @@ municipiosDisponiveis: string[] = [];
   gordura: number | null = null;
   proteina: number | null = null;
 
+
+
+mesesDisponiveis = [
+  { nome: 'Janeiro', valor: 1 },
+  { nome: 'Fevereiro', valor: 2 },
+  { nome: 'Março', valor: 3 },
+  { nome: 'Abril', valor: 4 },
+  { nome: 'Maio', valor: 5 },
+  { nome: 'Junho', valor: 6 },
+  { nome: 'Julho', valor: 7 },
+  { nome: 'Agosto', valor: 8 },
+  { nome: 'Setembro', valor: 9 },
+  { nome: 'Outubro', valor: 10 },
+  { nome: 'Novembro', valor: 11 },
+  { nome: 'Dezembro', valor: 12 },
+];
+
   dadosList = [
   // JL
   { laticinio: 'JL', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 5, producaoLitros: 90, precoLitro: 4.8, ccs: 6, cbt: 4, gordura: 3.9, proteina: 3.3 },
@@ -48,7 +65,7 @@ municipiosDisponiveis: string[] = [];
   // Nova Fazenda
   { laticinio: 'CCPR', regiao: 'Taquaral', municipio: 'Orizona', mesReferencia: 5, producaoLitros: 80, precoLitro: 4.5, ccs: 5, cbt: 5, gordura: 3.7, proteina: 3.1 },
   { laticinio: 'CCPR', regiao: 'Buritizinho', municipio: 'Silvania', mesReferencia: 6, producaoLitros: 140, precoLitro: 4.6, ccs: 6, cbt: 4, gordura: 3.8, proteina: 3.2 },
-  { laticinio: 'CCPR', regiao: 'Firmeza', municipio: 'Orizona', mesReferencia: 7, producaoLitros: 210, precoLitro: 4.8, ccs: 5, cbt: 5, gordura: 4.0, proteina: 3.4 },
+  { laticinio: 'CCPR', regiao: 'Firmeza', municipio: 'Orizona', mesReferencia: 10, producaoLitros: 210, precoLitro: 4.8, ccs: 5, cbt: 5, gordura: 4.0, proteina: 3.4 },
   { laticinio: 'CCPR', regiao: 'Buritizinho', municipio: 'Pires', mesReferencia: 8, producaoLitros: 290, precoLitro: 4.9, ccs: 6, cbt: 6, gordura: 4.1, proteina: 3.5 },
   { laticinio: 'CCPR', regiao: 'Apamac', municipio: 'Orizona', mesReferencia: 9, producaoLitros: 380, precoLitro: 5.0, ccs: 5, cbt: 5, gordura: 4.3, proteina: 3.7 },
 
@@ -74,11 +91,11 @@ ngOnInit() {
     this.tentarMontarGrafico();
   }
 
- get dadosListFiltrados() {
-  if (!this.municipioSelecionado || this.municipioSelecionado === 'geral') {
-    return this.dadosList;
-  }
-  return this.dadosList.filter(d => d.municipio === this.municipioSelecionado);
+get dadosListFiltrados() {
+  return this.dadosList.filter(d =>
+    (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
+    (this.mesReferencia === null || d.mesReferencia === this.mesReferencia)
+  );
 }
 
   tentarMontarGrafico() {
@@ -264,6 +281,8 @@ ngOnInit() {
   const grupos: Record<string, any[]> = {};
 
   for (const item of this.dadosListFiltrados) {
+    if (this.mesReferencia !== null && item.mesReferencia !== this.mesReferencia) continue;
+
     if (!grupos[item.regiao]) {
       grupos[item.regiao] = [];
     }
