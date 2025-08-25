@@ -95,7 +95,7 @@ ngOnInit() {
 get dadosListFiltrados() {
   return this.dadosList.filter(d =>
     (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
-    (this.mesReferencia === null || d.mesReferencia === this.mesReferencia)
+    (this.mesReferencia === null || d.mesReferencia === this.mesReferencia) //
   );
 }
 
