@@ -1,0 +1,34 @@
+.faixa-container {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* espaço entre os inputs e o separador */
+  margin-bottom: 10px;
+}
+
+.faixa-input {
+
+  height: 30px;           /* altura menor */
+  border: 1px solid var(--ion-color-medium);
+  border-radius: 6px;     /* levemente menor que o original */
+  padding: 4px 8px;       /* padding mais compacto */
+  background: var(--ion-color-light);
+  color: var(--ion-color-dark);
+  font-size: 12px;        /* fonte menor */
+  text-align: center;     /* centraliza os números */
+}
+
+.faixa-separador {
+  font-weight: bold;
+  font-size: 16px;        /* levemente menor */
+  color: var(--ion-color-medium);
+}
+
+.faixa-input.invalido {
+  border-color: red;
+}
+
+.faixa-aviso {
+  color: red;
+  font-size: 12px;
+  margin-top: 2px;
+}

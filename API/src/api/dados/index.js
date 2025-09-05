@@ -3,7 +3,7 @@ import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { create, index, show, update, destroy } from './controller'
 import { schema } from './model'
-export Dados, { schema } from './model'
+//export Dados, { schema } from './model'
 
 const router = new Router()
 const { propriedade, municipio, regiao } = schema.tree
