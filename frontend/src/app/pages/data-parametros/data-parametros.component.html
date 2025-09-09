@@ -100,17 +100,17 @@
 </ion-card>
 
   <!-- Por Região -->
-  <ng-container *ngIf="agrupamentoSelecionado === 'regiao'">
-    <ion-text color="medium">
-      <h2 style="margin: 16px 0 8px;">Média de Preço por Região</h2>
-    </ion-text>
+<ng-container *ngIf="agrupamentoSelecionado === 'regiao'">
+  <ion-text color="medium">
+    <h2 style="margin: 16px 0 8px;">Média de Preço por Região</h2>
+  </ion-text>
 
+  <!-- Verifica se há seleção válida -->
+  <ng-container *ngIf="municipioSelecionado && municipioSelecionado.toLowerCase() !== 'geral'; else mensagemSelecao">
+    <!-- Cards de dados por região -->
     <ion-card *ngFor="let grupo of dadosPorRegiao; trackBy: trackByLaticinio">
       <ion-card-header>
-        <ion-card-title>
-          {{municipioSelecionado}}
-          {{ grupo.regiao }}
-        </ion-card-title>
+        <ion-card-title>{{ grupo.regiao }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-item *ngFor="let lat of grupo.laticinios; trackBy: trackByFaixa">
@@ -120,23 +120,34 @@
       </ion-card-content>
     </ion-card>
 
-   <ion-card>
-  <ion-card-header>
-    <ion-card-title>
-      Gráfico por Região
-      <span *ngIf="municipioSelecionado && municipioSelecionado !== 'geral'">
-        — {{ municipioSelecionado }}
-      </span>
-      <span *ngIf="mesReferencia">
-        ({{ obterNomeMes(mesReferencia) }})
-      </span>
-    </ion-card-title>
-  </ion-card-header>
-  <ion-card-content>
-    <canvas #graficoRegiao style="width: 100%; max-width: 600px; height: 300px;"></canvas>
-  </ion-card-content>
-</ion-card>
+    <!-- Card do gráfico -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          Gráfico por Região
+          <span *ngIf="mesReferencia">
+            ({{ obterNomeMes(mesReferencia) }})
+          </span>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <canvas #graficoRegiao style="width: 100%; max-width: 600px; height: 300px;"></canvas>
+      </ion-card-content>
+    </ion-card>
   </ng-container>
+
+  <!-- Mensagem quando não há seleção -->
+  <ng-template #mensagemSelecao>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Selecione a região</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        Nenhum dado disponível até que uma região seja selecionada.
+      </ion-card-content>
+    </ion-card>
+  </ng-template>
+</ng-container>
 
   <!-- Por Laticínio -->
 <ng-container *ngIf="agrupamentoSelecionado === 'laticinio'">
@@ -144,6 +155,9 @@
     <!-- Aqui vão os cards e gráfico normalmente -->
     <ion-text color="medium">
       <h2 style="margin: 16px 0 8px;">Média de Preço por Faixas</h2>
+      <h2 *ngIf="tituloGraficoFiltrado" style="margin: 16px 0 8px;">
+  {{ tituloGraficoFiltrado }}
+</h2>
     </ion-text>
 
    <ion-card *ngFor="let grupo of dadosPorLaticinioFaixas; trackBy: trackByLaticinio">
@@ -161,7 +175,7 @@
 
     <ion-card>
       <ion-card-header>
-        <ion-card-title>Comparativo Intervalo e Preços</ion-card-title>
+       <ion-card-title>{{ tituloGrafico }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <canvas id="graficoLitrosPreco" style="width: 100%; max-width: 600px; height: 300px;"></canvas>

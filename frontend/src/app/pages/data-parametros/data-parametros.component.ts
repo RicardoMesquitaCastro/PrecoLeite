@@ -21,6 +21,7 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
    grafico: Chart | null = null;
   graficoIniciado = false;
   agrupamentoSelecionado: string = 'laticinio';
+  tituloGrafico: string = 'Comparativo Intervalos e Preços';
   regiaoSelecionada: string | null = null;
 
   municipioSelecionado: string | null = "geral";
@@ -112,14 +113,26 @@ get dadosListFiltrados() {
     }
   }
 
+  atualizarTitulo() {
+  if (this.faixaMin !== null && this.faixaMax !== null) {
+  this.tituloGrafico = `Comparativo ${this.faixaMin}-${this.faixaMax} Litros`;
+} else {
+  this.tituloGrafico = 'Comparativo Intervalo de Litros';
+}
+
+if (this.municipioSelecionado ) {
+  this.tituloGrafico += ` - Município: ${this.municipioSelecionado}`;
+}
+}
+
 montarGraficoRegiao() {
   // 🔁 Filtra por município e mês
   const dadosFiltrados = this.dadosList.filter(d =>
-  (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
-  (this.mesSelecionado === 'geral' || d.mesReferencia === Number(this.mesSelecionado))
-);
+    (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
+    (this.mesReferencia === null || d.mesReferencia === Number(this.mesReferencia))
+  );
 
-  // Agrupa por região com base nos dados filtrados
+  // Agrupa por região (média correta)
   const dadosAgrupados = this.agruparPorRegiao(dadosFiltrados);
 
   const labels = dadosAgrupados.map(g => g.regiao);
@@ -139,7 +152,7 @@ montarGraficoRegiao() {
     data: {
       labels,
       datasets: [{
-        label: 'Média de Preço por Região (R$)',
+        label: `Média de Preço por Região  ${this.municipioSelecionado} (R$)`,
         data,
         backgroundColor: backgroundColors.slice(0, data.length),
         borderColor: borderColors.slice(0, data.length),
@@ -149,7 +162,7 @@ montarGraficoRegiao() {
     options: {
       responsive: true,
       plugins: {
-        legend: { display: false }
+        legend: { display: true, position: 'top' }
       },
       scales: {
         y: {
@@ -158,7 +171,8 @@ montarGraficoRegiao() {
           ticks: {
             stepSize: 0.1,
             precision: 2,
-            callback: value => typeof value === 'number' ? value.toFixed(2) : value
+            callback: value =>
+              typeof value === 'number' ? value.toFixed(2) : value
           }
         },
         x: { ticks: { autoSkip: false } }
@@ -169,98 +183,120 @@ montarGraficoRegiao() {
 
 atualizarFiltros() {
   this.criarGrafico(); // chama sua função que refaz o gráfico
+   this.montarGraficoRegiao();
 }
 
-agruparPorRegiao(dados: any[]): any[] {
-  const mapa = new Map<string, { regiao: string, laticinios: any[], mediaPreco: number }>();
+private agruparPorRegiao(dados: any[]) {
+  const grupos: Record<string, { soma: number, qtd: number }> = {};
 
-  for (const item of dados) {
-    if (!mapa.has(item.regiao)) {
-      mapa.set(item.regiao, { regiao: item.regiao, laticinios: [], mediaPreco: 0 });
+  // 1. Agrupa por região + laticínio
+  const porLaticinio: Record<string, { soma: number, qtd: number }> = {};
+
+  for (const d of dados) {
+    const chave = `${d.regiao}-${d.laticinio}`;
+    if (!porLaticinio[chave]) {
+      porLaticinio[chave] = { soma: 0, qtd: 0 };
     }
-    const grupo = mapa.get(item.regiao)!;
-    grupo.laticinios.push(item);
+    porLaticinio[chave].soma += d.precoLitro;
+    porLaticinio[chave].qtd++;
   }
 
-  // Calcula média de preço por grupo
-  for (const grupo of mapa.values()) {
-    const soma = grupo.laticinios.reduce((acc, cur) => acc + cur.precoLitro, 0);
-    grupo.mediaPreco = grupo.laticinios.length > 0 ? soma / grupo.laticinios.length : 0;
+  // 2. Calcula a média de cada laticínio e agrupa por região
+  for (const chave in porLaticinio) {
+    const [regiao] = chave.split('-');
+    const mediaLaticinio = porLaticinio[chave].soma / porLaticinio[chave].qtd;
+
+    if (!grupos[regiao]) {
+      grupos[regiao] = { soma: 0, qtd: 0 };
+    }
+    grupos[regiao].soma += mediaLaticinio;
+    grupos[regiao].qtd++;
   }
 
-  return Array.from(mapa.values());
+  // 3. Calcula a média final por região
+  return Object.entries(grupos).map(([regiao, { soma, qtd }]) => ({
+    regiao,
+    mediaPreco: qtd > 0 ? soma / qtd : 0
+  }));
 }
 
-  criarGrafico() {
+ criarGrafico() {
   const cores = ['#FF7400', '#E00809', '#0B5A68', '#0078BD', '#9966FF', '#FF9F40'];
 
-  // ✅ Aplica os filtros antes de agrupar
+  // 1️⃣ Filtra os dados
   let dados = this.dadosListFiltrados;
 
-  // Filtro por município
   if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
     dados = dados.filter(d => d.municipio === this.municipioSelecionado);
   }
 
-  // Filtro por mês
   if (this.mesReferencia !== null) {
     dados = dados.filter(d => d.mesReferencia === this.mesReferencia);
   }
 
-  // Filtro por faixa digitada
- if (this.faixaMin !== null && this.faixaMax !== null) {
-  dados = dados.filter(d =>
-    d.producaoLitros >= this.faixaMin! && d.producaoLitros <= this.faixaMax!
-  );
-}
+  // 2️⃣ Faixas
+  const usarFaixaCustom = this.faixaMin !== null && this.faixaMax !== null;
+  const faixas = usarFaixaCustom
+    ? [{ label: `${this.faixaMin}-${this.faixaMax} L`, min: this.faixaMin!, max: this.faixaMax! }]
+    : [
+        { label: '0 - 100 L', min: 0, max: 100 },
+        { label: '100 - 200 L', min: 100, max: 200 },
+        { label: '200 - 400 L', min: 200, max: 400 },
+        { label: '400 - 800 L', min: 400, max: 800 }
+      ];
 
-  // Agrupamento por laticínio + faixa
-  const grupos: Record<string, Record<string, { precoTotal: number; count: number }>> = {};
+  // 3️⃣ Laticínios
+  const laticinios = Array.from(new Set(dados.map(d => d.laticinio)));
 
-  dados.forEach(item => {
-    const faixa = this.getFaixaLitros(item.producaoLitros || 0); // ainda usa função padrão
-    if (!grupos[item.laticinio]) grupos[item.laticinio] = {};
-    if (!grupos[item.laticinio][faixa]) grupos[item.laticinio][faixa] = { precoTotal: 0, count: 0 };
+  // 4️⃣ Calcula média por laticínio e faixa
+  const mediaFaixaPorLaticinio = (items: any[], laticinio: string, min: number, max: number): number => {
+    const filtrados = items.filter(
+      i => i.laticinio === laticinio && i.producaoLitros >= min && i.producaoLitros <= max
+    );
+    if (filtrados.length === 0) return 0;
+    const soma = filtrados.reduce((acc, curr) => acc + curr.precoLitro, 0);
+    return soma / filtrados.length;
+  };
 
-    grupos[item.laticinio][faixa].precoTotal += item.precoLitro;
-    grupos[item.laticinio][faixa].count++;
-  });
+  // 5️⃣ Monta datasets
+  const datasets = laticinios.map((lat, i) => ({
+    label: lat,
+    data: faixas.map(f => mediaFaixaPorLaticinio(dados, lat, f.min, f.max)),
+    backgroundColor: cores[i % cores.length],
+    borderWidth: 1
+  }));
 
-  // Descobre todas as faixas
-  const todasFaixas = Array.from(
-    new Set(dados.map(item => this.getFaixaLitros(item.producaoLitros || 0)))
-  ).sort((a, b) => {
-    const minA = a === '401+' ? 401 : Number(a.split('-')[0]);
-    const minB = b === '401+' ? 401 : Number(b.split('-')[0]);
-    return minA - minB;
-  });
+  // 6️⃣ Monta título dinâmico com faixa, município e mês
+  let titulo = usarFaixaCustom
+    ? `Comparativo ${this.faixaMin}-${this.faixaMax} Litros`
+    : ' Gráfico Comparativo ';
 
-  // Monta os datasets
-  const datasets = Object.keys(grupos).map((laticinio, i) => {
-    const data = todasFaixas.map(faixa => {
-      const g = grupos[laticinio][faixa];
-      return g ? g.precoTotal / g.count : 0;
-    });
+  if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
+    titulo += ` - Município: ${this.municipioSelecionado}`;
+  }
 
-    return {
-      label: laticinio,
-      data,
-      backgroundColor: cores[i % cores.length],
-      borderWidth: 1
-    };
-  });
+  if (this.mesReferencia !== null) {
+    const mesNome = this.mesesDisponiveis.find(m => m.valor === this.mesReferencia)?.nome;
+    if (mesNome) {
+      titulo += ` - Mês: ${mesNome}`;
+    }
+  }
 
+
+  this.tituloGrafico = titulo;
+
+  // 7️⃣ Renderiza gráfico
   const ctx = (document.getElementById('graficoLitrosPreco') as HTMLCanvasElement)?.getContext('2d');
   if (!ctx) return;
 
-  // Evita criar múltiplos gráficos em cima do mesmo canvas
-  if (this.grafico) {
-    this.grafico.destroy();
-  }
+  if (this.grafico) this.grafico.destroy();
 
   this.grafico = new Chart(ctx, {
     type: 'bar',
-    data: { labels: todasFaixas, datasets },
+    data: {
+      labels: faixas.map(f => f.label),
+      datasets
+    },
     options: {
       indexAxis: 'x',
       responsive: true,
@@ -273,11 +309,33 @@ agruparPorRegiao(dados: any[]): any[] {
         legend: { position: 'top' }
       },
       scales: {
-        x: { title: { display: true, text: 'Preço Médio (R$)' }, beginAtZero: true },
-        y: { title: { display: true, text: 'Faixa de Litros' } }
+        x: { title: { display: true, text: 'Faixa de Litros' }, beginAtZero: true },
+        y: { title: { display: true, text: 'Preço Médio (R$)' } }
       }
     }
   });
+}
+
+get tituloGraficoFiltrado(): string | null {
+  const partes: string[] = [];
+
+  if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
+    partes.push(`Município: ${this.municipioSelecionado}`);
+  }
+
+  if (this.mesReferencia !== null) {
+    const mesNome = this.mesesDisponiveis.find(m => m.valor === this.mesReferencia)?.nome;
+    if (mesNome) partes.push(`Mês: ${mesNome}`);
+  }
+
+  if (this.faixaMin !== null && this.faixaMax !== null) {
+    partes.push(`Faixa: ${this.faixaMin}-${this.faixaMax} L`);
+  }
+
+  if (partes.length === 0) return null;
+
+  // Retorna apenas os filtros ativos, sem “Gráfico Comparativo”
+  return partes.join(' - ');
 }
 
   getFaixaLitros(producaoLitros: number): string {
