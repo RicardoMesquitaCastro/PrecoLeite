@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
 import { FaixaValidaPipe } from './faixa-valida.pipe';
+import  {list}  from './dados';
+import { DadoLeite } from './dado-leite.model';
 
 Chart.register(...registerables);
 
@@ -23,9 +25,9 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
   agrupamentoSelecionado: string = 'laticinio';
   tituloGrafico: string = 'Comparativo Intervalos e Preços';
   regiaoSelecionada: string | null = null;
-
+  dadosList: DadoLeite[] = []; // já tipado corretamente
   municipioSelecionado: string | null = "geral";
-municipiosDisponiveis: string[] = [];
+  municipiosDisponiveis: string[] = [];
 mesSelecionado: string = 'geral';
 
   laticinio: string = '';
@@ -54,37 +56,18 @@ mesesDisponiveis = [
   { nome: 'Dezembro', valor: 12 },
 ];
 
-  dadosList = [
-  // JL
-  { laticinio: 'JL', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 1, producaoLitros: 90, precoLitro: 2.5, ccs: 6, cbt: 4, gordura: 3.9, proteina: 3.3 },
-  { laticinio: 'JL', regiao: 'Taquaral', municipio: 'Pires', mesReferencia: 1, producaoLitros: 160, precoLitro: 3.1, ccs: 5, cbt: 5, gordura: 4.1, proteina: 3.4 },
-  { laticinio: 'JL', regiao: 'Apamac', municipio: 'Silvania', mesReferencia: 3, producaoLitros: 220, precoLitro: 5.0, ccs: 4, cbt: 4, gordura: 4.0, proteina: 3.6 },
-  { laticinio: 'JL', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 12, producaoLitros: 470, precoLitro: 4.7, ccs: 6, cbt: 6, gordura: 3.8, proteina: 3.2 },
-  { laticinio: 'JL', regiao: 'Firmeza', municipio: 'Orizona', mesReferencia: 12, producaoLitros: 410, precoLitro: 4.9, ccs: 5, cbt: 5, gordura: 4.2, proteina: 3.7 },
 
-  // Mega Leite
-  { laticinio: 'Piracanjuba', regiao: 'PiresRio', municipio: 'Pires', mesReferencia: 6, producaoLitros: 120, precoLitro: 5.1, ccs: 3, cbt: 4, gordura: 4.0, proteina: 3.5 },
-  { laticinio: 'Piracanjuba', regiao: 'Buritizinho', municipio: 'Orizona', mesReferencia: 7, producaoLitros: 250, precoLitro: 5.3, ccs: 2, cbt: 3, gordura: 4.3, proteina: 3.6 },
-  { laticinio: 'Piracanjuba', regiao: 'Apamac', municipio: 'Orizona', mesReferencia: 8, producaoLitros: 320, precoLitro: 5.0, ccs: 4, cbt: 3, gordura: 4.1, proteina: 3.7 },
-  { laticinio: 'Piracanjuba', regiao: 'Firmeza', municipio: 'Silvania', mesReferencia: 9 , producaoLitros: 410, precoLitro: 5.2, ccs: 3, cbt: 3, gordura: 4.4, proteina: 3.8 },
-  { laticinio: 'Piracanjuba', regiao: 'Firmeza', municipio: 'Orizona', mesReferencia: 10, producaoLitros: 500, precoLitro: 5.4, ccs: 2, cbt: 2, gordura: 4.6, proteina: 3.9 },
 
-  // Nova Fazenda
-  { laticinio: 'CCPR', regiao: 'Taquaral', municipio: 'Orizona', mesReferencia: 11, producaoLitros: 80, precoLitro: 4.5, ccs: 5, cbt: 5, gordura: 3.7, proteina: 3.1 },
-  { laticinio: 'CCPR', regiao: 'Buritizinho', municipio: 'Silvania', mesReferencia: 2, producaoLitros: 140, precoLitro: 4.6, ccs: 6, cbt: 4, gordura: 3.8, proteina: 3.2 },
-  { laticinio: 'CCPR', regiao: 'Firmeza', municipio: 'Orizona', mesReferencia:  1, producaoLitros: 210, precoLitro: 4.8, ccs: 5, cbt: 5, gordura: 4.0, proteina: 3.4 },
-  { laticinio: 'CCPR', regiao: 'Buritizinho', municipio: 'Silvania', mesReferencia: 2, producaoLitros: 290, precoLitro: 4.9, ccs: 6, cbt: 6, gordura: 4.1, proteina: 3.5 },
-  { laticinio: 'CCPR', regiao: 'Apamac', municipio: 'Orizona', mesReferencia: 3, producaoLitros: 380, precoLitro: 5.0, ccs: 5, cbt: 5, gordura: 4.3, proteina: 3.7 },
+laticinioIcons: Record<string, string> = {
+  'JL': 'assets/icon/valeza.png',
+  'CCPR': 'assets/icon/ccpr.png',
+  'Piracanjuba': 'assets/icon/piracanjuba.png',
+  'ITALAC': 'assets/icon/italac.png'
 
-  // Leite Bom
-  { laticinio: 'ITALAC', regiao: 'Taquaral', municipio: 'Pires', mesReferencia: 5, producaoLitros: 150, precoLitro: 5.5, ccs: 3, cbt: 3, gordura: 4.4, proteina: 3.8 },
-  { laticinio: 'ITALAC', regiao: 'Taquaral', municipio: 'Pires', mesReferencia: 5, producaoLitros: 100, precoLitro: 3, ccs: 4, cbt: 3, gordura: 4.5, proteina: 3.9 },
-  { laticinio: 'ITALAC', regiao: 'Buritizinho', municipio: 'Silvania', mesReferencia: 2, producaoLitros: 350, precoLitro: 5.7, ccs: 3, cbt: 2, gordura: 4.6, proteina: 4.0 },
-  { laticinio: 'ITALAC', regiao: 'Buritizinho', municipio: 'Pires', mesReferencia: 8, producaoLitros: 430, precoLitro: 5.8, ccs: 2, cbt: 3, gordura: 4.7, proteina: 4.1 },
-  { laticinio: 'ITALAC', regiao: 'Apamac', municipio: 'Orizona', mesReferencia: 12, producaoLitros: 520, precoLitro: 5.9, ccs: 2, cbt: 2, gordura: 4.8, proteina: 4.2 },
-];
+};
 
 ngOnInit() {
+  this.dadosList = list;
     const unicos = new Set(this.dadosList.map(d => d.municipio));
     this.municipiosDisponiveis = Array.from(unicos);
   }
@@ -240,9 +223,10 @@ private agruparPorRegiao(dados: any[]) {
     ? [{ label: `${this.faixaMin}-${this.faixaMax} L`, min: this.faixaMin!, max: this.faixaMax! }]
     : [
         { label: '0 - 100 L', min: 0, max: 100 },
-        { label: '100 - 200 L', min: 100, max: 200 },
-        { label: '200 - 400 L', min: 200, max: 400 },
-        { label: '400 - 800 L', min: 400, max: 800 }
+        { label: '100 - 200 L', min: 101, max: 200 },
+        { label: '200 - 400 L', min: 201, max: 400 },
+        { label: '400 - 800 L', min: 401, max: 800 },
+        { label: '800 - 1000 L', min: 801, max: 1000 }
       ];
 
   // 3️⃣ Laticínios
@@ -340,10 +324,11 @@ get tituloGraficoFiltrado(): string | null {
 
   getFaixaLitros(producaoLitros: number): string {
   if (producaoLitros >= 0 && producaoLitros <= 100) return '0-100';
-  if (producaoLitros > 100 && producaoLitros <= 200) return '100-200';
-  if (producaoLitros > 200 && producaoLitros <= 400) return '200-400';
-  if (producaoLitros > 400 && producaoLitros <= 800) return '400-800';
-  return '800+'; // se passar de 800, fica nessa faixa
+  if (producaoLitros > 101 && producaoLitros <= 200) return '100-200';
+  if (producaoLitros > 201 && producaoLitros <= 400) return '200-400';
+  if (producaoLitros > 401 && producaoLitros <= 800) return '400-800';
+  if (producaoLitros > 801 && producaoLitros <= 1000) return '800-1000';
+  return '1001+'; // se passar de 800, fica nessa faixa
 }
 
 faixaMin: number | null = null;
@@ -391,9 +376,10 @@ get dadosPorLaticinioFaixas() {
     } else {
       faixas = [
         { faixa: '0 - 100 L', mediaPreco: this.mediaFaixa(items, 0, 100) },
-        { faixa: '100 - 200 L', mediaPreco: this.mediaFaixa(items, 100, 200) },
-        { faixa: '200 - 400 L', mediaPreco: this.mediaFaixa(items, 200, 400) },
-        { faixa: '400 - 800 L', mediaPreco: this.mediaFaixa(items, 400, 800) }
+        { faixa: '100 - 200 L', mediaPreco: this.mediaFaixa(items, 101, 200) },
+        { faixa: '200 - 400 L', mediaPreco: this.mediaFaixa(items, 201, 400) },
+        { faixa: '400 - 800 L', mediaPreco: this.mediaFaixa(items, 401, 800) },
+        { faixa: '800 - 1000 L', mediaPreco: this.mediaFaixa(items, 801, 1000) }
       ];
     }
 
