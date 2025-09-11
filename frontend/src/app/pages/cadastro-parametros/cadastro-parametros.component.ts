@@ -18,17 +18,16 @@ export class CadastroParametrosComponent {
   cbt = '';
   gordura = '';
   proteina = '';
-  erro = '';
 
   constructor(
     private router: Router,
     private registroService: RegistroService,
-    private toastController: ToastController  // ✅ injetar o ToastController
+    private toastController: ToastController
   ) {}
 
   async cadastrarParametros() {
     if (!this.todosCamposPreenchidos()) {
-      this.erro = 'Preencha todos os campos obrigatórios.';
+      this.mostrarToast('Preencha todos os campos obrigatórios.', 'danger');
       return;
     }
 
@@ -42,27 +41,26 @@ export class CadastroParametrosComponent {
       proteina: this.proteina,
     };
 
-    // Mostrar dados no console
     console.log('Dados cadastrados:', dadosParametros);
+     this.router.navigate(['/home']); // opcional
 
-    // Limpar formulário
-    this.mesReferencia = '';
-    this.precoLitro = '';
-    this.producaoLitros = '';
-    this.ccs = '';
-    this.cbt = '';
-    this.gordura = '';
-    this.proteina = '';
-    this.erro = '';
-
-    // Mostrar toast de sucesso
-    const toast = await this.toastController.create({
-      message: 'Cadastro realizado com sucesso!',
-      duration: 2000,       // duração em ms
-      color: 'success',
-      position: 'top'
+    // Chamada do serviço (descomente quando estiver implementado)
+    /*
+    this.registroService.cadastrar(dadosParametros).subscribe({
+      next: async () => {
+        this.limparFormulario();
+        await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
+        this.router.navigate(['/home']); // opcional
+      },
+      error: async (err) => {
+        await this.mostrarToast('Erro ao cadastrar: ' + err.message, 'danger');
+      }
     });
-    await toast.present();
+    */
+
+    // Para teste local, sem backend:
+    this.limparFormulario();
+    await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
   }
 
   todosCamposPreenchidos(): boolean {
@@ -75,7 +73,26 @@ export class CadastroParametrosComponent {
       this.gordura,
       this.proteina
     ];
-
     return campos.every(campo => campo && campo.trim() !== '');
+  }
+
+  limparFormulario() {
+    this.mesReferencia = '';
+    this.precoLitro = '';
+    this.producaoLitros = '';
+    this.ccs = '';
+    this.cbt = '';
+    this.gordura = '';
+    this.proteina = '';
+  }
+
+  async mostrarToast(mensagem: string, cor: 'success' | 'danger') {
+    const toast = await this.toastController.create({
+      message: mensagem,
+      duration: 2000,
+      color: cor,
+      position: 'top',
+    });
+    await toast.present();
   }
 }

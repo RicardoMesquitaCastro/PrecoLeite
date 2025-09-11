@@ -1,29 +1,31 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>PreçoLeite</ion-title>
-    <ion-buttons slot="end">
-      <ion-menu-button autoHide="false"></ion-menu-button>
-    </ion-buttons>
+    <ion-title>Cadastro de Conta</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <ion-text color="medium">
-    <h2 style="margin-top: 24px;">Cadastro</h2>
+    <h2 style="margin-top: 24px;">Crie sua Conta</h2>
   </ion-text>
 
   <ion-item>
-    <ion-input [(ngModel)]="name" placeholder="Nome Completo"></ion-input>
+    <ion-input [(ngModel)]="name" placeholder="Nome"></ion-input>
   </ion-item>
 
   <ion-item>
-    <ion-input [(ngModel)]="email" placeholder="E-mail"></ion-input>
+    <ion-input [(ngModel)]="email" placeholder="Email"></ion-input>
   </ion-item>
 
   <ion-item>
     <ion-input [(ngModel)]="password" type="password" placeholder="Senha"></ion-input>
   </ion-item>
 
-  <ion-button color="primary" expand="full" (click)="cadastrarConta()">Cadastrar</ion-button>
-  <p style="color:red">{{ erro }}</p>
+  <ion-button
+    color="primary"
+    expand="full"
+    (click)="cadastrarConta()"
+    [disabled]="!name || !email || !password">
+    Cadastrar
+  </ion-button>
 </ion-content>
