@@ -9,7 +9,6 @@ import { DadoLeite } from './dado-leite.model';
 
 Chart.register(...registerables);
 
-
 @Component({
   selector: 'app-data-parametros',
   standalone: true,
@@ -25,10 +24,12 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
   agrupamentoSelecionado: string = 'laticinio';
   tituloGrafico: string = 'Comparativo Intervalos e Preços';
   regiaoSelecionada: string | null = null;
-  dadosList: DadoLeite[] = []; // já tipado corretamente
+  dadosList: DadoLeite[] = [];
   municipioSelecionado: string | null = "geral";
   municipiosDisponiveis: string[] = [];
   mesSelecionado: string = 'geral';
+  anoSelecionado: number = new Date().getFullYear(); // ano atual
+  anosDisponiveis: number[] = [];
 
   laticinio: string = '';
   mesReferencia: number | null = null;
@@ -38,8 +39,6 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
   cbt: number | null = null;
   gordura: number | null = null;
   proteina: number | null = null;
-
-
 
   mesesDisponiveis = [
     { nome: 'Janeiro', valor: 1 },
@@ -56,21 +55,27 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
     { nome: 'Dezembro', valor: 12 },
   ];
 
-
-
   laticinioIcons: Record<string, string> = {
     'JL': 'assets/icon/valeza.png',
     'CCPR': 'assets/icon/ccpr.png',
     'Piracanjuba': 'assets/icon/piracanjuba.png',
     'ITALAC': 'assets/icon/italac.png'
-
   };
 
+  faixaMin: number | null = null;
+  faixaMax: number | null = null;
+
   ngOnInit() {
-    this.dadosList = list;
-    const unicos = new Set(this.dadosList.map(d => d.municipio));
-    this.municipiosDisponiveis = Array.from(unicos);
-  }
+  this.dadosList = list;
+
+  // Municípios disponíveis
+  const unicos = new Set(this.dadosList.map(d => d.municipio));
+  this.municipiosDisponiveis = Array.from(unicos);
+
+  // Anos disponíveis
+  const anosUnicos = new Set(this.dadosList.map(d => d.anoReferencia));
+  this.anosDisponiveis = Array.from(anosUnicos).sort((a, b) => b - a); // do maior para o menor
+}
 
   ngAfterViewInit() {
     this.criarGrafico();
@@ -84,7 +89,8 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
   get dadosListFiltrados() {
     return this.dadosList.filter(d =>
       (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
-      (this.mesReferencia === null || d.mesReferencia === this.mesReferencia) //
+      (this.mesReferencia === null || d.mesReferencia === this.mesReferencia) &&
+      (this.anoSelecionado === null || d.anoReferencia === this.anoSelecionado)
     );
   }
 
@@ -97,25 +103,37 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
   }
 
   atualizarTitulo() {
+    let partes: string[] = [];
+
     if (this.faixaMin !== null && this.faixaMax !== null) {
-      this.tituloGrafico = `Comparativo ${this.faixaMin}-${this.faixaMax} Litros`;
-    } else {
-      this.tituloGrafico = 'Comparativo Intervalo de Litros';
+      partes.push(`Faixa: ${this.faixaMin}-${this.faixaMax} L`);
     }
 
-    if (this.municipioSelecionado) {
-      this.tituloGrafico += ` - Município: ${this.municipioSelecionado}`;
+    if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
+      partes.push(`Município: ${this.municipioSelecionado}`);
     }
+
+    if (this.mesReferencia !== null) {
+      const mesNome = this.mesesDisponiveis.find(m => m.valor === this.mesReferencia)?.nome;
+      if (mesNome) partes.push(`Mês: ${mesNome}`);
+    }
+
+    if (this.anoSelecionado !== null) {
+      partes.push(`Ano: ${this.anoSelecionado}`);
+    }
+
+    this.tituloGrafico = partes.length > 0
+      ? `Comparativo ${partes.join(' - ')}`
+      : 'Comparativo Intervalo de Litros';
   }
 
   montarGraficoRegiao() {
-    // 🔁 Filtra por município e mês
     const dadosFiltrados = this.dadosList.filter(d =>
       (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
-      (this.mesReferencia === null || d.mesReferencia === Number(this.mesReferencia))
+      (this.mesReferencia === null || d.mesReferencia === Number(this.mesReferencia)) &&
+      (this.anoSelecionado === null || d.anoReferencia === this.anoSelecionado)
     );
 
-    // Agrupa por região (média correta)
     const dadosAgrupados = this.agruparPorRegiao(dadosFiltrados);
 
     const labels = dadosAgrupados.map(g => g.regiao);
@@ -146,19 +164,12 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
       },
       options: {
         responsive: true,
-        plugins: {
-          legend: { display: true, position: 'top' }
-        },
+        plugins: { legend: { display: true, position: 'top' } },
         scales: {
           y: {
             beginAtZero: false,
             min: 1.5,
-            ticks: {
-              stepSize: 0.1,
-              precision: 2,
-              callback: value =>
-                typeof value === 'number' ? value.toFixed(2) : value
-            }
+            ticks: { stepSize: 0.1, precision: 2, callback: value => typeof value === 'number' ? value.toFixed(2) : value }
           },
           x: { ticks: { autoSkip: false } }
         }
@@ -167,38 +178,30 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
   }
 
   atualizarFiltros() {
-    this.criarGrafico(); // chama sua função que refaz o gráfico
+    this.criarGrafico();
     this.montarGraficoRegiao();
   }
 
   private agruparPorRegiao(dados: any[]) {
     const grupos: Record<string, { soma: number, qtd: number }> = {};
-
-    // 1. Agrupa por região + laticínio
     const porLaticinio: Record<string, { soma: number, qtd: number }> = {};
 
     for (const d of dados) {
       const chave = `${d.regiao}-${d.laticinio}`;
-      if (!porLaticinio[chave]) {
-        porLaticinio[chave] = { soma: 0, qtd: 0 };
-      }
+      if (!porLaticinio[chave]) porLaticinio[chave] = { soma: 0, qtd: 0 };
       porLaticinio[chave].soma += d.precoLitro;
       porLaticinio[chave].qtd++;
     }
 
-    // 2. Calcula a média de cada laticínio e agrupa por região
     for (const chave in porLaticinio) {
       const [regiao] = chave.split('-');
       const mediaLaticinio = porLaticinio[chave].soma / porLaticinio[chave].qtd;
 
-      if (!grupos[regiao]) {
-        grupos[regiao] = { soma: 0, qtd: 0 };
-      }
+      if (!grupos[regiao]) grupos[regiao] = { soma: 0, qtd: 0 };
       grupos[regiao].soma += mediaLaticinio;
       grupos[regiao].qtd++;
     }
 
-    // 3. Calcula a média final por região
     return Object.entries(grupos).map(([regiao, { soma, qtd }]) => ({
       regiao,
       mediaPreco: qtd > 0 ? soma / qtd : 0
@@ -207,19 +210,10 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
 
   criarGrafico() {
     const cores = ['#FF7400', '#E00809', '#0B5A68', '#0078BD', '#9966FF', '#FF9F40'];
-
-    // 1️⃣ Filtra os dados
     let dados = this.dadosListFiltrados;
 
-    if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
-      dados = dados.filter(d => d.municipio === this.municipioSelecionado);
-    }
+    const laticinios = Array.from(new Set(dados.map(d => d.laticinio)));
 
-    if (this.mesReferencia !== null) {
-      dados = dados.filter(d => d.mesReferencia === this.mesReferencia);
-    }
-
-    // 2️⃣ Faixas
     const usarFaixaCustom = this.faixaMin !== null && this.faixaMax !== null;
     const faixas = usarFaixaCustom
       ? [{ label: `${this.faixaMin}-${this.faixaMax} L`, min: this.faixaMin!, max: this.faixaMax! }]
@@ -231,20 +225,13 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
         { label: '800 - 1000 L', min: 801, max: 1000 }
       ];
 
-    // 3️⃣ Laticínios
-    const laticinios = Array.from(new Set(dados.map(d => d.laticinio)));
-
-    // 4️⃣ Calcula média por laticínio e faixa
     const mediaFaixaPorLaticinio = (items: any[], laticinio: string, min: number, max: number): number => {
-      const filtrados = items.filter(
-        i => i.laticinio === laticinio && i.producaoLitros >= min && i.producaoLitros <= max
-      );
+      const filtrados = items.filter(i => i.laticinio === laticinio && i.producaoLitros >= min && i.producaoLitros <= max);
       if (filtrados.length === 0) return 0;
       const soma = filtrados.reduce((acc, curr) => acc + curr.precoLitro, 0);
       return soma / filtrados.length;
     };
 
-    // 5️⃣ Monta datasets
     const datasets = laticinios.map((lat, i) => ({
       label: lat,
       data: faixas.map(f => mediaFaixaPorLaticinio(dados, lat, f.min, f.max)),
@@ -252,10 +239,9 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
       borderWidth: 1
     }));
 
-    // 6️⃣ Monta título dinâmico com faixa, município e mês
     let titulo = usarFaixaCustom
       ? `Comparativo ${this.faixaMin}-${this.faixaMax} Litros`
-      : ' Gráfico Comparativo ';
+      : 'Gráfico Comparativo';
 
     if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
       titulo += ` - Município: ${this.municipioSelecionado}`;
@@ -263,15 +249,15 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
 
     if (this.mesReferencia !== null) {
       const mesNome = this.mesesDisponiveis.find(m => m.valor === this.mesReferencia)?.nome;
-      if (mesNome) {
-        titulo += ` - Mês: ${mesNome}`;
-      }
+      if (mesNome) titulo += ` - Mês: ${mesNome}`;
     }
 
+    if (this.anoSelecionado !== null) {
+      titulo += ` - Ano: ${this.anoSelecionado}`;
+    }
 
     this.tituloGrafico = titulo;
 
-    // 7️⃣ Renderiza gráfico
     const ctx = (document.getElementById('graficoLitrosPreco') as HTMLCanvasElement)?.getContext('2d');
     if (!ctx) return;
 
@@ -279,19 +265,12 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
 
     this.grafico = new Chart(ctx, {
       type: 'bar',
-      data: {
-        labels: faixas.map(f => f.label),
-        datasets
-      },
+      data: { labels: faixas.map(f => f.label), datasets },
       options: {
         indexAxis: 'x',
         responsive: true,
         plugins: {
-          tooltip: {
-            callbacks: {
-              label: context => `Preço médio: R$${context.raw}`
-            }
-          },
+          tooltip: { callbacks: { label: context => `Preço médio: R$${context.raw}` } },
           legend: { position: 'top' }
         },
         scales: {
@@ -299,6 +278,36 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
           y: { title: { display: true, text: 'Preço Médio (R$)' } }
         }
       }
+    });
+  }
+
+  // --- Resto das funções de cálculo e agrupamento, todas usando this.dadosListFiltrados ---
+  get dadosPorRegiao() {
+    const grupos: Record<string, any[]> = {};
+
+    for (const item of this.dadosListFiltrados) {
+      if (this.mesReferencia !== null && item.mesReferencia !== this.mesReferencia) continue;
+      if (this.anoSelecionado !== null && item.anoReferencia !== this.anoSelecionado) continue;
+
+      if (!grupos[item.regiao]) grupos[item.regiao] = [];
+      grupos[item.regiao].push(item);
+    }
+
+    return Object.entries(grupos).map(([regiao, items]) => {
+      const mediaPreco = items.reduce((acc, curr) => acc + curr.precoLitro, 0) / items.length;
+      const laticiniosMap: Record<string, { soma: number, count: number }> = {};
+      for (const item of items) {
+        if (!laticiniosMap[item.laticinio]) laticiniosMap[item.laticinio] = { soma: 0, count: 0 };
+        laticiniosMap[item.laticinio].soma += item.precoLitro;
+        laticiniosMap[item.laticinio].count++;
+      }
+
+      const laticinios = Object.entries(laticiniosMap).map(([laticinio, dados]) => ({
+        laticinio,
+        mediaPreco: dados.soma / dados.count,
+      }));
+
+      return { regiao, mediaPreco, laticinios };
     });
   }
 
@@ -333,8 +342,6 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
     return '1001+'; // se passar de 800, fica nessa faixa
   }
 
-  faixaMin: number | null = null;
-  faixaMax: number | null = null;
 
   temDadosFaixas(): boolean {
     return this.dadosPorLaticinioFaixas.some(grupo =>
@@ -476,46 +483,8 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
     return medias;
   }
 
-  get dadosPorRegiao() {
-    const grupos: Record<string, any[]> = {};
-
-    for (const item of this.dadosListFiltrados) {
-      if (this.mesReferencia !== null && item.mesReferencia !== this.mesReferencia) continue;
-
-      if (!grupos[item.regiao]) {
-        grupos[item.regiao] = [];
-      }
-      grupos[item.regiao].push(item);
-    }
-
-    return Object.entries(grupos).map(([regiao, items]) => {
-      const mediaPreco = items.reduce((acc, curr) => acc + curr.precoLitro, 0) / items.length;
-
-      const laticiniosMap: Record<string, { soma: number, count: number }> = {};
-      for (const item of items) {
-        if (!laticiniosMap[item.laticinio]) {
-          laticiniosMap[item.laticinio] = { soma: 0, count: 0 };
-        }
-        laticiniosMap[item.laticinio].soma += item.precoLitro;
-        laticiniosMap[item.laticinio].count++;
-      }
-
-      const laticinios = Object.entries(laticiniosMap).map(([laticinio, dados]) => ({
-        laticinio,
-        mediaPreco: dados.soma / dados.count,
-      }));
-
-      return {
-        regiao,
-        mediaPreco,
-        laticinios,
-      };
-    });
-  }
-
   obterNomeMes(mes: number): string {
-    const nomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
     return nomes[mes - 1] || 'Desconhecido';
   }
 
@@ -523,11 +492,6 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
     return Array.from(new Set(this.dadosListFiltrados.map(d => d.regiao))).sort();
   }
 
-  trackByLaticinio(index: number, item: any) {
-    return item.laticinio;
-  }
-
-  trackByFaixa(index: number, item: any) {
-    return item.faixa;
-  }
+  trackByLaticinio(index: number, item: any) { return item.laticinio; }
+  trackByFaixa(index: number, item: any) { return item.faixa; }
 }

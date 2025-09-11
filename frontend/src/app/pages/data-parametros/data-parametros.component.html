@@ -43,6 +43,20 @@
         </ion-select>
       </ion-item>
 
+      <!-- Filtro de Ano -->
+      <ion-item class="ion-margin-top">
+  <ion-label position="stacked">
+    <ion-icon name="calendar-number-outline" slot="start" class="ion-margin-end"></ion-icon>
+    Filtro por Ano
+  </ion-label>
+  <ion-select [(ngModel)]="anoSelecionado" (ngModelChange)="atualizarFiltros()" placeholder="Ano"
+    interface="popover">
+    <ion-select-option *ngFor="let ano of anosDisponiveis" [value]="ano">
+      {{ ano }}
+    </ion-select-option>
+  </ion-select>
+</ion-item>
+
       <!-- Faixa de Litros -->
       <ion-item class="ion-margin-top faixa-item" *ngIf="agrupamentoSelecionado === 'laticinio'">
         <ion-label style="margin-bottom: 10px;" position="stacked">
@@ -80,7 +94,6 @@
 
     </ion-card-content>
   </ion-card>
-
   <!-- Por Região -->
   <ng-container *ngIf="agrupamentoSelecionado === 'regiao'">
     <ion-text color="medium">
