@@ -207,8 +207,8 @@
     <ion-item *ngFor="let item of grupo.items; trackBy: trackByFaixa">
       <ion-label style="display: flex; align-items: center; gap: 6px;">
         <img [src]="laticinioIcons[item.laticinio] || 'assets/icon/default.svg'"
-             alt="{{ item.laticinio }} icon"
-             style="width: 20px; height: 20px;" />
+            alt="{{ item.laticinio }} icon"
+            style="width: 20px; height: 20px;" />
         <div>
           {{ item.laticinio }}<br>
           Média Geral: R$ {{ item.mediaPrecoDoLaticinio | number:'1.2-2' }}
