@@ -128,6 +128,9 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
   }
 
   montarGraficoRegiao() {
+
+     if (!this.graficoRegiaoRef?.nativeElement) return;
+
     const dadosFiltrados = this.dadosList.filter(d =>
       (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
       (this.mesReferencia === null || d.mesReferencia === Number(this.mesReferencia)) &&
@@ -209,6 +212,7 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
   }
 
   criarGrafico() {
+
     const cores = ['#FF7400', '#E00809', '#0B5A68', '#0078BD', '#9966FF', '#FF9F40'];
     let dados = this.dadosListFiltrados;
 
