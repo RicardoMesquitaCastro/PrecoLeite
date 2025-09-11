@@ -28,6 +28,7 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
   municipioSelecionado: string | null = "geral";
   municipiosDisponiveis: string[] = [];
   mesSelecionado: string = 'geral';
+  currentYear = new Date().getFullYear();
   anoSelecionado: number = new Date().getFullYear(); // ano atual
   anosDisponiveis: number[] = [];
 
@@ -185,6 +186,15 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
     this.montarGraficoRegiao();
   }
 
+  limparFiltros() {
+  this.municipioSelecionado = 'geral'; // ou null, dependendo da lógica
+  this.anoSelecionado = this.currentYear; // Reseta para o ano atual
+  this.mesReferencia = null;
+  this.faixaMin = null;
+  this.faixaMax = null;
+  this.atualizarFiltros(); // Chama a função que atualiza os dados com os filtros limpos
+}
+
   private agruparPorRegiao(dados: any[]) {
     const grupos: Record<string, { soma: number, qtd: number }> = {};
     const porLaticinio: Record<string, { soma: number, qtd: number }> = {};
@@ -211,79 +221,99 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
     }));
   }
 
-  criarGrafico() {
+criarGrafico() {
+  const cores = ['#FF7400', '#E00809', '#0B5A68', '#0078BD', '#9966FF', '#FF9F40'];
+  let dados = this.dadosListFiltrados;
 
-    const cores = ['#FF7400', '#E00809', '#0B5A68', '#0078BD', '#9966FF', '#FF9F40'];
-    let dados = this.dadosListFiltrados;
+  const laticinios = Array.from(new Set(dados.map(d => d.laticinio)));
 
-    const laticinios = Array.from(new Set(dados.map(d => d.laticinio)));
-
-    const usarFaixaCustom = this.faixaMin !== null && this.faixaMax !== null;
-    const faixas = usarFaixaCustom
-      ? [{ label: `${this.faixaMin}-${this.faixaMax} L`, min: this.faixaMin!, max: this.faixaMax! }]
-      : [
+  const usarFaixaCustom = this.faixaMin !== null && this.faixaMax !== null;
+  const faixas = usarFaixaCustom
+    ? [{ label: `${this.faixaMin}-${this.faixaMax} L`, min: this.faixaMin!, max: this.faixaMax! }]
+    : [
         { label: '0 - 100 L', min: 0, max: 100 },
-        { label: '100 - 200 L', min: 101, max: 200 },
+        { label: '101 - 200 L', min: 101, max: 200 },
         { label: '200 - 400 L', min: 201, max: 400 },
         { label: '400 - 800 L', min: 401, max: 800 },
         { label: '800 - 1000 L', min: 801, max: 1000 }
       ];
 
-    const mediaFaixaPorLaticinio = (items: any[], laticinio: string, min: number, max: number): number => {
-      const filtrados = items.filter(i => i.laticinio === laticinio && i.producaoLitros >= min && i.producaoLitros <= max);
-      if (filtrados.length === 0) return 0;
-      const soma = filtrados.reduce((acc, curr) => acc + curr.precoLitro, 0);
-      return soma / filtrados.length;
-    };
+  const mediaFaixaPorLaticinio = (items: any[], laticinio: string, min: number, max: number): number => {
+    const filtrados = items.filter(i => i.laticinio === laticinio && i.producaoLitros >= min && i.producaoLitros <= max);
+    if (filtrados.length === 0) return 0;
+    const soma = filtrados.reduce((acc, curr) => acc + curr.precoLitro, 0);
+    return soma / filtrados.length;
+  };
 
-    const datasets = laticinios.map((lat, i) => ({
-      label: lat,
-      data: faixas.map(f => mediaFaixaPorLaticinio(dados, lat, f.min, f.max)),
-      backgroundColor: cores[i % cores.length],
-      borderWidth: 1
-    }));
+  // Filtra faixas que tenham pelo menos 1 valor diferente de 0 em algum laticínio
+  const faixasFiltradas = faixas.filter(f =>
+    laticinios.some(lat => mediaFaixaPorLaticinio(dados, lat, f.min, f.max) > 0)
+  );
 
-    let titulo = usarFaixaCustom
-      ? `Comparativo ${this.faixaMin}-${this.faixaMax} Litros`
-      : 'Gráfico Comparativo';
+  const datasets = laticinios.map((lat, i) => ({
+    label: lat,
+    data: faixasFiltradas.map(f => mediaFaixaPorLaticinio(dados, lat, f.min, f.max)),
+    backgroundColor: cores[i % cores.length],
+    borderWidth: 1
+  }));
 
-    if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
-      titulo += ` - Município: ${this.municipioSelecionado}`;
-    }
-
-    if (this.mesReferencia !== null) {
-      const mesNome = this.mesesDisponiveis.find(m => m.valor === this.mesReferencia)?.nome;
-      if (mesNome) titulo += ` - Mês: ${mesNome}`;
-    }
-
-    if (this.anoSelecionado !== null) {
-      titulo += ` - Ano: ${this.anoSelecionado}`;
-    }
-
-    this.tituloGrafico = titulo;
-
-    const ctx = (document.getElementById('graficoLitrosPreco') as HTMLCanvasElement)?.getContext('2d');
-    if (!ctx) return;
-
-    if (this.grafico) this.grafico.destroy();
-
-    this.grafico = new Chart(ctx, {
-      type: 'bar',
-      data: { labels: faixas.map(f => f.label), datasets },
-      options: {
-        indexAxis: 'x',
-        responsive: true,
-        plugins: {
-          tooltip: { callbacks: { label: context => `Preço médio: R$${context.raw}` } },
-          legend: { position: 'top' }
-        },
-        scales: {
-          x: { title: { display: true, text: 'Faixa de Litros' }, beginAtZero: true },
-          y: { title: { display: true, text: 'Preço Médio (R$)' } }
-        }
-      }
-    });
+  // Monta o título como array de linhas
+  const tituloLinhas: string[] = [];
+  if (usarFaixaCustom) {
+    tituloLinhas.push(`Comparativo ${this.faixaMin}-${this.faixaMax} Litros`);
+  } else {
+    tituloLinhas.push('Gráfico Comparativo');
   }
+
+  if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
+    tituloLinhas.push(`Município: ${this.municipioSelecionado}`);
+  }
+
+  if (this.mesReferencia !== null) {
+    const mesNome = this.mesesDisponiveis.find(m => m.valor === this.mesReferencia)?.nome;
+    if (mesNome) tituloLinhas.push(`Mês: ${mesNome}`);
+  }
+
+  if (this.anoSelecionado !== null) {
+    tituloLinhas.push(`Ano: ${this.anoSelecionado}`);
+  }
+
+  // Atribui ao título do gráfico
+  this.tituloGrafico = tituloLinhas.join(' | '); // opcional, se quiser exibir em algum HTML
+
+  const ctx = (document.getElementById('graficoLitrosPreco') as HTMLCanvasElement)?.getContext('2d');
+  if (!ctx) return;
+
+  if (this.grafico) this.grafico.destroy();
+
+  this.grafico = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: faixasFiltradas.map(f => f.label), datasets },
+    options: {
+      indexAxis: 'x',
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: tituloLinhas, // <-- array de linhas para multi-linha
+          font: { size: 16, weight: 'bold' },
+          padding: { top: 10, bottom: 20 }
+        },
+        tooltip: {
+          callbacks: {
+            label: context => `Preço médio: R$${context.raw}`
+          }
+        },
+        legend: { position: 'top' }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Faixa de Litros' }, beginAtZero: true },
+        y: { title: { display: true, text: 'Preço Médio (R$)' } }
+      }
+    }
+  });
+}
+
 
   // --- Resto das funções de cálculo e agrupamento, todas usando this.dadosListFiltrados ---
   get dadosPorRegiao() {
@@ -315,27 +345,27 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
     });
   }
 
-  get tituloGraficoFiltrado(): string | null {
-    const partes: string[] = [];
+ get tituloGraficoFiltrado(): string | null {
+  const partes: string[] = [];
 
-    if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
-      partes.push(`Município: ${this.municipioSelecionado}`);
-    }
-
-    if (this.mesReferencia !== null) {
-      const mesNome = this.mesesDisponiveis.find(m => m.valor === this.mesReferencia)?.nome;
-      if (mesNome) partes.push(`Mês: ${mesNome}`);
-    }
-
-    if (this.faixaMin !== null && this.faixaMax !== null) {
-      partes.push(`Faixa: ${this.faixaMin}-${this.faixaMax} L`);
-    }
-
-    if (partes.length === 0) return null;
-
-    // Retorna apenas os filtros ativos, sem “Gráfico Comparativo”
-    return partes.join(' - ');
+  if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
+    partes.push(`Município: ${this.municipioSelecionado}`);
   }
+
+  if (this.mesReferencia !== null) {
+    const mesNome = this.mesesDisponiveis.find(m => m.valor === this.mesReferencia)?.nome;
+    if (mesNome) partes.push(`Mês: ${mesNome}`);
+  }
+
+  if (this.faixaMin !== null && this.faixaMax !== null) {
+    partes.push(`Faixa: ${this.faixaMin}-${this.faixaMax} L`);
+  }
+
+  if (partes.length === 0) return null;
+
+  // Retorna os filtros ativos separados por <br>
+  return partes.join('<br><br>');
+}
 
   getFaixaLitros(producaoLitros: number): string {
     if (producaoLitros >= 0 && producaoLitros <= 100) return '0-100';

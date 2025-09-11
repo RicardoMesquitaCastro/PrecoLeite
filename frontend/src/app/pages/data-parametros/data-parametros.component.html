@@ -42,20 +42,19 @@
           </ion-select-option>
         </ion-select>
       </ion-item>
-
       <!-- Filtro de Ano -->
       <ion-item class="ion-margin-top">
-  <ion-label position="stacked">
-    <ion-icon name="calendar-number-outline" slot="start" class="ion-margin-end"></ion-icon>
-    Filtro por Ano
-  </ion-label>
-  <ion-select [(ngModel)]="anoSelecionado" (ngModelChange)="atualizarFiltros()" placeholder="Ano"
-    interface="popover">
-    <ion-select-option *ngFor="let ano of anosDisponiveis" [value]="ano">
-      {{ ano }}
-    </ion-select-option>
-  </ion-select>
-</ion-item>
+        <ion-label position="stacked">
+          <ion-icon name="calendar-number-outline" slot="start" class="ion-margin-end"></ion-icon>
+          Filtro por Ano
+        </ion-label>
+        <ion-select [(ngModel)]="anoSelecionado" (ngModelChange)="atualizarFiltros()" placeholder="Ano"
+          interface="popover">
+          <ion-select-option *ngFor="let ano of anosDisponiveis" [value]="ano">
+            {{ ano }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
 
       <!-- Faixa de Litros -->
       <ion-item class="ion-margin-top faixa-item" *ngIf="agrupamentoSelecionado === 'laticinio'">
@@ -76,6 +75,11 @@
             [class.invalido]="faixaMin !== null && faixaMax !== null && faixaMin >= faixaMax"></ion-input>
         </div>
       </ion-item>
+
+      <div class="ion-margin-top"
+        *ngIf="municipioSelecionado !== 'geral' || mesReferencia !== null || anoSelecionado !== currentYear || faixaMin !== null || faixaMax !== null">
+        <ion-button expand="block" (click)="limparFiltros()">Limpar Filtros</ion-button>
+      </div>
 
       <!-- Segmento de agrupamento -->
       <ng-container *ngIf="municipioSelecionado">
@@ -103,22 +107,21 @@
     <!-- Verifica se há seleção válida -->
     <ng-container *ngIf="municipioSelecionado && municipioSelecionado.toLowerCase() !== 'geral'; else mensagemSelecao">
       <!-- Cards de dados por região -->
-    <ion-card *ngFor="let grupo of dadosPorRegiao; trackBy: trackByLaticinio">
-  <ion-card-header>
-    <ion-card-title>{{ grupo.regiao }}</ion-card-title>
-  </ion-card-header>
-  <ion-card-content>
-    <ion-item *ngFor="let lat of grupo.laticinios; trackBy: trackByFaixa">
-      <ion-label style="display: flex; align-items: center; gap: 6px;">
-        <img [src]="laticinioIcons[lat.laticinio] || 'assets/icon/default.svg'"
-             alt="{{ lat.laticinio }} icon"
-             style="width: 20px; height: 20px;" />
-        {{ lat.laticinio }}
-      </ion-label>
-      <ion-note slot="end">R$ {{ lat.mediaPreco | number:'1.2-2' }}</ion-note>
-    </ion-item>
-  </ion-card-content>
-</ion-card>
+      <ion-card *ngFor="let grupo of dadosPorRegiao; trackBy: trackByLaticinio">
+        <ion-card-header>
+          <ion-card-title>{{ grupo.regiao }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item *ngFor="let lat of grupo.laticinios; trackBy: trackByFaixa">
+            <ion-label style="display: flex; align-items: center; gap: 6px;">
+              <img [src]="laticinioIcons[lat.laticinio] || 'assets/icon/default.svg'" alt="{{ lat.laticinio }} icon"
+                style="width: 20px; height: 20px;" />
+              {{ lat.laticinio }}
+            </ion-label>
+            <ion-note slot="end">R$ {{ lat.mediaPreco | number:'1.2-2' }}</ion-note>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
 
       <!-- Card do gráfico -->
       <ion-card>
@@ -157,9 +160,16 @@
         <h2 style="margin: 16px 16px 8px; font-weight: 600; font-size: 1.3rem;">
           Média de Preço por Faixas
         </h2>
-        <h3 *ngIf="tituloGraficoFiltrado"
-          style="margin: 0 16px 12px; font-weight: 400; font-size: 1rem; color: #9ca3af;">
-          {{ tituloGraficoFiltrado }}
+        <h3 *ngIf="tituloGraficoFiltrado" [innerHTML]="tituloGraficoFiltrado" style="
+      margin: 0 16px 16px;
+      font-weight: 500;
+      font-size: 1.1rem;
+      color: #4b5563;
+      letter-spacing: 0.5px;
+      line-height: 1.4;
+      border-left: 4px solid rgba(0,255,128,0.2);
+      padding-left: 12px;
+    ">
         </h3>
       </ion-text>
 
@@ -167,9 +177,8 @@
         <ion-card-header>
           <ion-card-title>
             Laticínio:
-            <img [src]="laticinioIcons[grupo.laticinio]"
-           alt="{{ grupo.laticinio }} icon"
-           class="laticinio-icon" style="width:20px; height:20px; margin-left:6px;" />
+            <img [src]="laticinioIcons[grupo.laticinio]" alt="{{ grupo.laticinio }} icon" class="laticinio-icon"
+              style="width:20px; height:20px; margin-left:6px;" />
             {{ grupo.laticinio }}
           </ion-card-title>
         </ion-card-header>
@@ -184,9 +193,7 @@
 
       <ion-card>
         <ion-card-header>
-          <ion-card-title>
-            <ion-icon name="bar-chart-outline" color="primary"></ion-icon>
-            {{ tituloGrafico }}</ion-card-title>
+          <ion-icon name="bar-chart-outline" color="primary"></ion-icon>
         </ion-card-header>
         <ion-card-content>
           <canvas id="graficoLitrosPreco" style="width: 100%; max-width: 600px; height: 300px;"></canvas>
@@ -212,24 +219,23 @@
       <h2 style="margin: 16px 16px 8px; font-weight: 600; font-size: 1.3rem;">Média de Preço por Mês</h2>
     </ion-text>
 
-   <ion-card *ngFor="let grupo of dadosPorMes; trackBy: trackByLaticinio">
-  <ion-card-header>
-    <ion-card-title>{{ grupo.mes }}</ion-card-title>
-  </ion-card-header>
-  <ion-card-content>
-    <ion-item *ngFor="let item of grupo.items; trackBy: trackByFaixa">
-      <ion-label style="display: flex; align-items: center; gap: 6px;">
-        <img [src]="laticinioIcons[item.laticinio] || 'assets/icon/default.svg'"
-            alt="{{ item.laticinio }} icon"
-            style="width: 20px; height: 20px;" />
-        <div>
-          {{ item.laticinio }}<br>
-          Média Geral: R$ {{ item.mediaPrecoDoLaticinio | number:'1.2-2' }}
-        </div>
-      </ion-label>
-    </ion-item>
-  </ion-card-content>
-</ion-card>
+    <ion-card *ngFor="let grupo of dadosPorMes; trackBy: trackByLaticinio">
+      <ion-card-header>
+        <ion-card-title>{{ grupo.mes }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item *ngFor="let item of grupo.items; trackBy: trackByFaixa">
+          <ion-label style="display: flex; align-items: center; gap: 6px;">
+            <img [src]="laticinioIcons[item.laticinio] || 'assets/icon/default.svg'" alt="{{ item.laticinio }} icon"
+              style="width: 20px; height: 20px;" />
+            <div>
+              {{ item.laticinio }}<br>
+              Média Geral: R$ {{ item.mediaPrecoDoLaticinio | number:'1.2-2' }}
+            </div>
+          </ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
   </ng-container>
 
 </ion-content>
