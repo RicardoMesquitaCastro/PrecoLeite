@@ -18,6 +18,10 @@ const routes: Routes = [
     path: 'cadastro-propriedade',
     loadComponent: () => import('./pages/cadastro-propriedade/cadastro-propriedade.component').then((m) => m.CadastroPropriedadeComponent),
   },
+  {
+    path: 'cadastro-parametros',
+    loadComponent: () => import('./pages/cadastro-parametros/cadastro-parametros.component').then((m) => m.CadastroParametrosComponent),
+  },
     {
     path: 'data-parametros',
     loadComponent: () => import('./pages/data-parametros/data-parametros.component').then((m) => m.DataParametrosPage),
