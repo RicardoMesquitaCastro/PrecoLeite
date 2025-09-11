@@ -157,9 +157,7 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
       data: {
         labels,
         datasets: [{
-          label: this.municipioSelecionado?.toLowerCase() === 'geral'
-            ? 'Média de Preço por Região (R$)'
-            : `Média de Preço de ${this.municipioSelecionado} (R$)`,
+        label: ` (R$) Média de Preço de ${this.municipioSelecionado} ${this.mesSelecionado !== 'geral' ? this.mesSelecionado : ''} ${this.anoSelecionado}`,
           data,
           backgroundColor: backgroundColors.slice(0, data.length),
           borderColor: borderColors.slice(0, data.length),
@@ -526,6 +524,13 @@ criarGrafico() {
     return Array.from(new Set(this.dadosListFiltrados.map(d => d.regiao))).sort();
   }
 
-  trackByLaticinio(index: number, item: any) { return item.laticinio; }
-  trackByFaixa(index: number, item: any) { return item.faixa; }
+trackByLaticinio(index: number, item: any): string {
+    // Retorna uma combinação única baseada em propriedades do item
+    return `${item.regiao}-${item.laticinio}-${item.mediaPreco}`; // Ajuste conforme as propriedades disponíveis
+  }
+
+  trackByFaixa(index: number, item: any): string {
+    // Retorna uma combinação única baseada em propriedades do item
+    return `${item.laticinio}-${item.mediaPreco}-${item.faixa}`; // Ajuste conforme as propriedades disponíveis
+  }
 }
