@@ -3,6 +3,9 @@ import user from './user'
 import auth from './auth'
 import passwordReset from './password-reset'
 import dados from './dados'
+import cadastroContas from './cadastroConta'
+import cadastroParametros from './cadastroParametros'
+import cadastroPropriedade from './cadastroPropriedade'
 
 const router = new Router()
 
@@ -33,5 +36,8 @@ router.use('/users', user)
 router.use('/auth', auth)
 router.use('/password-resets', passwordReset)
 router.use('/dados', dados)
+router.use('/cadastroContas', cadastroContas)
+router.use('/cadastroParametros', cadastroParametros)
+router.use('/cadastroPropriedade', cadastroPropriedade)
 
 export default router
