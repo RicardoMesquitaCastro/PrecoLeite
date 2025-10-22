@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { CadastroContaService } from '../../services/cadastro-conta.service';
 
 @Component({
   selector: 'app-cadastro-conta',
@@ -10,13 +11,24 @@ import { CommonModule } from '@angular/common';
   imports: [IonicModule, FormsModule, CommonModule],
   styleUrls: ['./cadastro-conta.component.scss'],
 })
-export class CadastroContaComponent {
+export class CadastroContaComponent implements OnInit{
   name = '';
   email = '';
   password = '';
   erro = '';
 
-  constructor(private router: Router, private toastController: ToastController) {}
+  constructor(
+    private router: Router,
+    private toastController: ToastController,
+    private cadastroContaService: CadastroContaService
+  ) {}
+
+  ngOnInit(): void {
+     this.cadastroContaService.getAll().subscribe({
+
+
+    });
+  }
 
   async cadastrarConta() {
     if (!this.name || !this.email || !this.password) {
@@ -24,32 +36,29 @@ export class CadastroContaComponent {
       return;
     }
 
-    const dados = {
-      nome: this.name,
+    const conta = {
+      name: this.name,
       email: this.email,
-      senha: this.password,
+      password: this.password,
     };
 
-    console.log('Dados cadastrados:', dados);
-
-    // Chamada do serviço (comentada por enquanto)
-    /*
-    this.auth.register(this.name, this.email, this.password).subscribe({
-      next: async (res) => {
-        this.auth.saveToken(res.token); // apenas se seu serviço tiver isso
+    this.cadastroContaService.create(conta).subscribe({
+      next: async () => {
         await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
+        this.limparFormulario();
         this.router.navigate(['/cadastro-propriedade']);
       },
-      error: async () => {
-        await this.mostrarToast('Erro ao cadastrar', 'danger');
+      error: async (err) => {
+        console.error('Erro ao cadastrar conta:', err);
+        await this.mostrarToast('Erro ao cadastrar conta.', 'danger');
       }
     });
-    */
+  }
 
-    // Para teste local sem backend:
-    this.limparFormulario();
-    await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
-    this.router.navigate(['/cadastro-propriedade']);
+  get() {
+
+
+
   }
 
   limparFormulario() {
