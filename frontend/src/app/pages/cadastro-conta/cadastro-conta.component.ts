@@ -55,12 +55,6 @@ export class CadastroContaComponent implements OnInit{
     });
   }
 
-  get() {
-
-
-
-  }
-
   limparFormulario() {
     this.name = '';
     this.email = '';

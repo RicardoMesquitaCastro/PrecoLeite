@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonicModule, ToastController } from '@ionic/angular';
-import { RegistroService } from 'src/app/services/registro.service';
+import { CadastroParametrosService, CadastroParametros } from 'src/app/services/cadastro-parametros.service';
 
 @Component({
   selector: 'app-cadastro-parametros',
@@ -19,9 +19,12 @@ export class CadastroParametrosComponent {
   gordura = '';
   proteina = '';
 
+  // Substitua pelo token real do usuário/master
+
+
   constructor(
     private router: Router,
-    private registroService: RegistroService,
+    private cadastroService: CadastroParametrosService,
     private toastController: ToastController
   ) {}
 
@@ -31,36 +34,27 @@ export class CadastroParametrosComponent {
       return;
     }
 
-    const dadosParametros = {
+    // Montando o objeto de dados convertendo para tipos corretos
+    const dadosParametros: CadastroParametros = {
+      contaId: 'CONTA_PADRAO', // ajuste se houver seleção do usuário
       mesReferencia: this.mesReferencia,
-      precoLitro: this.precoLitro,
-      producaoLitros: this.producaoLitros,
-      ccs: this.ccs,
-      cbt: this.cbt,
-      gordura: this.gordura,
-      proteina: this.proteina,
+      precoLeite: parseFloat(this.precoLitro),
+      producaoLitros: parseFloat(this.producaoLitros),
+      ccs: parseFloat(this.ccs),
+      cbt: parseFloat(this.cbt),
+      gordura: parseFloat(this.gordura),
+      proteina: parseFloat(this.proteina),
     };
 
-    console.log('Dados cadastrados:', dadosParametros);
-     this.router.navigate(['/home']); // opcional
-
-    // Chamada do serviço (descomente quando estiver implementado)
-    /*
-    this.registroService.cadastrar(dadosParametros).subscribe({
-      next: async () => {
-        this.limparFormulario();
-        await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
-        this.router.navigate(['/home']); // opcional
-      },
-      error: async (err) => {
-        await this.mostrarToast('Erro ao cadastrar: ' + err.message, 'danger');
-      }
-    });
-    */
-
-    // Para teste local, sem backend:
-    this.limparFormulario();
-    await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
+    try {
+      const resposta = await this.cadastroService.create(dadosParametros).toPromise();
+      console.log('Dados cadastrados:', resposta);
+      this.limparFormulario();
+      await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
+      this.router.navigate(['/home']);
+    } catch (err: any) {
+      await this.mostrarToast('Erro ao cadastrar: ' + (err?.message || 'Erro desconhecido'), 'danger');
+    }
   }
 
   todosCamposPreenchidos(): boolean {
