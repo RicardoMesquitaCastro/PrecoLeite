@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonicModule, ToastController } from '@ionic/angular';
+import { CadastroPropriedade, CadastroPropriedadeService } from 'src/app/services/cadastro-propriedade.service';
 import { RegistroService } from 'src/app/services/registro.service';
 
 @Component({
@@ -18,41 +19,31 @@ export class CadastroPropriedadeComponent {
 
   constructor(
     private router: Router,
-    private registroService: RegistroService,
+    private propriedadeService: CadastroPropriedadeService,
     private toastController: ToastController
   ) {}
 
-  async cadastrarPropriedade() {
+async cadastrarPropriedade() {
     if (!this.nomePropriedade || !this.municipio || !this.regiao) {
       await this.mostrarToast('Preencha todos os campos.', 'danger');
       return;
     }
 
-    const dados = {
-      propriedade: this.nomePropriedade,
+    const dados: CadastroPropriedade = {
+      nomePropriedade: this.nomePropriedade,
       municipio: this.municipio,
       regiao: this.regiao,
     };
 
-    console.log('Dados cadastrados:', dados);
-
-    // Chamada do serviço (comentada por enquanto)
-    /*
-    this.registroService.cadastrarPropriedade(dados).subscribe({
-      next: async () => {
-        await this.mostrarToast('Propriedade cadastrada com sucesso!', 'success');
-        this.router.navigate(['/cadastro-parametros']);
-      },
-      error: async () => {
-        await this.mostrarToast('Erro ao cadastrar propriedade', 'danger');
-      }
-    });
-    */
-
-    // Para teste local sem backend:
-    this.limparFormulario();
-    await this.mostrarToast('Propriedade cadastrada com sucesso!', 'success');
-    this.router.navigate(['/cadastro-parametros']);
+    try {
+      const resposta = await this.propriedadeService.create(dados).toPromise();
+      console.log('Propriedade cadastrada:', resposta);
+      this.limparFormulario();
+      await this.mostrarToast('Propriedade cadastrada com sucesso!', 'success');
+      this.router.navigate(['/cadastro-parametros']);
+    } catch (err: any) {
+      await this.mostrarToast('Erro ao cadastrar propriedade: ' + (err?.message || 'Erro desconhecido'), 'danger');
+    }
   }
 
   limparFormulario() {
