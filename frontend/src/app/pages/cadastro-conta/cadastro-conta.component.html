@@ -10,15 +10,29 @@
   </ion-text>
 
   <ion-item>
-    <ion-input [(ngModel)]="name" placeholder="Nome"></ion-input>
+    <ion-input
+      [(ngModel)]="name"
+      placeholder="Nome"
+      clearInput>
+    </ion-input>
   </ion-item>
 
   <ion-item>
-    <ion-input [(ngModel)]="email" placeholder="Email"></ion-input>
+    <ion-input
+      [(ngModel)]="email"
+      type="email"
+      placeholder="Email"
+      clearInput>
+    </ion-input>
   </ion-item>
 
   <ion-item>
-    <ion-input [(ngModel)]="password" type="password" placeholder="Senha"></ion-input>
+    <ion-input
+      [(ngModel)]="password"
+      type="password"
+      placeholder="Senha"
+      clearInput>
+    </ion-input>
   </ion-item>
 
   <ion-button
