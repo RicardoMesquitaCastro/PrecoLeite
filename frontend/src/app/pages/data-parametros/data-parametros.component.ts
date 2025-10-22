@@ -5,7 +5,8 @@ import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
 import { FaixaValidaPipe } from './faixa-valida.pipe';
 import { list } from './dados';
-import { DadoLeite } from './dado-leite.model';
+//import { DadoLeite } from './dado-leite.model';
+import { DadosService, DadoLeite } from 'src/app/services/dados.service';
 
 Chart.register(...registerables);
 
@@ -16,7 +17,12 @@ Chart.register(...registerables);
   templateUrl: './data-parametros.component.html',
   styleUrls: ['./data-parametros.component.scss']
 })
+
+
 export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnInit {
+
+  constructor(private dadosService: DadosService) {}
+
   @ViewChild('graficoRegiao', { static: false }) graficoRegiaoRef!: ElementRef<HTMLCanvasElement>;
   graficoRegiao!: Chart;
   grafico: Chart | null = null;
@@ -66,16 +72,37 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
   faixaMin: number | null = null;
   faixaMax: number | null = null;
 
-  ngOnInit() {
-  this.dadosList = list;
+//   ngOnInit() {
+//   this.dadosList = list;
 
-  // Municípios disponíveis
+//   // Municípios disponíveis
+//   const unicos = new Set(this.dadosList.map(d => d.municipio));
+//   this.municipiosDisponiveis = Array.from(unicos);
+
+//   // Anos disponíveis
+//   const anosUnicos = new Set(this.dadosList.map(d => d.anoReferencia));
+//   this.anosDisponiveis = Array.from(anosUnicos).sort((a, b) => b - a); // do maior para o menor
+// }
+
+ngOnInit() {
+  this.dadosService.getAll().subscribe({
+    next: (res) => {
+      this.dadosList = res.rows;
+      this.inicializarFiltros();
+    },
+    error: (err) => {
+      console.error('Erro ao buscar dados:', err);
+    }
+  });
+}
+
+
+inicializarFiltros() {
   const unicos = new Set(this.dadosList.map(d => d.municipio));
   this.municipiosDisponiveis = Array.from(unicos);
 
-  // Anos disponíveis
   const anosUnicos = new Set(this.dadosList.map(d => d.anoReferencia));
-  this.anosDisponiveis = Array.from(anosUnicos).sort((a, b) => b - a); // do maior para o menor
+  this.anosDisponiveis = Array.from(anosUnicos).sort((a, b) => b - a);
 }
 
   ngAfterViewInit() {

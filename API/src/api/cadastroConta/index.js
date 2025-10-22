@@ -28,6 +28,7 @@ router.post('/',
   body({ name, email, password }),
   create)
 
+
 /**
  * @api {get} /cadastroContas Retrieve cadastro contas
  * @apiName RetrieveCadastroContas

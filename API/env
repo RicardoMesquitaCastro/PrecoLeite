@@ -1,0 +1,4 @@
+MONGODB_URI=mongodb+srv://ricardimmcastro93_db_user:pOCZDv2cVwEFuQBr@precoleite.ex6akoc.mongodb.net/?retryWrites=true&w=majority&appName=PrecoLeite
+SENDGRID_KEY=teste
+MASTER_KEY=teste
+JWT_SECRET=teste
