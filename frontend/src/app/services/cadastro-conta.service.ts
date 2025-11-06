@@ -19,7 +19,7 @@ export class CadastroContaService {
 
   private getHeaders(): HttpHeaders {
     // token master de autenticação
-    const token = 'masterKey';
+    const token = 'teste';
     return new HttpHeaders({
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
