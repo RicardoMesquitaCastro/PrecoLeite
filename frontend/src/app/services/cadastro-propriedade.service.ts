@@ -15,7 +15,7 @@ export interface CadastroPropriedade {
 })
 export class CadastroPropriedadeService {
   private apiUrl = 'http://localhost:9000/cadastroPropriedade';
-  private token = 'masterKey'; // token master padrão
+  private token = 'teste'; // token master padrão
 
   constructor(private http: HttpClient) {}
 

@@ -32,36 +32,29 @@ export class CadastroContaService {
   }
 
   /** READ (lista todas) */
-getAll(): Observable<CadastroConta[]> {
-  console.log('➡️ Entrou no método getAll()');
+ getAll(): Observable<CadastroConta[]> {
+    console.log('➡️ Entrou no método getAll()');
 
-  // Mock de dados
-  const mockData: CadastroConta[] = [
-    { _id: '1', name: 'João Silva', email: 'joao@example.com', password: '123456' },
-    { _id: '2', name: 'Maria Souza', email: 'maria@example.com', password: 'abcdef' },
-    { _id: '3', name: 'Carlos Lima', email: 'carlos@example.com', password: 'qwerty' }
-  ];
-
-  return of(mockData).pipe(
-    tap(res => console.log('📦 CadastroConta mock recebido:', res)),
-    catchError(err => {
-      console.error('❌ Erro mockando dados:', err);
-      return of([]); // fallback
-    })
-  );
-}
+    return this.http.get<CadastroConta[]>(this.apiUrl, { headers: this.getHeaders() }).pipe(
+      tap(res => console.log('📦 CadastroConta recebido do backend:', res)),
+      catchError(err => {
+        console.error('❌ Erro no GET /cadastroContas:', err);
+        return of([]); // retorna array vazio pra não quebrar a aplicação
+      })
+    );
+  }
   /** READ (por ID) */
   getById(id: string): Observable<CadastroConta> {
     return this.http.get<CadastroConta>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
   }
 
   /** UPDATE */
-  update(id: string, conta: CadastroConta): Observable<CadastroConta> {
-    return this.http.put<CadastroConta>(`${this.apiUrl}/${id}`, conta, { headers: this.getHeaders() });
-  }
+  // update(id: string, conta: CadastroConta): Observable<CadastroConta> {
+  //   return this.http.put<CadastroConta>(`${this.apiUrl}/${id}`, conta, { headers: this.getHeaders() });
+  // }
 
   /** DELETE */
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
-  }
+  // delete(id: string): Observable<void> {
+  //   return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+  // }
 }

@@ -19,7 +19,7 @@ export interface CadastroParametros {
 })
 export class CadastroParametrosService {
   private apiUrl = 'http://localhost:9000/cadastroParametros'; // URL do seu backend
-  private token = 'masterKey'; // token master padrão
+  private token = 'teste'; // token master padrão
 
   constructor(private http: HttpClient) {}
 

@@ -1,5 +1,5 @@
-import { success, notFound } from '../../services/response'
-import { CadastroPropriedade } from '.'
+import { success, notFound } from '../../services/response/index.js'
+import CadastroPropriedade from './model.js'
 
 export const create = ({ bodymen: { body } }, res, next) =>
   CadastroPropriedade.create(body)
