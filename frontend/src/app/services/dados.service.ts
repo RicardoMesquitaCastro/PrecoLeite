@@ -22,8 +22,8 @@ export interface DadoLeite {
   providedIn: 'root',
 })
 export class DadosService {
-  private apiUrl = 'http://localhost:3000/dados';
-  private token = 'masterKey';
+  private apiUrl = 'http://localhost:9000/dados';
+  private token = 'teste';
   private usarMock = false; // ← defina `false` para usar o backend real
 
   constructor(private http: HttpClient) {}

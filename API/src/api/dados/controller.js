@@ -1,5 +1,5 @@
 import { success, notFound } from '../../services/response/'
-import { Dados } from '.'
+import  Dados  from './model.js'
 
 export const create = ({ bodymen: { body } }, res, next) =>
   Dados.create(body)

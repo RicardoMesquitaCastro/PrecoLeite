@@ -88,6 +88,7 @@ ngOnInit() {
   this.dadosService.getAll().subscribe({
     next: (res) => {
       this.dadosList = res.rows;
+      console.log("🚀 ~ DataParametrosPage ~ ngOnInit ~ this.dadosList:", this.dadosList)
       this.inicializarFiltros();
     },
     error: (err) => {

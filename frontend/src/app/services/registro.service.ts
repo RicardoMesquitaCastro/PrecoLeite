@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class RegistroService {
-  private baseUrl = 'http://localhost:3000'; // ⬅️ URL do seu backend
+  private baseUrl = 'http://localhost:9000'; // ⬅️ URL do seu backend
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
