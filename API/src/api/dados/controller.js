@@ -1,5 +1,6 @@
 import { success, notFound } from '../../services/response/'
 import  Dados  from './model.js'
+import { returnAllDocuments } from './useCases/returnAllDocuments.js'
 
 export const create = ({ bodymen: { body } }, res, next) =>
   Dados.create(body)
@@ -39,3 +40,9 @@ export const destroy = ({ params }, res, next) =>
     .then((dados) => dados ? dados.remove() : null)
     .then(success(res, 204))
     .catch(next)
+
+export const returnAll = (req, res, next) => {
+    returnAllDocuments()
+        .then(success(res))
+        .catch(next)
+}

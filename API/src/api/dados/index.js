@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, returnAll } from './controller'
 import { schema } from './model'
 //export Dados, { schema } from './model'
 
@@ -71,5 +71,18 @@ router.put('/:id',
  */
 router.delete('/:id',
   destroy)
+
+/**
+ * @api {get} /dados/all Retrieve dados
+ * @apiName RetrieveDados
+ * @apiGroup Dados
+ * @apiUse listParams
+ * @apiSuccess {Number} count Total amount of dados.
+ * @apiSuccess {Object[]} rows List of dados.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ */
+router.get('/all',
+  query(),
+  returnAll)
 
 export default router
