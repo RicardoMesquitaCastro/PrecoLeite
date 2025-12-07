@@ -7,7 +7,7 @@ import { schema } from './model'
 //export CadastroPropriedade, { schema } from './model'
 
 const router = new Router()
-const { cadastroId, nomePropriedade, municipio, regiao } = schema.tree
+const { contaId, nomePropriedade, municipio, regiao } = schema.tree
 
 /**
  * @api {post} /cadastroPropriedade Create some entity
@@ -15,7 +15,7 @@ const { cadastroId, nomePropriedade, municipio, regiao } = schema.tree
  * @apiGroup CadastroPropriedade
  * @apiPermission master
  * @apiParam {String} access_token master access token.
- * @apiParam cadastroId Some entity's cadastroId.
+ * @apiParam contaId Some entity's contaId.
  * @apiParam nomePropriedade Some entity's nomePropriedade.
  * @apiParam municipio Some entity's municipio.
  * @apiParam regiao Some entity's regiao.
@@ -26,7 +26,7 @@ const { cadastroId, nomePropriedade, municipio, regiao } = schema.tree
  */
 router.post('/',
   master(),
-  body({ cadastroId, nomePropriedade, municipio, regiao }),
+  body({ contaId, nomePropriedade, municipio, regiao }),
   create)
 
 /**
@@ -67,7 +67,7 @@ router.get('/:id',
  * @apiGroup CadastroPropriedade
  * @apiPermission master
  * @apiParam {String} access_token master access token.
- * @apiParam cadastroId Some entity's cadastroId.
+ * @apiParam contaId Some entity's contaId.
  * @apiParam nomePropriedade Some entity's nomePropriedade.
  * @apiParam municipio Some entity's municipio.
  * @apiParam regiao Some entity's regiao.
@@ -78,7 +78,7 @@ router.get('/:id',
  */
 router.put('/:id',
   master(),
-  body({ cadastroId, nomePropriedade, municipio, regiao }),
+  body({ contaId, nomePropriedade, municipio, regiao }),
   update)
 
 /**

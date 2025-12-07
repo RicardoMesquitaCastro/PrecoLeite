@@ -85,21 +85,38 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
 // }
 
 ngOnInit() {
-  this.dadosService.getAll().subscribe({
-    next: (res) => {
-      this.dadosList = res;
-      console.log("🚀 ~ DataParametrosPage ~ ngOnInit ~ this.dadosList:", this.dadosList)
-      this.inicializarFiltros();
-    },
-    error: (err) => {
-      console.error('Erro ao buscar dados:', err);
-    }
+  this.dadosService.getAll().subscribe((res: any) => {
+    console.log("🚀 ~ DataParametrosPage ~ ngOnInit ~ res:", res)
+    const propriedades = res.cadastroPropriedade;
+    const parametros = res.cadastroParametros;
+
+   this.dadosList = parametros.map((p: any) => {
+  // Busca a propriedade pelo contaId
+  const prop = propriedades.find((pr: any) => pr.contaId === p.contaId) || {};
+
+  return {
+    laticinio: p.laticinio,
+    regiao: prop.regiao ?? "",
+    municipio: prop.municipio ?? "",
+    mesReferencia: Number(p.mesReferencia),
+    anoReferencia: new Date(p.createdAt).getFullYear(),
+    producaoLitros: Number(p.producaoLitros),
+    precoLitro: Number(p.precoLeite),
+    ccs: Number(p.ccs),
+    cbt: Number(p.cbt),
+    gordura: Number(p.gordura),
+    proteina: Number(p.proteina)
+  };
+});
+
+    console.log("🔎 Lista final unificada:", this.dadosList);
+    this.inicializarFiltros();
   });
 }
 
-
 inicializarFiltros() {
   const unicos = new Set(this.dadosList.map(d => d.municipio));
+  console.log("🚀 ~ DataParametrosPage ~ inicializarFiltros ~ unicos:", unicos)
   this.municipiosDisponiveis = Array.from(unicos);
 
   const anosUnicos = new Set(this.dadosList.map(d => d.anoReferencia));

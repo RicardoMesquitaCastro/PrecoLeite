@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose'
 
 const cadastroPropriedadeSchema = new Schema({
-  cadastroId: {
+  contaId: {
     type: String
   },
   nomePropriedade: {
@@ -26,7 +26,7 @@ cadastroPropriedadeSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      cadastroId: this.cadastroId,
+      contaId: this.contaId,
       nomePropriedade: this.nomePropriedade,
       municipio: this.municipio,
       regiao: this.regiao,

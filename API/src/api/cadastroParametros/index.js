@@ -7,7 +7,7 @@ import { schema } from './model'
 //export CadastroParametros, { schema } from './model'
 
 const router = new Router()
-const { contaId, mesReferencia, precoLeite, producaoLitros, ccs, cbt, gordura, proteina } = schema.tree
+const { contaId, mesReferencia, laticinio, precoLeite, producaoLitros, ccs, cbt, gordura, proteina } = schema.tree
 
 /**
  * @api {post} /cadastroParametros Create cadastro parametros
@@ -17,6 +17,7 @@ const { contaId, mesReferencia, precoLeite, producaoLitros, ccs, cbt, gordura, p
  * @apiParam {String} access_token master access token.
  * @apiParam contaId Cadastro parametros's contaId.
  * @apiParam mesReferencia Cadastro parametros's mesReferencia.
+ * @apiParam laticinio Cadastro parametros's laticinio.
  * @apiParam precoLeite Cadastro parametros's precoLeite.
  * @apiParam producaoLitros Cadastro parametros's producaoLitros.
  * @apiParam ccs Cadastro parametros's ccs.
@@ -30,7 +31,7 @@ const { contaId, mesReferencia, precoLeite, producaoLitros, ccs, cbt, gordura, p
  */
 router.post('/',
   master(),
-  body({ contaId, mesReferencia, precoLeite, producaoLitros, ccs, cbt, gordura, proteina }),
+  body({ contaId, mesReferencia, laticinio, precoLeite, producaoLitros, ccs, cbt, gordura, proteina }),
   create)
 
 /**
@@ -73,8 +74,9 @@ router.get('/:id',
  * @apiParam {String} access_token master access token.
  * @apiParam contaId Cadastro parametros's contaId.
  * @apiParam mesReferencia Cadastro parametros's mesReferencia.
+ *  @apiParam laticino Cadastro parametros's laticino.
  * @apiParam precoLeite Cadastro parametros's precoLeite.
- * @apiParam producaoLitros Cadastro parametros's producaoLitros.
+ * @apiParam producaoLitros Cadastro parametros's producaoLitros. *
  * @apiParam ccs Cadastro parametros's ccs.
  * @apiParam cbt Cadastro parametros's cbt.
  * @apiParam gordura Cadastro parametros's gordura.
@@ -86,7 +88,7 @@ router.get('/:id',
  */
 router.put('/:id',
   master(),
-  body({ contaId, mesReferencia, precoLeite, producaoLitros, ccs, cbt, gordura, proteina }),
+  body({ contaId, mesReferencia, laticinio, precoLeite, producaoLitros, ccs, cbt, gordura, proteina }),
   update)
 
 /**

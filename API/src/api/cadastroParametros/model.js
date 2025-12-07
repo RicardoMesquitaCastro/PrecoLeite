@@ -4,6 +4,9 @@ const cadastroParametrosSchema = new Schema({
   contaId: {
     type: String
   },
+  laticinio: {
+    type: String
+  },
   mesReferencia: {
     type: String
   },
@@ -39,6 +42,7 @@ cadastroParametrosSchema.methods = {
       // simple view
       id: this.id,
       contaId: this.contaId,
+      laticinio: this.laticinio,
       mesReferencia: this.mesReferencia,
       precoLeite: this.precoLeite,
       producaoLitros: this.producaoLitros,

@@ -3,8 +3,6 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface CadastroPropriedade {
-  _id?: string;
-  cadastroId?: string; // opcional, se vinculado a outro cadastro
   nomePropriedade: string;
   municipio: string;
   regiao: string;
