@@ -1,9 +1,9 @@
 import mongoose, { Schema } from 'mongoose';
 
 const cadastroContaSchema = new Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  name: String,
+  email: { type: String, unique: true },
+  password: String
 }, {
   timestamps: true,
   toJSON: {
@@ -12,6 +12,7 @@ const cadastroContaSchema = new Schema({
   }
 });
 
+// Métodos
 cadastroContaSchema.methods = {
   view(full) {
     const view = {
@@ -26,6 +27,11 @@ cadastroContaSchema.methods = {
   }
 };
 
-// ✅ Export nomeado
-export const CadastroConta = mongoose.model('CadastroConta', cadastroContaSchema);
+// ⚠️ PREVENÇÃO DE OVERWRITE DO MODELO
+export const CadastroConta =
+  mongoose.models.CadastroConta || mongoose.model('CadastroConta', cadastroContaSchema);
+
+// Exportação correta do schema
 export const schema = CadastroConta.schema;
+
+export default CadastroConta;

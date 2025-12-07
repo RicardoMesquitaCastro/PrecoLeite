@@ -87,7 +87,7 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
 ngOnInit() {
   this.dadosService.getAll().subscribe({
     next: (res) => {
-      this.dadosList = res.rows;
+      this.dadosList = res;
       console.log("🚀 ~ DataParametrosPage ~ ngOnInit ~ this.dadosList:", this.dadosList)
       this.inicializarFiltros();
     },

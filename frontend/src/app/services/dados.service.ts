@@ -36,37 +36,37 @@ export class DadosService {
   }
 
   /** 🔹 Retorna lista de dados */
-  getAll(params?: any): Observable<{ count: number; rows: DadoLeite[] }> {
-    if (this.usarMock) {
-      // --- MODO LOCAL (mock) ---
-      let dadosFiltrados = list;
+  getAll(params?: any): Observable<any> {
+  if (this.usarMock) {
+    let dadosFiltrados = list;
 
-      // aplica filtros opcionais (ex: anoReferencia, municipio, etc)
-      if (params) {
-        Object.keys(params).forEach((key) => {
-          if (params[key] != null && params[key] !== '') {
-            dadosFiltrados = dadosFiltrados.filter(
-              (item) => String() === String(params[key])
-            );
-          }
-        });
-      }
-
-      return of({ count: dadosFiltrados.length, rows: dadosFiltrados });
-    }
-
-    // --- MODO BACKEND REAL ---
-    let httpParams = new HttpParams();
     if (params) {
       Object.keys(params).forEach((key) => {
-        httpParams = httpParams.set(key, params[key]);
+        if (params[key] != null && params[key] !== '') {
+          dadosFiltrados = dadosFiltrados.filter(
+  (item) => String((item as any)[key]) === String(params[key])
+);
+        }
       });
     }
-    return this.http.get<{ count: number; rows: DadoLeite[] }>(this.apiUrl, {
-      headers: this.getHeaders(),
-      params: httpParams,
+
+    return of({ count: dadosFiltrados.length, rows: dadosFiltrados });
+  }
+
+  // --- MODO BACKEND REAL ---
+  let httpParams = new HttpParams();
+  if (params) {
+    Object.keys(params).forEach((key) => {
+      httpParams = httpParams.set(key, params[key]);
     });
   }
+
+  // 🔥 ALTERAÇÃO AQUI: adicionar /all
+  return this.http.get<any>(`${this.apiUrl}/all`, {
+    headers: this.getHeaders(),
+    params: httpParams,
+  });
+}
 
   /** 🔹 Cadastrar novo registro */
   create(dado: DadoLeite): Observable<DadoLeite> {

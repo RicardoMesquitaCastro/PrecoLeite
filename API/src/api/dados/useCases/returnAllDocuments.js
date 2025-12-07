@@ -1,13 +1,36 @@
 import Dados from '../model'
-import cadastroConta from '../../cadastroConta/model'
-import cadastroPropriedade from '../../cadastroPropriedade/model'
-import cadastroParametros from '../../cadastroParametros/model'
+import { CadastroConta } from '../../cadastroConta/model'
+import CadastroPropriedade from '../../cadastroPropriedade/model'
+import CadastroParametros from '../../cadastroParametros/model'
+
+console.log('📌 MODELOS IMPORTADOS:')
+console.log('Dados:', Dados)
+console.log('CadastroConta:', CadastroConta)
+console.log('CadastroPropriedade:', CadastroPropriedade)
+console.log('CadastroParametros:', CadastroParametros)
 
 export const returnAllDocuments = async () => {
-    const dadosPromise = await Dados.find().then(dados => dados.map(dado => dado.view()))
-    const cadastroContaPromise = await cadastroConta.find().then(contas => contas.map(conta => conta.view()))
-    const cadastroPropriedadePromise = await cadastroPropriedade.find().then(propriedades => propriedades.map(prop => prop.view()))
-    const cadastroParametrosPromise = await cadastroParametros.find().then(parametros => parametros.map(param => param.view()))
+    console.log('📌 INICIANDO returnAllDocuments...')
+
+    const dadosPromise = await Dados.find().then(dados => {
+        console.log('🔹 Dados encontrados:', dados.length)
+        return dados.map(dado => dado.view())
+    })
+
+    const cadastroContaPromise = await CadastroConta.find().then(contas => {
+        console.log('🔹 Contas encontradas:', contas.length)
+        return contas.map(conta => conta.view())
+    })
+
+    const cadastroPropriedadePromise = await CadastroPropriedade.find().then(propriedades => {
+        console.log('🔹 Propriedades encontradas:', propriedades.length)
+        return propriedades.map(prop => prop.view())
+    })
+
+    const cadastroParametrosPromise = await CadastroParametros.find().then(parametros => {
+        console.log('🔹 Parametros encontrados:', parametros.length)
+        return parametros.map(param => param.view())
+    })
 
     return {
         dados: dadosPromise,

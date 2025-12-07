@@ -1,15 +1,9 @@
 import mongoose, { Schema } from 'mongoose'
 
 const dadosSchema = new Schema({
-  propriedade: {
-    type: String
-  },
-  municipio: {
-    type: String
-  },
-  regiao: {
-    type: String
-  }
+  propriedade: String,
+  municipio: String,
+  regiao: String
 }, {
   timestamps: true,
   toJSON: {
@@ -19,9 +13,8 @@ const dadosSchema = new Schema({
 })
 
 dadosSchema.methods = {
-  view (full) {
+  view(full) {
     const view = {
-      // simple view
       id: this.id,
       propriedade: this.propriedade,
       municipio: this.municipio,
@@ -30,14 +23,11 @@ dadosSchema.methods = {
       updatedAt: this.updatedAt
     }
 
-    return full ? {
-      ...view
-      // add properties for a full view
-    } : view
+    return full ? { ...view } : view
   }
 }
 
-const model = mongoose.model('Dados', dadosSchema)
+const Dados = mongoose.model('Dados', dadosSchema)
 
-export const schema = model.schema
-export default model
+export default Dados
+export const schema = Dados.schema
