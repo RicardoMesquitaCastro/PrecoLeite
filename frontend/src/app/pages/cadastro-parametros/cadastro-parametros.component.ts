@@ -11,6 +11,7 @@ import { CadastroParametrosService, CadastroParametros } from 'src/app/services/
   styleUrls: ['./cadastro-parametros.component.scss'],
 })
 export class CadastroParametrosComponent {
+  laticinio = '';
   mesReferencia = '';
   precoLitro = '';
   producaoLitros = '';
@@ -33,10 +34,8 @@ export class CadastroParametrosComponent {
       this.mostrarToast('Preencha todos os campos obrigatórios.', 'danger');
       return;
     }
-
-    // Montando o objeto de dados convertendo para tipos corretos
-    const dadosParametros: CadastroParametros = {
-      contaId: 'CONTA_PADRAO', // ajuste se houver seleção do usuário
+ const dadosParametros: CadastroParametros = {
+      laticinio: this.laticinio,
       mesReferencia: this.mesReferencia,
       precoLeite: parseFloat(this.precoLitro),
       producaoLitros: parseFloat(this.producaoLitros),
@@ -45,9 +44,9 @@ export class CadastroParametrosComponent {
       gordura: parseFloat(this.gordura),
       proteina: parseFloat(this.proteina),
     };
-
+    // Montando o objeto de dados convertendo para tipos corretos
     try {
-      const resposta = await this.cadastroService.create(dadosParametros).toPromise();
+       const resposta = await this.cadastroService.create(dadosParametros).toPromise();
       console.log('Dados cadastrados:', resposta);
       this.limparFormulario();
       await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
@@ -59,6 +58,7 @@ export class CadastroParametrosComponent {
 
   todosCamposPreenchidos(): boolean {
     const campos = [
+      this.laticinio,
       this.mesReferencia,
       this.precoLitro,
       this.producaoLitros,
@@ -71,6 +71,7 @@ export class CadastroParametrosComponent {
   }
 
   limparFormulario() {
+    this.laticinio,
     this.mesReferencia = '';
     this.precoLitro = '';
     this.producaoLitros = '';

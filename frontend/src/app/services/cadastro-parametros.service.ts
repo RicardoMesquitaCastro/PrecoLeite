@@ -3,8 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface CadastroParametros {
-  _id?: string;
-  contaId: string;
+  laticinio: string;
   mesReferencia: string;
   precoLeite: number;
   producaoLitros: number;
