@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CadastroContaService } from '../../services/cadastro-conta.service';
 
+
 @Component({
   selector: 'app-cadastro-conta',
   templateUrl: './cadastro-conta.component.html',
@@ -17,18 +18,20 @@ export class CadastroContaComponent implements OnInit{
   password = '';
   erro = '';
 
+  mesorregioes: any[] = [];
+
   constructor(
     private router: Router,
     private toastController: ToastController,
-    private cadastroContaService: CadastroContaService
+    private cadastroContaService: CadastroContaService,
   ) {}
 
   ngOnInit(): void {
-     this.cadastroContaService.getAll().subscribe({
-
-
+    this.cadastroContaService.getAll().subscribe({
     });
+
   }
+
 
   async cadastrarConta() {
     if (!this.name || !this.email || !this.password) {
