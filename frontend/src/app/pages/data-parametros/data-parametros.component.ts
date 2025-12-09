@@ -66,7 +66,9 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
     'JL': 'assets/icon/valeza.png',
     'CCPR': 'assets/icon/ccpr.png',
     'Piracanjuba': 'assets/icon/piracanjuba.png',
-    'ITALAC': 'assets/icon/italac.png'
+    'ITALAC': 'assets/icon/italac.png',
+    'Nestle' : 'assets/icon/nestle.jpg',
+    'Marajoara' : 'assets/icon/marajoara.jpg',
   };
 
   faixaMin: number | null = null;
@@ -86,7 +88,6 @@ export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnIn
 
 ngOnInit() {
   this.dadosService.getAll().subscribe((res: any) => {
-    console.log("🚀 ~ DataParametrosPage ~ ngOnInit ~ res:", res)
     const propriedades = res.cadastroPropriedade;
     const parametros = res.cadastroParametros;
 
@@ -109,14 +110,12 @@ ngOnInit() {
   };
 });
 
-    console.log("🔎 Lista final unificada:", this.dadosList);
     this.inicializarFiltros();
   });
 }
 
 inicializarFiltros() {
   const unicos = new Set(this.dadosList.map(d => d.municipio));
-  console.log("🚀 ~ DataParametrosPage ~ inicializarFiltros ~ unicos:", unicos)
   this.municipiosDisponiveis = Array.from(unicos);
 
   const anosUnicos = new Set(this.dadosList.map(d => d.anoReferencia));
