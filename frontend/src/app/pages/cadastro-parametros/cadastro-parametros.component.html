@@ -12,29 +12,74 @@
     <h2 style="margin-top: 24px;">Cadastro dos Parâmetros</h2>
   </ion-text>
 
-   <ion-item>
-    <ion-input [(ngModel)]="laticinio" placeholder="Laticínio"></ion-input>
-  </ion-item>
+  <!-- 🔽 Laticínio (Select) -->
   <ion-item>
-    <ion-input [(ngModel)]="mesReferencia" placeholder="Mês Referência"></ion-input>
+    <ion-select
+      [(ngModel)]="laticinio"
+      placeholder="Selecione o laticínio">
+
+      @for (item of laticinios; track item) {
+        <ion-select-option [value]="item">
+          {{ item }}
+        </ion-select-option>
+      }
+
+    </ion-select>
   </ion-item>
+
   <ion-item>
-    <ion-input [(ngModel)]="precoLitro" placeholder="Preço por Litro"></ion-input>
+    <ion-input
+      [(ngModel)]="mesReferencia"
+      placeholder="Mês Referência">
+    </ion-input>
   </ion-item>
+
   <ion-item>
-    <ion-input [(ngModel)]="producaoLitros" placeholder="Produção em Litros"></ion-input>
+    <ion-input
+      [(ngModel)]="precoLitro"
+      type="number"
+      placeholder="Preço por Litro">
+    </ion-input>
   </ion-item>
+
   <ion-item>
-    <ion-input [(ngModel)]="ccs" placeholder="CCS"></ion-input>
+    <ion-input
+      [(ngModel)]="producaoLitros"
+      type="number"
+      placeholder="Produção em Litros">
+    </ion-input>
   </ion-item>
+
   <ion-item>
-    <ion-input [(ngModel)]="cbt" placeholder="CBT"></ion-input>
+    <ion-input
+      [(ngModel)]="ccs"
+      type="number"
+      placeholder="CCS">
+    </ion-input>
   </ion-item>
+
   <ion-item>
-    <ion-input [(ngModel)]="gordura" placeholder="Gordura"></ion-input>
+    <ion-input
+      [(ngModel)]="cbt"
+      type="number"
+      placeholder="CBT">
+    </ion-input>
   </ion-item>
+
   <ion-item>
-    <ion-input [(ngModel)]="proteina" placeholder="Proteína"></ion-input>
+    <ion-input
+      [(ngModel)]="gordura"
+      type="number"
+      placeholder="Gordura">
+    </ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input
+      [(ngModel)]="proteina"
+      type="number"
+      placeholder="Proteína">
+    </ion-input>
   </ion-item>
 
   <ion-button
