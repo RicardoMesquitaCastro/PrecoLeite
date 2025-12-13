@@ -19,7 +19,7 @@ Chart.register(...registerables);
 })
 
 
-export class DataParametrosPage implements AfterViewInit, AfterViewChecked, OnInit {
+export class DataParametrosPage implements OnInit, AfterViewInit  {
 
   constructor(private dadosService: DadosService) {}
 
@@ -114,6 +114,13 @@ ngOnInit() {
   });
 }
 
+ionViewDidEnter() {
+  requestAnimationFrame(() => {
+    this.criarGrafico();
+    this.montarGraficoRegiao();
+  },);
+}
+
 inicializarFiltros() {
   const unicos = new Set(this.dadosList.map(d => d.municipio));
   this.municipiosDisponiveis = Array.from(unicos);
@@ -124,10 +131,6 @@ inicializarFiltros() {
 
   ngAfterViewInit() {
     this.criarGrafico();
-    this.tentarMontarGrafico();
-  }
-
-  ngAfterViewChecked() {
     this.tentarMontarGrafico();
   }
 
