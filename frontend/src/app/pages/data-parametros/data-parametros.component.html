@@ -131,7 +131,7 @@
                     style="width: 20px; height: 20px;" />
                   {{ lat.laticinio }}
                 </ion-label>
-                <ion-note slot="end">R$ {{ lat.mediaPreco | number:'1.2-2' }}</ion-note>
+                <ion-note style="font-size: 14px;" slot="end">R$ {{ lat.mediaPreco | number:'1.2-2' }}</ion-note>
               </ion-item>
             }
           </ion-card-content>
@@ -155,10 +155,10 @@
     } @else {
       <ion-card>
         <ion-card-header>
-          <ion-card-title>Selecione a região</ion-card-title>
+          <ion-card-title>Selecione o Município</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          Nenhum dado disponível até que uma região seja selecionada.
+          Nenhum dado disponível até que um município seja selecionado.
         </ion-card-content>
       </ion-card>
     }
