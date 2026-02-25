@@ -35,7 +35,7 @@ export class DataParametrosPage implements OnInit, AfterViewInit  {
   municipiosDisponiveis: string[] = [];
   mesSelecionado: string = 'geral';
   currentYear = new Date().getFullYear();
-  anoSelecionado: number = new Date().getFullYear(); // ano atual
+  anoSelecionado: number = 2025; // ano atual
   anosDisponiveis: number[] = [];
 
   laticinio: string = '';
@@ -87,31 +87,7 @@ export class DataParametrosPage implements OnInit, AfterViewInit  {
 // }
 
 ngOnInit() {
-  this.dadosService.getAll().subscribe((res: any) => {
-    const propriedades = res.cadastroPropriedade;
-    const parametros = res.cadastroParametros;
-
-   this.dadosList = parametros.map((p: any) => {
-  // Busca a propriedade pelo contaId
-  const prop = propriedades.find((pr: any) => pr.contaId === p.contaId) || {};
-
-  return {
-    laticinio: p.laticinio,
-    regiao: prop.regiao ?? "",
-    municipio: prop.municipio ?? "",
-    mesReferencia: Number(p.mesReferencia),
-    anoReferencia: new Date(p.createdAt).getFullYear(),
-    producaoLitros: Number(p.producaoLitros),
-    precoLitro: Number(p.precoLeite),
-    ccs: Number(p.ccs),
-    cbt: Number(p.cbt),
-    gordura: Number(p.gordura),
-    proteina: Number(p.proteina)
-  };
-});
-
-    this.inicializarFiltros();
-  });
+//
 }
 
 ionViewDidEnter() {
@@ -129,10 +105,40 @@ inicializarFiltros() {
   this.anosDisponiveis = Array.from(anosUnicos).sort((a, b) => b - a);
 }
 
-  ngAfterViewInit() {
-    this.criarGrafico();
-    this.tentarMontarGrafico();
-  }
+carregarDados() {
+  this.dadosService.getAll().subscribe((res: any) => {
+    const propriedades = res.cadastroPropriedade;
+    const parametros = res.cadastroParametros;
+
+    this.dadosList = parametros.map((p: any) => {
+      const prop = propriedades.find((pr: any) => pr.contaId === p.contaId) || {};
+
+      return {
+        laticinio: p.laticinio,
+        regiao: prop.regiao ?? "",
+        municipio: prop.municipio ?? "",
+        mesReferencia: Number(p.mesReferencia),
+        anoReferencia: new Date(p.createdAt).getFullYear(),
+        producaoLitros: Number(p.producaoLitros),
+        precoLitro: Number(p.precoLeite),
+        ccs: Number(p.ccs),
+        cbt: Number(p.cbt),
+        gordura: Number(p.gordura),
+        proteina: Number(p.proteina)
+      };
+    });
+
+    this.inicializarFiltros();
+
+    setTimeout(() => {
+      this.criarGrafico();
+    });
+  });
+}
+
+ ngAfterViewInit() {
+  this.carregarDados();
+}
 
   get dadosListFiltrados() {
     return this.dadosList.filter(d =>
@@ -204,7 +210,7 @@ inicializarFiltros() {
       data: {
         labels,
         datasets: [{
-        label: ` (R$) Média de Preço de ${this.municipioSelecionado} ${this.mesSelecionado !== 'geral' ? this.mesSelecionado : ''} ${this.anoSelecionado}`,
+        label: ` (R$) Média regional de ${this.municipioSelecionado} ${this.mesSelecionado !== 'geral' ? this.mesSelecionado : ''} ${this.anoSelecionado}`,
           data,
           backgroundColor: backgroundColors.slice(0, data.length),
           borderColor: borderColors.slice(0, data.length),
@@ -233,7 +239,7 @@ inicializarFiltros() {
 
   limparFiltros() {
   this.municipioSelecionado = 'geral'; // ou null, dependendo da lógica
-  this.anoSelecionado = this.currentYear; // Reseta para o ano atual
+  this.anoSelecionado = 2025//this.currentYear; // Reseta para o ano atual
   this.mesReferencia = null;
   this.faixaMin = null;
   this.faixaMax = null;
@@ -277,9 +283,10 @@ criarGrafico() {
     ? [{ label: `${this.faixaMin}-${this.faixaMax} L`, min: this.faixaMin!, max: this.faixaMax! }]
     : [
         { label: '0 - 100 L', min: 0, max: 100 },
-        { label: '101 - 200 L', min: 101, max: 200 },
+        { label: '100 - 200 L', min: 101, max: 200 },
         { label: '200 - 400 L', min: 201, max: 400 },
-        { label: '400 - 800 L', min: 401, max: 800 },
+        { label: '400 - 600 L', min: 401, max: 600 },
+        { label: '600 - 800 L', min: 601, max: 800 },
         { label: '800 - 1000 L', min: 801, max: 1000 }
       ];
 
@@ -416,7 +423,8 @@ criarGrafico() {
     if (producaoLitros >= 0 && producaoLitros <= 100) return '0-100';
     if (producaoLitros > 101 && producaoLitros <= 200) return '100-200';
     if (producaoLitros > 201 && producaoLitros <= 400) return '200-400';
-    if (producaoLitros > 401 && producaoLitros <= 800) return '400-800';
+    if (producaoLitros > 401 && producaoLitros <= 600) return '400-600';
+     if (producaoLitros > 601 && producaoLitros <= 800) return '600-800';
     if (producaoLitros > 801 && producaoLitros <= 1000) return '800-1000';
     return '1001+'; // se passar de 800, fica nessa faixa
   }
@@ -466,7 +474,8 @@ criarGrafico() {
           { faixa: '0 - 100 L', mediaPreco: this.mediaFaixa(items, 0, 100) },
           { faixa: '100 - 200 L', mediaPreco: this.mediaFaixa(items, 101, 200) },
           { faixa: '200 - 400 L', mediaPreco: this.mediaFaixa(items, 201, 400) },
-          { faixa: '400 - 800 L', mediaPreco: this.mediaFaixa(items, 401, 800) },
+          { faixa: '400 - 600 L', mediaPreco: this.mediaFaixa(items, 401, 600) },
+          { faixa: '600 - 800 L', mediaPreco: this.mediaFaixa(items, 601, 800) },
           { faixa: '800 - 1000 L', mediaPreco: this.mediaFaixa(items, 801, 1000) }
         ];
       }

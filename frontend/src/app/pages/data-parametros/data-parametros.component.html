@@ -76,7 +76,7 @@
       }
 
       <!-- Botão limpar -->
-      @if (municipioSelecionado !== 'geral' || mesReferencia !== null || anoSelecionado !== currentYear || faixaMin !== null || faixaMax !== null) {
+      @if (municipioSelecionado !== 'geral' || mesReferencia !== null || faixaMin !== null || faixaMax !== null) {
         <div class="ion-margin-top">
           <ion-button expand="block" (click)="limparFiltros()">Limpar Filtros</ion-button>
         </div>
