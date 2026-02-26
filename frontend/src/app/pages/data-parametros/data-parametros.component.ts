@@ -22,8 +22,22 @@ Chart.register(...registerables);
 export class DataParametrosPage implements OnInit, AfterViewInit  {
 
   constructor(private dadosService: DadosService) {}
+private _graficoRegiaoRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('graficoRegiao')
+set graficoRegiaoSetter(ref: ElementRef<HTMLCanvasElement> | undefined) {
 
-  @ViewChild('graficoRegiao', { static: false }) graficoRegiaoRef!: ElementRef<HTMLCanvasElement>;
+  if (!ref) return;
+
+  this._graficoRegiaoRef = ref;
+
+  // Quando o canvas nasce no DOM, cria o gráfico
+  if (
+    this.agrupamentoSelecionado === 'regiao' &&
+    this.municipioSelecionado !== 'geral'
+  ) {
+    this.montarGraficoRegiao();
+  }
+}
   graficoRegiao!: Chart;
   grafico: Chart | null = null;
   graficoIniciado = false;
@@ -150,7 +164,7 @@ carregarDados() {
 
   tentarMontarGrafico() {
     if (this.graficoIniciado) return;
-    if (this.graficoRegiaoRef?.nativeElement) {
+    if (this._graficoRegiaoRef?.nativeElement) {
       this.montarGraficoRegiao();
       this.graficoIniciado = true;
     }
@@ -183,7 +197,7 @@ carregarDados() {
 
   montarGraficoRegiao() {
 
-     if (!this.graficoRegiaoRef?.nativeElement) return;
+     if (!this._graficoRegiaoRef?.nativeElement) return;
 
     const dadosFiltrados = this.dadosList.filter(d =>
       (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
@@ -205,7 +219,7 @@ carregarDados() {
 
     if (this.graficoRegiao) this.graficoRegiao.destroy();
 
-    this.graficoRegiao = new Chart(this.graficoRegiaoRef.nativeElement, {
+    this.graficoRegiao = new Chart(this._graficoRegiaoRef.nativeElement, {
       type: 'bar',
       data: {
         labels,
@@ -589,4 +603,32 @@ trackByLaticinio(index: number, item: any): string {
     // Retorna uma combinação única baseada em propriedades do item
     return `${item.laticinio}-${item.mediaPreco}-${item.faixa}`; // Ajuste conforme as propriedades disponíveis
   }
+
+  onSegmentChange() {
+
+  // Destrói gráficos antigos
+  if (this.grafico) {
+    this.grafico.destroy();
+    this.grafico = null;
+  }
+
+  if (this.graficoRegiao) {
+    this.graficoRegiao.destroy();
+    this.graficoRegiao = undefined as any;
+  }
+
+  // Espera o Angular recriar o canvas
+  requestAnimationFrame(() => {
+
+    if (this.agrupamentoSelecionado === 'laticinio') {
+      this.criarGrafico();
+    }
+
+    if (this.agrupamentoSelecionado === 'regiao' &&
+        this.municipioSelecionado !== 'geral') {
+      this.montarGraficoRegiao();
+    }
+
+  });
+}
 }

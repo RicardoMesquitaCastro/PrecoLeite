@@ -84,17 +84,24 @@
 
       <!-- Segmento de agrupamento -->
       @if (municipioSelecionado) {
-        <ion-segment [(ngModel)]="agrupamentoSelecionado" class="ion-margin-top">
-          <ion-segment-button value="laticinio">
-            <ion-label>Laticínio</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="mes">
-            <ion-label>Mês</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="regiao">
-            <ion-label>Região</ion-label>
-          </ion-segment-button>
-        </ion-segment>
+   <ion-segment
+  [(ngModel)]="agrupamentoSelecionado"
+  (ionChange)="onSegmentChange()"
+  class="ion-margin-top">
+
+  <ion-segment-button value="laticinio">
+    <ion-label>Laticínio</ion-label>
+  </ion-segment-button>
+
+  <ion-segment-button value="mes">
+    <ion-label>Mês</ion-label>
+  </ion-segment-button>
+
+  <ion-segment-button value="regiao">
+    <ion-label>Região</ion-label>
+  </ion-segment-button>
+
+</ion-segment>
       }
     </ion-card-content>
   </ion-card>
