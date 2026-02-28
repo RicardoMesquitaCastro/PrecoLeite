@@ -93,53 +93,58 @@ proteina: string = '0.00';
 
  formatarMoeda(event: any, campo: 'precoLitro' | 'gordura' | 'proteina') {
 
-  let input = event.target;
+  const input = event.target;
 
   // Remove tudo que não for número
-  let valor = input.value.replace(/\D/g, '');
+  let somenteNumeros = input.value.replace(/\D/g, '');
 
-  if (!valor) {
+  // Se vazio → volta para 0
+  if (!somenteNumeros) {
     this[campo] = '0.00';
     input.value = '0.00';
     return;
   }
 
-  // Limita tamanho (opcional — evita números absurdos)
-  valor = valor.substring(0, 9);
+  // Remove zeros excessivos à esquerda
+  somenteNumeros = somenteNumeros.replace(/^0+/, '');
 
-  const numeroFormatado = (parseInt(valor, 10) / 100).toFixed(2);
+  if (!somenteNumeros) {
+    this[campo] = '0.00';
+    input.value = '0.00';
+    return;
+  }
 
-  this[campo] = numeroFormatado;
-  input.value = numeroFormatado;
+  // Limite de tamanho (evita números absurdos)
+  somenteNumeros = somenteNumeros.substring(0, 9);
+
+  const valorFinal = (parseInt(somenteNumeros, 10) / 100).toFixed(2);
+
+  this[campo] = valorFinal;
+  input.value = valorFinal;
+}
+
+valorValido(valor: any): boolean {
+  if (!valor) return false;
+
+  const numero = Number(valor);
+
+  return !isNaN(numero) && numero > 0;
 }
 
 
 
-  todosCamposPreenchidos(): boolean {
+ todosCamposPreenchidos(): boolean {
 
-  const campos = [
-    this.laticinio,
-    this.mesReferencia,
-    this.precoLitro,
-    this.producaoLitros,
-    this.ccs,
-    this.cbt,
-    this.gordura,
-    this.proteina
-  ];
+  if (!this.laticinio || !this.mesReferencia) return false;
 
-  return campos.every(campo => {
-    if (campo === null) return false;
+  if (!this.valorValido(this.precoLitro)) return false;
+  if (!this.valorValido(this.gordura)) return false;
+  if (!this.valorValido(this.proteina)) return false;
+  if (!this.valorValido(this.producaoLitros)) return false;
+  if (!this.valorValido(this.ccs)) return false;
+  if (!this.valorValido(this.cbt)) return false;
 
-    const valor = campo.toString().trim();
-
-    if (valor === '') return false;
-
-    // bloqueia 0.00
-    if (valor === '0.00') return false;
-
-    return true;
-  });
+  return true;
 }
 
   limparFormulario() {
