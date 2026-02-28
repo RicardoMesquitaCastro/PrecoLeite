@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>PreçoLeite</ion-title>
     <ion-buttons slot="end">
-      <ion-menu-button autoHide="false"></ion-menu-button>
+      <ion-menu-button autoHide="true"></ion-menu-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -15,11 +15,13 @@
   <!-- 🔽 Laticínio (Select) -->
   <ion-item>
     <ion-select
+     interface="alert"
+     (ionFocus)="removerFoco($event)"
       [(ngModel)]="laticinio"
       placeholder="Selecione o laticínio">
 
       @for (item of laticinios; track item) {
-        <ion-select-option [value]="item">
+        <ion-select-option   [value]="item">
           {{ item }}
         </ion-select-option>
       }
@@ -28,11 +30,21 @@
   </ion-item>
 
   <ion-item>
-    <ion-input
-      [(ngModel)]="mesReferencia"
-      placeholder="Mês Referência">
-    </ion-input>
-  </ion-item>
+
+  <ion-select
+     interface="alert"
+     (ionFocus)="removerFoco($event)"
+    [(ngModel)]="mesReferencia"
+    placeholder="Selecione o mês Referência">
+
+    @for (mes of mesesDisponiveis; track mes.valor) {
+      <ion-select-option  [value]="mes.valor">
+        {{ mes.nome }}
+      </ion-select-option>
+    }
+
+  </ion-select>
+</ion-item>
 
   <ion-item>
     <ion-input

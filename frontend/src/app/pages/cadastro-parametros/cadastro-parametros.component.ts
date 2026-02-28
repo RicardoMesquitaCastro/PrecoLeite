@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,7 +11,7 @@ import {
 @Component({
   selector: 'app-cadastro-parametros',
   templateUrl: './cadastro-parametros.component.html',
-  imports: [IonicModule, FormsModule],
+  imports: [IonicModule, FormsModule, CommonModule],
   styleUrls: ['./cadastro-parametros.component.scss'],
 })
 export class CadastroParametrosComponent {
@@ -18,13 +19,28 @@ export class CadastroParametrosComponent {
   // 🔹 Laticínio agora vem de um ion-select
   laticinio: string | null = null;
 
-  mesReferencia = '';
+ mesesDisponiveis  = [
+  { nome: 'Janeiro', valor: '1' },
+  { nome: 'Fevereiro', valor: '2' },
+  { nome: 'Março', valor: '3' },
+  { nome: 'Abril', valor: '4' },
+  { nome: 'Maio', valor: '5' },
+  { nome: 'Junho', valor: '6' },
+  { nome: 'Julho', valor: '7' },
+  { nome: 'Agosto', valor: '8' },
+  { nome: 'Setembro', valor: '9' },
+  { nome: 'Outubro', valor: '10' },
+  { nome: 'Novembro', valor: '11' },
+  { nome: 'Dezembro', valor: '12' },
+];
   precoLitro = '';
   producaoLitros = '';
   ccs = '';
   cbt = '';
   gordura = '';
   proteina = '';
+
+  mesReferencia: string | null = null;
 
   // 🔹 Lista de opções do select
   laticinios: string[] = [
@@ -51,7 +67,7 @@ export class CadastroParametrosComponent {
 
     const dadosParametros: CadastroParametros = {
       laticinio: this.laticinio!,
-      mesReferencia: this.mesReferencia,
+       mesReferencia: String(this.mesReferencia),
       precoLeite: parseFloat(this.precoLitro),
       producaoLitros: parseFloat(this.producaoLitros),
       ccs: parseFloat(this.ccs),
@@ -59,6 +75,7 @@ export class CadastroParametrosComponent {
       gordura: parseFloat(this.gordura),
       proteina: parseFloat(this.proteina),
     };
+    console.log("🚀 ~ CadastroParametrosComponent ~ cadastrarParametros ~ dadosParametros:", dadosParametros)
 
     try {
       const resposta = await this.cadastroService.create(dadosParametros).toPromise();
@@ -93,7 +110,7 @@ export class CadastroParametrosComponent {
 
   limparFormulario() {
     this.laticinio = null;
-    this.mesReferencia = '';
+    mesReferencia: this.mesReferencia,
     this.precoLitro = '';
     this.producaoLitros = '';
     this.ccs = '';
@@ -111,4 +128,8 @@ export class CadastroParametrosComponent {
     });
     await toast.present();
   }
+
+  removerFoco(event: any) {
+  (event.target as HTMLElement).blur();
+}
 }
