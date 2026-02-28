@@ -301,7 +301,8 @@ criarGrafico() {
         { label: '200 - 400 L', min: 201, max: 400 },
         { label: '400 - 600 L', min: 401, max: 600 },
         { label: '600 - 800 L', min: 601, max: 800 },
-        { label: '800 - 1000 L', min: 801, max: 1000 }
+        { label: '800 - 1000 L', min: 801, max: 1000 },
+        { label: '1000 - 2000 L', min: 1001, max: 2000 }
       ];
 
   const mediaFaixaPorLaticinio = (items: any[], laticinio: string, min: number, max: number): number => {
@@ -440,6 +441,7 @@ criarGrafico() {
     if (producaoLitros > 401 && producaoLitros <= 600) return '400-600';
      if (producaoLitros > 601 && producaoLitros <= 800) return '600-800';
     if (producaoLitros > 801 && producaoLitros <= 1000) return '800-1000';
+     if (producaoLitros > 1001 && producaoLitros <= 2000) return '800-1000';
     return '1001+'; // se passar de 800, fica nessa faixa
   }
 
@@ -485,12 +487,13 @@ criarGrafico() {
         }];
       } else {
         faixas = [
-          { faixa: '0 - 100 L', mediaPreco: this.mediaFaixa(items, 0, 100) },
-          { faixa: '100 - 200 L', mediaPreco: this.mediaFaixa(items, 101, 200) },
-          { faixa: '200 - 400 L', mediaPreco: this.mediaFaixa(items, 201, 400) },
-          { faixa: '400 - 600 L', mediaPreco: this.mediaFaixa(items, 401, 600) },
-          { faixa: '600 - 800 L', mediaPreco: this.mediaFaixa(items, 601, 800) },
-          { faixa: '800 - 1000 L', mediaPreco: this.mediaFaixa(items, 801, 1000) }
+          { faixa: '0 - 100', mediaPreco: this.mediaFaixa(items, 0, 100) },
+          { faixa: '100 - 200', mediaPreco: this.mediaFaixa(items, 101, 200) },
+          { faixa: '200 - 400', mediaPreco: this.mediaFaixa(items, 201, 400) },
+          { faixa: '400 - 600', mediaPreco: this.mediaFaixa(items, 401, 600) },
+          { faixa: '600 - 800', mediaPreco: this.mediaFaixa(items, 601, 800) },
+          { faixa: '800 - 1000', mediaPreco: this.mediaFaixa(items, 801, 1000) },
+          { faixa: '1000 - 2000', mediaPreco: this.mediaFaixa(items, 1001, 2000) }
         ];
       }
 
