@@ -15,37 +15,44 @@
 
   <!-- Nome da Propriedade -->
   <ion-item>
-    <ion-input [(ngModel)]="nomePropriedade" placeholder="Nome da Propriedade"></ion-input>
+    <ion-input
+      [(ngModel)]="nomePropriedade"
+      placeholder="Nome da Propriedade">
+    </ion-input>
   </ion-item>
 
-  <!-- Município (carregado do IBGE) -->
+  <!-- Município -->
   <ion-item button (click)="abrirModalMunicipios()">
     <ion-label position="stacked">Município</ion-label>
-    <ion-input [value]="municipio" placeholder="Selecione..." readonly></ion-input>
+    <ion-input
+      [value]="municipio"
+      placeholder="Selecionar"
+      readonly>
+    </ion-input>
   </ion-item>
 
-  <!-- Modal -->
+  <!-- Modal Municípios -->
   <ion-modal [isOpen]="modalAberto" (didDismiss)="modalAberto = false">
     <ng-template>
       <ion-header>
         <ion-toolbar color="primary">
           <ion-title>Selecionar Município</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="modalAberto = false">Fechar</ion-button>
+            <ion-button (click)="modalAberto = false">
+              Fechar
+            </ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
 
       <ion-content>
 
-        <!-- Busca -->
         <ion-searchbar
           placeholder="Buscar município..."
           [(ngModel)]="filtroMunicipio"
           (ionInput)="filtrarMunicipios()">
         </ion-searchbar>
 
-        <!-- Lista filtrada -->
         <ion-list>
           <ion-item
             button
@@ -59,30 +66,66 @@
     </ng-template>
   </ion-modal>
 
-  <!-- Região / Povoado (mostra automaticamente conforme o município) -->
+  <!-- ================= REGIÃO / POVOADO ================= -->
+
+  <!-- Se for Orizona -->
   <ng-container *ngIf="municipio?.toLowerCase() === 'orizona'; else campoRegiaoNormal">
 
-    <!-- Select de povoados -->
-    <ion-item>
-      <ion-label position="stacked">Região</ion-label>
-      <ion-select [(ngModel)]="povoado" placeholder="Selecione..">
-        <ion-select-option *ngFor="let p of povoadoOrz" [value]="p">
+    <!-- Select padrão -->
+    <ion-item *ngIf="!modoManualPovoado">
+      <ion-label position="stacked">Povoado</ion-label>
+      <ion-select
+        [(ngModel)]="povoado"
+        placeholder="Selecione o povoado">
+
+        <ion-select-option
+          *ngFor="let p of povoadoOrz"
+          [value]="p">
           {{ p }}
         </ion-select-option>
+
       </ion-select>
+    </ion-item>
+
+    <!-- Botão liberar digitação -->
+    <ion-button
+      *ngIf="!modoManualPovoado"
+      fill="clear"
+      size="small"
+      (click)="modoManualPovoado = true">
+      Não encontrei meu povoado
+    </ion-button>
+
+    <!-- Input manual -->
+    <ion-item *ngIf="modoManualPovoado">
+      <ion-label position="stacked">Povoado</ion-label>
+      <ion-input
+        [(ngModel)]="povoado"
+        placeholder="Digite o povoado">
+      </ion-input>
     </ion-item>
 
   </ng-container>
 
-  <!-- Campo normal quando NÃO for Orizona -->
+  <!-- Se NÃO for Orizona -->
   <ng-template #campoRegiaoNormal>
     <ion-item>
-      <ion-label position="stacked">Região</ion-label>
-      <ion-input [(ngModel)]="regiao" placeholder="Digite a região..."></ion-input>
+      <ion-label position="stacked">Povoado</ion-label>
+      <ion-input
+        [(ngModel)]="regiao"
+        placeholder="Digite o Povoado">
+      </ion-input>
     </ion-item>
   </ng-template>
 
-  <ion-button color="primary" expand="full" (click)="cadastrarPropriedade()">Salvar</ion-button>
+  <!-- Botão salvar -->
+  <ion-button
+    color="primary"
+    expand="full"
+    (click)="cadastrarPropriedade()">
+    Salvar
+  </ion-button>
+
   <p style="color:red">{{ erro }}</p>
 
 </ion-content>

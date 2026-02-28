@@ -37,7 +37,7 @@ export class CadastroPropriedadeComponent implements OnInit {
   "Firmeza"
   ];
   modalAberto = false;
-
+modoManualPovoado = false;
 
   constructor(
     private router: Router,
@@ -75,11 +75,9 @@ export class CadastroPropriedadeComponent implements OnInit {
   this.municipio = nome;
   this.modalAberto = false;
 
-  // Quando município for Orizona, troca campo por povoados
-  if (nome.toLowerCase() === 'orizona') {
-    this.regiao = '';   // limpa campo normal
-    this.povoado = '';  // selecionará via select
-  }
+  this.modoManualPovoado = false; // sempre reseta
+  this.povoado = '';
+  this.regiao = '';
 }
 
 async cadastrarPropriedade() {
