@@ -19,26 +19,26 @@ export class CadastroParametrosComponent {
   // 🔹 Laticínio agora vem de um ion-select
   laticinio: string | null = null;
 
- mesesDisponiveis  = [
-  { nome: 'Janeiro', valor: '1' },
-  { nome: 'Fevereiro', valor: '2' },
-  { nome: 'Março', valor: '3' },
-  { nome: 'Abril', valor: '4' },
-  { nome: 'Maio', valor: '5' },
-  { nome: 'Junho', valor: '6' },
-  { nome: 'Julho', valor: '7' },
-  { nome: 'Agosto', valor: '8' },
-  { nome: 'Setembro', valor: '9' },
-  { nome: 'Outubro', valor: '10' },
-  { nome: 'Novembro', valor: '11' },
-  { nome: 'Dezembro', valor: '12' },
-];
-  precoLitro = '';
+  mesesDisponiveis = [
+    { nome: 'Janeiro', valor: '1' },
+    { nome: 'Fevereiro', valor: '2' },
+    { nome: 'Março', valor: '3' },
+    { nome: 'Abril', valor: '4' },
+    { nome: 'Maio', valor: '5' },
+    { nome: 'Junho', valor: '6' },
+    { nome: 'Julho', valor: '7' },
+    { nome: 'Agosto', valor: '8' },
+    { nome: 'Setembro', valor: '9' },
+    { nome: 'Outubro', valor: '10' },
+    { nome: 'Novembro', valor: '11' },
+    { nome: 'Dezembro', valor: '12' },
+  ];
+  precoLitro: string = '0.00';
   producaoLitros = '';
   ccs = '';
   cbt = '';
-  gordura = '';
-  proteina = '';
+  gordura: string = '0.00';
+proteina: string = '0.00';
 
   mesReferencia: string | null = null;
 
@@ -48,7 +48,7 @@ export class CadastroParametrosComponent {
     'Italac',
     'Itambé',
     'Piracanjuba',
-    'Valeza',
+    'JL',
     'Marajoara',
     'Nestlé'
   ];
@@ -57,7 +57,7 @@ export class CadastroParametrosComponent {
     private router: Router,
     private cadastroService: CadastroParametrosService,
     private toastController: ToastController
-  ) {}
+  ) { }
 
   async cadastrarParametros() {
     if (!this.todosCamposPreenchidos()) {
@@ -67,7 +67,7 @@ export class CadastroParametrosComponent {
 
     const dadosParametros: CadastroParametros = {
       laticinio: this.laticinio!,
-       mesReferencia: String(this.mesReferencia),
+      mesReferencia: String(this.mesReferencia),
       precoLeite: parseFloat(this.precoLitro),
       producaoLitros: parseFloat(this.producaoLitros),
       ccs: parseFloat(this.ccs),
@@ -75,11 +75,9 @@ export class CadastroParametrosComponent {
       gordura: parseFloat(this.gordura),
       proteina: parseFloat(this.proteina),
     };
-    console.log("🚀 ~ CadastroParametrosComponent ~ cadastrarParametros ~ dadosParametros:", dadosParametros)
 
     try {
       const resposta = await this.cadastroService.create(dadosParametros).toPromise();
-      console.log('Dados cadastrados:', resposta);
 
       this.limparFormulario();
       await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
@@ -93,25 +91,61 @@ export class CadastroParametrosComponent {
     }
   }
 
-  todosCamposPreenchidos(): boolean {
-    const campos = [
-      this.laticinio,
-      this.mesReferencia,
-      this.precoLitro,
-      this.producaoLitros,
-      this.ccs,
-      this.cbt,
-      this.gordura,
-      this.proteina
-    ];
+ formatarMoeda(event: any, campo: 'precoLitro' | 'gordura' | 'proteina') {
 
-    return campos.every(campo => campo !== null && campo.toString().trim() !== '');
+  let input = event.target;
+
+  // Remove tudo que não for número
+  let valor = input.value.replace(/\D/g, '');
+
+  if (!valor) {
+    this[campo] = '0.00';
+    input.value = '0.00';
+    return;
   }
+
+  // Limita tamanho (opcional — evita números absurdos)
+  valor = valor.substring(0, 9);
+
+  const numeroFormatado = (parseInt(valor, 10) / 100).toFixed(2);
+
+  this[campo] = numeroFormatado;
+  input.value = numeroFormatado;
+}
+
+
+
+  todosCamposPreenchidos(): boolean {
+
+  const campos = [
+    this.laticinio,
+    this.mesReferencia,
+    this.precoLitro,
+    this.producaoLitros,
+    this.ccs,
+    this.cbt,
+    this.gordura,
+    this.proteina
+  ];
+
+  return campos.every(campo => {
+    if (campo === null) return false;
+
+    const valor = campo.toString().trim();
+
+    if (valor === '') return false;
+
+    // bloqueia 0.00
+    if (valor === '0.00') return false;
+
+    return true;
+  });
+}
 
   limparFormulario() {
     this.laticinio = null;
     mesReferencia: this.mesReferencia,
-    this.precoLitro = '';
+      this.precoLitro = '';
     this.producaoLitros = '';
     this.ccs = '';
     this.cbt = '';
@@ -130,6 +164,6 @@ export class CadastroParametrosComponent {
   }
 
   removerFoco(event: any) {
-  (event.target as HTMLElement).blur();
-}
+    (event.target as HTMLElement).blur();
+  }
 }
