@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment.prod';
 
 export interface CadastroParametros {
   laticinio: string;
@@ -17,7 +18,7 @@ export interface CadastroParametros {
   providedIn: 'root',
 })
 export class CadastroParametrosService {
-  private apiUrl = 'http://localhost:9000/cadastroParametros'; // URL do seu backend
+  private apiUrl = `${environment.apiUrl}/cadastroParametros`; // URL do seu backend
   private token = 'teste'; // token master padrão
 
   constructor(private http: HttpClient) {}

@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({ providedIn: 'root' })
 export class RegistroService {
-  private baseUrl = 'http://localhost:9000'; // ⬅️ URL do seu backend
+  private baseUrl = `${environment.apiUrl}`; // ⬅️ URL do seu backend
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 

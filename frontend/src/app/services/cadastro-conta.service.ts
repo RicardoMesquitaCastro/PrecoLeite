@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, Observable, of, tap } from 'rxjs';
+import { environment } from 'src/environments/environment.prod';
 
 export interface CadastroConta {
   _id?: string;
@@ -13,15 +14,15 @@ export interface CadastroConta {
   providedIn: 'root'
 })
 export class CadastroContaService {
-  private apiUrl = 'http://localhost:9000/cadastroContas'; // ajuste conforme seu backend
-
+  private apiUrl = `${environment.apiUrl}/cadastroContas`; // ajuste conforme seu backend
+private token = 'teste';
   constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
     // token master de autenticação
-    const token = 'teste';
+
     return new HttpHeaders({
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${this.token}`,
       'Content-Type': 'application/json'
     });
   }

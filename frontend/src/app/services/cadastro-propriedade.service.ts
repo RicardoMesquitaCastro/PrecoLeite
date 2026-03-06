@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment.prod';
 
 export interface CadastroPropriedade {
   nomePropriedade: string;
@@ -12,7 +13,7 @@ export interface CadastroPropriedade {
   providedIn: 'root',
 })
 export class CadastroPropriedadeService {
-  private apiUrl = 'http://localhost:9000/cadastroPropriedade';
+  private apiUrl = `${environment.apiUrl}/cadastroPropriedade`;
   private token = 'teste'; // token master padrão
 
   constructor(private http: HttpClient) {}

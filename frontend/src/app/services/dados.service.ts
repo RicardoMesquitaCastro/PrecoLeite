@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { list } from '../pages/data-parametros/dados'; // <-- seu arquivo local
+import { environment } from 'src/environments/environment.prod';
 
 export interface DadoLeite {
   _id?: any;
@@ -22,7 +23,7 @@ export interface DadoLeite {
   providedIn: 'root',
 })
 export class DadosService {
-  private apiUrl = 'http://localhost:9000/dados';
+  private apiUrl = `${environment.apiUrl}/dados`;
   private token = 'teste';
   private usarMock = false; // ← defina `false` para usar o backend real
 
