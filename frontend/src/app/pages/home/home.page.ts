@@ -36,11 +36,11 @@ export class HomePage implements AfterViewInit {
    new Chart('cotacoesChart', {
         type: 'line',
         data: {
-          labels: ['Set','Out', 'Nov', 'Dez'],
+          labels: ['Set','Out', 'Nov', 'Dez', 'Jan'],
           datasets: [
             {
               label: 'Preço do Leite (R$/L)',
-              data: [2.34, 2.21, 2.02, 1.88],
+              data: [2.34, 2.21, 2.02, 1.88, 2.02],
               borderColor: '#4CAF50',
               backgroundColor: 'rgba(76, 175, 80, 0.1)',
               fill: true,

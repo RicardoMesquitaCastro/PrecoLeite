@@ -51,6 +51,8 @@ set graficoRegiaoSetter(ref: ElementRef<HTMLCanvasElement> | undefined) {
   currentYear = new Date().getFullYear();
   anoSelecionado: number = 2025; // ano atual
   anosDisponiveis: number[] = [];
+  laticinioSelecionado: string = 'todos'
+laticiniosDisponiveis: string[] = []
 
   laticinio: string = '';
   mesReferencia: number | null = null;
@@ -117,6 +119,11 @@ inicializarFiltros() {
 
   const anosUnicos = new Set(this.dadosList.map(d => d.anoReferencia));
   this.anosDisponiveis = Array.from(anosUnicos).sort((a, b) => b - a);
+
+  this.laticiniosDisponiveis = [
+  ...new Set(this.dadosList.map(d => d.laticinio))
+].sort()
+  console.log("🚀 ~ DataParametrosPage ~ inicializarFiltros ~ this.laticiniosDisponiveis:", this.laticiniosDisponiveis)
 }
 
 carregarDados() {
@@ -155,12 +162,13 @@ carregarDados() {
 }
 
   get dadosListFiltrados() {
-    return this.dadosList.filter(d =>
-      (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
-      (this.mesReferencia === null || d.mesReferencia === this.mesReferencia) &&
-      (this.anoSelecionado === null || d.anoReferencia === this.anoSelecionado)
-    );
-  }
+  return this.dadosList.filter(d =>
+    (this.municipioSelecionado === 'geral' || d.municipio === this.municipioSelecionado) &&
+    (this.mesReferencia === null || d.mesReferencia === this.mesReferencia) &&
+    (this.anoSelecionado === null || d.anoReferencia === this.anoSelecionado) &&
+    (this.laticinioSelecionado === 'todos' || d.laticinio === this.laticinioSelecionado)
+  );
+}
 
   tentarMontarGrafico() {
     if (this.graficoIniciado) return;
@@ -246,10 +254,7 @@ carregarDados() {
     });
   }
 
-  atualizarFiltros() {
-    this.criarGrafico();
-    this.montarGraficoRegiao();
-  }
+
 
   limparFiltros() {
   this.municipioSelecionado = 'geral'; // ou null, dependendo da lógica
@@ -257,6 +262,7 @@ carregarDados() {
   this.mesReferencia = null;
   this.faixaMin = null;
   this.faixaMax = null;
+  this.laticinioSelecionado = 'todos';
   this.atualizarFiltros(); // Chama a função que atualiza os dados com os filtros limpos
 }
 
@@ -284,6 +290,11 @@ carregarDados() {
       regiao,
       mediaPreco: qtd > 0 ? soma / qtd : 0
     }));
+  }
+
+   atualizarFiltros() {
+    this.criarGrafico();
+    this.montarGraficoRegiao();
   }
 
 criarGrafico() {

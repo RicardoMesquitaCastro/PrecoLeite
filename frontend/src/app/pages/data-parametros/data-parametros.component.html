@@ -42,6 +42,32 @@
         </ion-select>
       </ion-item>
 
+      <!-- Filtro de Laticínio -->
+<ion-item class="ion-margin-top">
+  <ion-label position="stacked">
+    <ion-icon name="business-outline" slot="start" class="ion-margin-end"></ion-icon>
+    Filtro por Laticínio
+  </ion-label>
+
+  <ion-select
+    [(ngModel)]="laticinioSelecionado"
+    (ngModelChange)="atualizarFiltros()"
+    placeholder="Todos os Laticínios"
+    interface="popover">
+
+    <ion-select-option value="todos">
+      Todos os Laticínios
+    </ion-select-option>
+
+    @for (l of laticiniosDisponiveis; track l) {
+      <ion-select-option [value]="l">
+        {{ l }}
+      </ion-select-option>
+    }
+
+  </ion-select>
+</ion-item>
+
       <!-- Filtro de Ano -->
       <ion-item class="ion-margin-top">
         <ion-label position="stacked">
@@ -76,7 +102,7 @@
       }
 
       <!-- Botão limpar -->
-      @if (municipioSelecionado !== 'geral' || mesReferencia !== null || faixaMin !== null || faixaMax !== null) {
+      @if (laticinioSelecionado  !== 'todos' || municipioSelecionado !== 'geral' || mesReferencia !== null || faixaMin !== null || faixaMax !== null) {
         <div class="ion-margin-top">
           <ion-button expand="block" (click)="limparFiltros()">Limpar Filtros</ion-button>
         </div>
@@ -90,15 +116,15 @@
   class="ion-margin-top">
 
   <ion-segment-button value="laticinio">
-    <ion-label>Laticínio</ion-label>
+    <ion-label style="font-size: 12px;">Laticínio</ion-label>
   </ion-segment-button>
 
   <ion-segment-button value="mes">
-    <ion-label>Mês</ion-label>
+    <ion-label style="font-size: 12px;">Mês</ion-label>
   </ion-segment-button>
 
   <ion-segment-button value="regiao">
-    <ion-label>Região</ion-label>
+    <ion-label style="font-size: 12px;">Região</ion-label>
   </ion-segment-button>
 
 </ion-segment>
