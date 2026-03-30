@@ -1,40 +1,60 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private baseUrl = 'http://localhost:3000/auth';
+  private authUrl = 'http://localhost:9000/auth';
+  private usersUrl = 'http://localhost:9000/users';
   private tokenKey = 'auth-token';
+  private masterKey = 'teste'; // valor do MASTER_KEY no seu .env
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  login(email: string, password: string) {
-    return this.http.post<{ token: string }>(`${this.baseUrl}/login`, { email, password });
+  // ─── LOGIN ────────────────────────────────────────────────────────────────
+  // O backend usa Basic Auth (email:senha) + master token como query param
+  login(email: string, password: string): Observable<{ token: string; user: any }> {
+    const headers = new HttpHeaders({
+      Authorization: 'Basic ' + btoa(`${email}:${password}`)
+    });
+
+    return this.http
+      .post<{ token: string; user: any }>(
+        `${this.authUrl}?access_token=${this.masterKey}`,
+        {},
+        { headers }
+      )
+      .pipe(tap(res => this.saveToken(res.token)));
   }
 
-  register(name: string, email: string, password: string) {
-  return this.http.post<{ token: string }>(`${this.baseUrl}/register`, {
-    nome: name,
-    email,
-    senha: password,
-  });
-}
+  // ─── REGISTRO ────────────────────────────────────────────────────────────
+  // Cria um novo CadastroConta via POST /cadastroContas (requer master token)
+  // O email precisa ser válido (ex: usuario@email.com)
+  register(name: string, email: string, password: string): Observable<any> {
+    return this.http.post(
+      `${this.usersUrl}?access_token=${this.masterKey}`,
+      { name, email, password }
+    );
+  }
 
-  saveToken(token: string) {
+  // ─── TOKEN ────────────────────────────────────────────────────────────────
+  saveToken(token: string): void {
     localStorage.setItem(this.tokenKey, token);
   }
 
-  getToken() {
+  getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
 
-  logout() {
-    localStorage.removeItem(this.tokenKey);
-    this.router.navigate(['/login']);
-  }
-
+  // ─── AUTH STATE ───────────────────────────────────────────────────────────
   isAuthenticated(): boolean {
     return !!this.getToken();
+  }
+
+  // ─── LOGOUT ───────────────────────────────────────────────────────────────
+  logout(): void {
+    localStorage.removeItem(this.tokenKey);
+    this.router.navigate(['/login']);
   }
 }

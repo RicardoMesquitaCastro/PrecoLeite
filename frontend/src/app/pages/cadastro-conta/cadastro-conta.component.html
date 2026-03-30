@@ -35,11 +35,31 @@
     </ion-input>
   </ion-item>
 
+  <!-- Feedback de erro -->
+  <ion-text color="danger" *ngIf="erro">
+    <p style="margin-top: 8px; font-size: 14px;">{{ erro }}</p>
+  </ion-text>
+
+  <!-- Feedback de sucesso -->
+  <ion-text color="success" *ngIf="sucesso">
+    <p style="margin-top: 8px; font-size: 14px;">{{ sucesso }}</p>
+  </ion-text>
+
   <ion-button
     color="primary"
     expand="full"
+    style="margin-top: 16px;"
     (click)="cadastrarConta()"
-    [disabled]="!name || !email || !password">
-    Cadastrar
+    [disabled]="!name || !email || !password || carregando">
+    <ion-spinner *ngIf="carregando" name="crescent" slot="start"></ion-spinner>
+    {{ carregando ? 'Cadastrando...' : 'Cadastrar' }}
   </ion-button>
+
+  <ion-button
+    fill="clear"
+    expand="full"
+    (click)="irParaLogin()">
+    Já tem uma conta? Entrar
+  </ion-button>
+
 </ion-content>

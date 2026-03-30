@@ -4,6 +4,7 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CadastroContaService } from '../../services/cadastro-conta.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 
 @Component({
@@ -12,57 +13,48 @@ import { CadastroContaService } from '../../services/cadastro-conta.service';
   imports: [IonicModule, FormsModule, CommonModule],
   styleUrls: ['./cadastro-conta.component.scss'],
 })
-export class CadastroContaComponent implements OnInit{
+export class CadastroContaComponent {
   name = '';
   email = '';
   password = '';
   erro = '';
+  sucesso = '';
+  carregando = false;
 
-  mesorregioes: any[] = [];
-
-  constructor(
-    private router: Router,
-    private toastController: ToastController,
-    private cadastroContaService: CadastroContaService,
-  ) {}
-
-  ngOnInit(): void {
-    this.cadastroContaService.getAll().subscribe({
-    });
-
-  }
-
+  constructor(private router: Router, private authService: AuthService, private toastController: ToastController, ) {}
 
   async cadastrarConta() {
+    this.erro = '';
+    this.sucesso = '';
+
     if (!this.name || !this.email || !this.password) {
       await this.mostrarToast('Preencha todos os campos.', 'danger');
       return;
     }
 
-    const conta = {
-      name: this.name,
-      email: this.email,
-      password: this.password,
-    };
+    this.carregando = true;
 
-    this.cadastroContaService.create(conta).subscribe({
-      next: async () => {
-        await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
-        this.limparFormulario();
-        this.router.navigate(['/cadastro-propriedade']);
+    this.authService.register(this.name, this.email, this.password).subscribe({
+      next: () => {
+        this.carregando = false;
+        this.sucesso = 'Conta criada com sucesso!';
+        setTimeout(() => this.router.navigate(['/login']), 1500);
       },
-      error: async (err) => {
-        console.error('Erro ao cadastrar conta:', err);
-        await this.mostrarToast('Erro ao cadastrar conta.', 'danger');
+      error: (err) => {
+        this.carregando = false;
+        if (err.status === 409 || err.error?.message?.includes('duplicate')) {
+          this.erro = 'Este e-mail já está cadastrado';
+        } else if (err.status === 401) {
+          this.erro = 'Acesso não autorizado';
+        } else {
+          this.erro = 'Erro ao criar conta. Tente novamente.';
+        }
       }
     });
   }
 
-  limparFormulario() {
-    this.name = '';
-    this.email = '';
-    this.password = '';
-    this.erro = '';
+  irParaLogin() {
+    this.router.navigate(['/login']);
   }
 
   async mostrarToast(mensagem: string, cor: 'success' | 'danger') {
