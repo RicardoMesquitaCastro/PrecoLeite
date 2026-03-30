@@ -9,7 +9,7 @@ export class AuthService {
   private authUrl = `${environment.apiUrl}/auth`;
   private usersUrl = `${environment.apiUrl}/users`;
   private tokenKey = 'auth-token';
-  private masterKey = 'teste'; // valor do MASTER_KEY no seu .env
+  private masterKey = 'a8d7c1f49e257252e02d3088cfa082a3'; // valor do MASTER_KEY no seu .env
 
   constructor(private http: HttpClient, private router: Router) {}
 
