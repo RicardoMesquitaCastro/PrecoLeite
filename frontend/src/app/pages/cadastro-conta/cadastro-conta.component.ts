@@ -36,9 +36,20 @@ export class CadastroContaComponent {
 
     this.authService.register(this.name, this.email, this.password).subscribe({
       next: () => {
-        this.carregando = false;
-        this.sucesso = 'Conta criada com sucesso!';
-        setTimeout(() => this.router.navigate(['/login']), 1500);
+        // Login automático após cadastro
+        this.authService.login(this.email, this.password).subscribe({
+          next: () => {
+            this.carregando = false;
+            this.sucesso = 'Conta criada com sucesso!';
+            setTimeout(() => this.router.navigate(['/home']), 1500);
+          },
+          error: () => {
+            // Cadastrou mas não logou — manda pro login manualmente
+            this.carregando = false;
+            this.sucesso = 'Conta criada! Faça login para continuar.';
+            setTimeout(() => this.router.navigate(['/login']), 1500);
+          }
+        });
       },
       error: (err) => {
         this.carregando = false;

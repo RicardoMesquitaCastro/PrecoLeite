@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { authGuard } from './services/auth.guard';
+import { propriedadeGuard } from './services/propriedade.guard';
 
 const routes: Routes = [
   {
@@ -16,9 +17,11 @@ const routes: Routes = [
     path: 'cadastro-conta',
     loadComponent: () => import('./pages/cadastro-conta/cadastro-conta.component').then((m) => m.CadastroContaComponent),
   },
-   {
+  {
     path: 'cadastro-propriedade',
-    loadComponent: () => import('./pages/cadastro-propriedade/cadastro-propriedade.component').then((m) => m.CadastroPropriedadeComponent),
+    loadComponent: () =>
+      import('./pages/cadastro-propriedade/cadastro-propriedade.component').then(m => m.CadastroPropriedadeComponent),
+    canActivate: [authGuard], // 🔒 precisa estar logado
   },
   {
     path: 'cadastro-parametros',
@@ -28,7 +31,7 @@ const routes: Routes = [
     path: 'data-parametros',
     loadComponent: () =>
       import('./pages/data-parametros/data-parametros.component').then(m => m.DataParametrosPage),
-    canActivate: [authGuard]
+    canActivate: [authGuard, propriedadeGuard], // 🔒 logado + tem propriedade
   },
   {
     path: '',
