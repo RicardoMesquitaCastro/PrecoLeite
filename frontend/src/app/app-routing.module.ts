@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { authGuard } from './services/auth.guard';
 
 const routes: Routes = [
   {
     path: 'home',
-    loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule)
+    loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule),
+     canActivate: [authGuard]
   },
    {
     path: 'login',
@@ -22,9 +24,11 @@ const routes: Routes = [
     path: 'cadastro-parametros',
     loadComponent: () => import('./pages/cadastro-parametros/cadastro-parametros.component').then((m) => m.CadastroParametrosComponent),
   },
-    {
+   {
     path: 'data-parametros',
-    loadComponent: () => import('./pages/data-parametros/data-parametros.component').then((m) => m.DataParametrosPage),
+    loadComponent: () =>
+      import('./pages/data-parametros/data-parametros.component').then(m => m.DataParametrosPage),
+    canActivate: [authGuard]
   },
   {
     path: '',

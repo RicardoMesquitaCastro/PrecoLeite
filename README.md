@@ -53,3 +53,12 @@ POST. No post sera dividido em telas
    }
 
    O ítem 3 será inserido por mes . O mês referencia sempre será o mês anterior, para salvar esse dado mesReferencia creio que alguns usuários iram querer colocar o atual, quando acontecer preciso que altere para o mes anterior. Não sei se é mais viável fazer no front ou back.
+
+
+pull master > main
+
+   git fetch origem-master
+git checkout origem-master/master -- API
+git add API
+git commit -m "update API from master"
+git push origin main

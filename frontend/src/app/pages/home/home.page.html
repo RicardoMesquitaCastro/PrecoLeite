@@ -57,15 +57,86 @@
   </ion-card>
 
   <!-- GRÁFICO COTAÇÕES -->
+ <ion-card>
+  <ion-card-header>
+    <ion-card-title>
+      LEITE AO PRODUTOR CEPEA/ESALQ (R$/litro) - Goiás
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <canvas id="cotacoesChart" style="width: 100%; height: 250px;"></canvas>
+  </ion-card-content>
+</ion-card>
+
+<!-- ✅ Inputs visíveis apenas para ADMIN -->
+@if (isAdmin) {
   <ion-card>
     <ion-card-header>
       <ion-card-title>
-        LEITE AO PRODUTOR CEPEA/ESALQ (R$/litro) - Goiás
+        <ion-icon name="settings-outline" style="margin-right: 8px;"></ion-icon>
+        Gerenciar Cotações (Admin)
       </ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <canvas id="cotacoesChart" style="width: 100%; height: 250px;"></canvas>
+
+      <!-- Formulário de adição -->
+      <ion-item>
+        <ion-input
+          [(ngModel)]="novoMes"
+          placeholder="Mês (ex: Jan/2025)"
+          clearInput>
+        </ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-top">
+        <ion-input
+          [(ngModel)]="novoPreco"
+          type="number"
+          placeholder="Preço (ex: 2.34)"
+          clearInput>
+        </ion-input>
+      </ion-item>
+
+      @if (mensagem) {
+        <ion-text [color]="mensagem.includes('sucesso') ? 'success' : 'danger'">
+          <p style="margin-top: 8px; font-size: 14px;">{{ mensagem }}</p>
+        </ion-text>
+      }
+
+      <ion-button
+        expand="block"
+        color="primary"
+        class="ion-margin-top"
+        (click)="adicionarCotacao()"
+        [disabled]="!novoMes || !novoPreco">
+        Adicionar Cotação
+      </ion-button>
+
+      <!-- Lista de cotações cadastradas -->
+      @if (cotacoes.length > 0) {
+        <ion-list class="ion-margin-top">
+          <ion-list-header>
+            <ion-label>Cotações Cadastradas</ion-label>
+          </ion-list-header>
+          @for (c of cotacoes; track c.id) {
+            <ion-item>
+              <ion-label>
+                {{ c.mes }} — R$ {{ c.preco | number:'1.2-2' }}
+              </ion-label>
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="danger"
+                (click)="excluirCotacao(c.id)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+          }
+        </ion-list>
+      }
+
     </ion-card-content>
   </ion-card>
+}
 
 </ion-content>
