@@ -1,35 +1,321 @@
+// ── Página ───────────────────────────────────────────
+.data-content {
+  --background: #f4f6f8;
+}
+
+// ── Cabeçalho ────────────────────────────────────────
+.page-header {
+  margin: 20px 16px 16px;
+}
+
+.page-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.page-icon {
+  font-size: 24px;
+  color: var(--ion-color-primary);
+}
+
+.page-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a2332;
+  letter-spacing: -0.3px;
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #8a95a3;
+  padding-left: 34px;
+}
+
+// ── Rótulo de seção ──────────────────────────────────
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8a95a3;
+  margin: 0 20px 8px;
+
+  ion-icon {
+    font-size: 14px;
+    color: var(--ion-color-primary);
+  }
+}
+
+// ── Painel de filtros ────────────────────────────────
+.filter-card {
+  background: #ffffff;
+  border-radius: 14px;
+  margin: 0 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+}
+
+.filter-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.filter-item {
+  flex: 1;
+  padding: 12px 14px;
+  min-width: 0;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #8a95a3;
+  margin-bottom: 4px;
+
+  ion-icon {
+    font-size: 12px;
+    color: var(--ion-color-primary);
+  }
+}
+
+.filter-select {
+  --padding-start: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a2332;
+}
+
+.filter-divider-h {
+  height: 1px;
+  background: #f0f2f4;
+}
+
+.filter-divider-v {
+  width: 1px;
+  background: #f0f2f4;
+  align-self: stretch;
+}
+
+// ── Faixa de litros ──────────────────────────────────
+.faixa-wrap {
+  padding: 12px 14px;
+}
+
 .faixa-container {
   display: flex;
   align-items: center;
-  gap: 5px; /* espaço entre os inputs e o separador */
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-top: 6px;
 }
 
 .faixa-input {
+  flex: 1;
+  height: 36px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: #f9fafb;
+  font-size: 13px;
+  text-align: center;
+  color: #1a2332;
 
-  height: 30px;           /* altura menor */
-  border: 1px solid var(--ion-color-medium);
-  border-radius: 6px;     /* levemente menor que o original */
-  padding: 4px 8px;       /* padding mais compacto */
-  background: var(--ion-color-light);
-  color: var(--ion-color-dark);
-  font-size: 12px;        /* fonte menor */
-  text-align: center;     /* centraliza os números */
+  &.invalido {
+    border-color: #ef4444;
+  }
 }
 
 .faixa-separador {
-  font-weight: bold;
-  font-size: 16px;        /* levemente menor */
-  color: var(--ion-color-medium);
+  font-weight: 700;
+  font-size: 16px;
+  color: #c4c9d4;
 }
 
-.faixa-input.invalido {
-  border-color: red;
+// ── Botão limpar ─────────────────────────────────────
+.clear-btn {
+  --color: #ef4444;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.faixa-aviso {
-  color: red;
-  font-size: 12px;
-  margin-top: 2px;
+// ── Segmento ─────────────────────────────────────────
+.custom-segment {
+  margin: 4px 8px 8px;
+
+  ion-segment-button {
+    font-size: 11px;
+    --padding-top: 6px;
+    --padding-bottom: 6px;
+  }
 }
 
+// ── Cabeçalho dos resultados ─────────────────────────
+.results-header {
+  margin: 20px 16px 12px;
+}
+
+.results-title {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a2332;
+}
+
+.results-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+  border-left: 3px solid var(--ion-color-primary);
+  padding-left: 10px;
+  line-height: 1.4;
+}
+
+// ── Cards de dados ───────────────────────────────────
+.data-card {
+  background: #ffffff;
+  border-radius: 14px;
+  margin: 0 16px 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+}
+
+.data-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f2f4;
+
+  .card-icon {
+    font-size: 18px;
+    color: var(--ion-color-primary);
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a2332;
+  }
+}
+
+.data-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f7f8fa;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.data-row-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.data-row-label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.data-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+}
+
+.lat-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.chart-card {
+  padding: 14px;
+}
+
+// ── Estado vazio ─────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px;
+  text-align: center;
+  color: #8a95a3;
+
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+// ── Dark mode ────────────────────────────────────────
+@media (prefers-color-scheme: dark) {
+  .data-content {
+    --background: #121212;
+  }
+
+  .page-title, .results-title {
+    color: #f0f0f0;
+  }
+
+  .page-subtitle, .results-subtitle {
+    color: #6b7280;
+  }
+
+  .filter-card, .data-card {
+    background: #1e1e1e;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  .filter-divider-h, .filter-divider-v {
+    background: #2a2a2a;
+  }
+
+  .filter-select {
+    color: #f0f0f0;
+  }
+
+  .faixa-input {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #f0f0f0;
+  }
+
+  .data-card-header {
+    border-bottom-color: #2a2a2a;
+    .card-title { color: #f0f0f0; }
+  }
+
+  .data-row {
+    border-bottom-color: #242424;
+  }
+
+  .data-row-left {
+    color: #d1d5db;
+  }
+}

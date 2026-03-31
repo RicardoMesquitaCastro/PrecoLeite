@@ -1,0 +1,212 @@
+// ── Página ───────────────────────────────────────────
+.login-content {
+  --background: #f4f6f8;
+}
+
+// ── Hero ─────────────────────────────────────────────
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 52px 24px 32px;
+  text-align: center;
+}
+
+.logo-wrap {
+  width: 160px;
+  height: 160px;
+  border-radius: 28px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(0, 128, 0, 0.18);
+  overflow: hidden;
+}
+
+.logo-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.hero-title {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 800;
+  color: #1a2332;
+  letter-spacing: -0.5px;
+}
+
+.hero-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #8a95a3;
+}
+
+// ── Formulário ───────────────────────────────────────
+.form-card {
+  padding: 0 16px;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8a95a3;
+  margin: 0 4px 8px;
+
+  ion-icon {
+    font-size: 14px;
+    color: var(--ion-color-primary);
+  }
+}
+
+// ── Grupo de campos ──────────────────────────────────
+.card-group {
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+.item-divider {
+  height: 1px;
+  background: #f0f2f4;
+  margin: 0 16px;
+}
+
+// ── Item ─────────────────────────────────────────────
+.custom-item {
+  --background: transparent;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --inner-padding-end: 0;
+
+  .field-icon {
+    font-size: 18px;
+    color: var(--ion-color-primary);
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+
+  .field-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8a95a3;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .custom-input {
+    --padding-start: 0;
+    --padding-end: 0;
+    font-size: 15px;
+    color: #1a2332;
+    font-weight: 500;
+  }
+}
+
+// ── Alerta erro ──────────────────────────────────────
+.alert-danger {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fff1f1;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #b91c1c;
+  line-height: 1.4;
+
+  ion-icon {
+    font-size: 18px;
+    color: #ef4444;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
+// ── Botões ───────────────────────────────────────────
+.save-btn {
+  margin-top: 20px;
+  --border-radius: 12px;
+  height: 52px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.link-btn {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #8a95a3;
+}
+
+// ── Dark mode ────────────────────────────────────────
+@media (prefers-color-scheme: dark) {
+  .login-content {
+    --background: #121212;
+  }
+
+  .logo-wrap {
+    background: #1e1e1e;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .hero-title {
+    color: #f0f0f0;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+  }
+
+  .card-group {
+    background: #1e1e1e;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  .item-divider {
+    background: #2a2a2a;
+  }
+
+  .custom-item {
+    .custom-input {
+      color: #f0f0f0;
+    }
+
+    .field-label {
+      color: #6b7280;
+    }
+  }
+
+  .alert-danger {
+    background: #2d0a0a;
+    border-color: #7f1d1d;
+    color: #fca5a5;
+
+    ion-icon { color: #f87171; }
+  }
+
+  .link-btn {
+    color: #6b7280;
+  }
+}

@@ -1,65 +1,119 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Cadastro de Conta</ion-title>
+    <ion-title>PreçoLeite</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-text color="medium">
-    <h2 style="margin-top: 24px;">Crie sua Conta</h2>
-  </ion-text>
+<ion-content class="conta-content">
 
-  <ion-item>
-    <ion-input
-      [(ngModel)]="name"
-      placeholder="Nome"
-      clearInput>
-    </ion-input>
-  </ion-item>
+  <!-- Cabeçalho visual -->
+  <div class="hero-section">
+    <div class="hero-icon">
+      <ion-icon name="person-add-outline"></ion-icon>
+    </div>
+    <h1 class="hero-title">Crie sua Conta</h1>
+    <p class="hero-subtitle">Acesse dados e estatísticas do PreçoLeite</p>
+  </div>
 
-  <ion-item>
-    <ion-input
-      [(ngModel)]="email"
-      type="email"
-      placeholder="Email"
-      clearInput>
-    </ion-input>
-  </ion-item>
+  <!-- Formulário -->
+  <div class="form-card">
 
-  <ion-item>
-    <ion-input
-      [(ngModel)]="password"
-      type="password"
-      placeholder="Senha"
-      clearInput>
-    </ion-input>
-  </ion-item>
+    <div class="section-label">
+      <ion-icon name="person-outline"></ion-icon>
+      Dados Pessoais
+    </div>
 
-  <!-- Feedback de erro -->
-  <ion-text color="danger" *ngIf="erro">
-    <p style="margin-top: 8px; font-size: 14px;">{{ erro }}</p>
-  </ion-text>
+    <div class="card-group">
+      <ion-item lines="none" class="custom-item">
+        <ion-icon name="person-outline" slot="start" class="field-icon"></ion-icon>
+        <div class="field-wrap">
+          <ion-label class="field-label">Nome</ion-label>
+          <ion-input
+            [(ngModel)]="name"
+            placeholder="Seu nome completo"
+            clearInput
+            class="custom-input">
+          </ion-input>
+        </div>
+      </ion-item>
 
-  <!-- Feedback de sucesso -->
-  <ion-text color="success" *ngIf="sucesso">
-    <p style="margin-top: 8px; font-size: 14px;">{{ sucesso }}</p>
-  </ion-text>
+      <div class="item-divider"></div>
 
-  <ion-button
-    color="primary"
-    expand="full"
-    style="margin-top: 16px;"
-    (click)="cadastrarConta()"
-    [disabled]="!name || !email || !password || carregando">
-    <ion-spinner *ngIf="carregando" name="crescent" slot="start"></ion-spinner>
-    {{ carregando ? 'Cadastrando...' : 'Cadastrar' }}
-  </ion-button>
+      <ion-item lines="none" class="custom-item">
+        <ion-icon name="mail-outline" slot="start" class="field-icon"></ion-icon>
+        <div class="field-wrap">
+          <ion-label class="field-label">E-mail</ion-label>
+          <ion-input
+            [(ngModel)]="email"
+            type="email"
+            placeholder="seu@email.com"
+            clearInput
+            class="custom-input">
+          </ion-input>
+        </div>
+      </ion-item>
 
-  <ion-button
-    fill="clear"
-    expand="full"
-    (click)="irParaLogin()">
-    Já tem uma conta? Entrar
-  </ion-button>
+      <div class="item-divider"></div>
+
+      <ion-item lines="none" class="custom-item">
+        <ion-icon name="lock-closed-outline" slot="start" class="field-icon"></ion-icon>
+        <div class="field-wrap">
+          <ion-label class="field-label">Senha</ion-label>
+          <ion-input
+            [(ngModel)]="password"
+            type="password"
+            placeholder="Mínimo 6 caracteres"
+            clearInput
+            class="custom-input">
+          </ion-input>
+        </div>
+      </ion-item>
+    </div>
+
+    <!-- Erro -->
+    @if (erro) {
+      <div class="alert-danger">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>{{ erro }}</span>
+      </div>
+    }
+
+    <!-- Sucesso -->
+    @if (sucesso) {
+      <div class="alert-success">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <span>{{ sucesso }}</span>
+      </div>
+    }
+
+    <!-- Botão cadastrar -->
+    <ion-button
+      color="primary"
+      expand="full"
+      class="save-btn"
+      (click)="cadastrarConta()"
+      [disabled]="!name || !email || !password || carregando">
+      @if (carregando) {
+        <ion-spinner name="crescent" slot="start"></ion-spinner>
+        Cadastrando...
+      } @else {
+        <ion-icon name="person-add-outline" slot="start"></ion-icon>
+        Criar Conta
+      }
+    </ion-button>
+
+    <!-- Link login -->
+    <ion-button
+      fill="clear"
+      expand="full"
+      class="link-btn"
+      (click)="irParaLogin()">
+      Já tem uma conta?
+      <strong style="margin-left: 4px;">Entrar</strong>
+    </ion-button>
+
+  </div>
+
+  <div style="height: 40px;"></div>
 
 </ion-content>

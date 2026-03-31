@@ -1,131 +1,171 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>PreçoLeite</ion-title>
-    <!-- <ion-buttons slot="end">
+    <ion-buttons slot="end">
       <ion-menu-button autoHide="false"></ion-menu-button>
-    </ion-buttons> -->
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="propriedade-content">
 
-  <ion-text color="medium">
-    <h2 style="margin-top: 24px;">Cadastro da Propriedade</h2>
-  </ion-text>
+  <!-- Cabeçalho -->
+  <div class="page-header">
+    <div class="page-title-row">
+      <ion-icon name="home-outline" class="page-icon"></ion-icon>
+      <h2 class="page-title">Cadastro da Propriedade</h2>
+    </div>
+    <p class="page-subtitle">Informe os dados da sua propriedade rural</p>
+  </div>
 
-  <!-- Nome da Propriedade -->
-  <ion-item>
-    <ion-input
-      [(ngModel)]="nomePropriedade"
-      placeholder="Nome da Propriedade">
-    </ion-input>
-  </ion-item>
+  <!-- ── Bloco: Dados da Propriedade ── -->
+  <div class="section-label">
+    <ion-icon name="farm-outline"></ion-icon>
+    Identificação
+  </div>
 
-  <!-- Município -->
-  <ion-item button (click)="abrirModalMunicipios()">
-    <ion-label position="stacked">Município</ion-label>
-    <ion-input
-      [value]="municipio"
-      placeholder="Selecionar"
-      readonly>
-    </ion-input>
-  </ion-item>
+  <div class="card-group">
 
-  <!-- Modal Municípios -->
-  <ion-modal [isOpen]="modalAberto" (didDismiss)="modalAberto = false">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar color="primary">
-          <ion-title>Selecionar Município</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="modalAberto = false">
-              Fechar
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
+    <!-- Nome -->
+    <ion-item lines="none" class="custom-item">
+      <ion-icon name="text-outline" slot="start" class="field-icon"></ion-icon>
+      <div class="field-wrap">
+        <ion-label class="field-label">Nome da Propriedade</ion-label>
+        <ion-input
+          [(ngModel)]="nomePropriedade"
+          placeholder="Ex: Fazenda Boa Vista"
+          class="custom-input">
+        </ion-input>
+      </div>
+    </ion-item>
 
-      <ion-content>
+    <div class="item-divider"></div>
 
-        <ion-searchbar
-          placeholder="Buscar município..."
-          [(ngModel)]="filtroMunicipio"
-          (ionInput)="filtrarMunicipios()">
-        </ion-searchbar>
+    <!-- Município -->
+    <ion-item lines="none" class="custom-item" button (click)="abrirModalMunicipios()">
+      <ion-icon name="location-outline" slot="start" class="field-icon"></ion-icon>
+      <div class="field-wrap">
+        <ion-label class="field-label">Município</ion-label>
+        <ion-input
+          [value]="municipio"
+          placeholder="Toque para selecionar"
+          readonly
+          class="custom-input">
+        </ion-input>
+      </div>
+      <ion-icon name="chevron-forward-outline" slot="end" class="chevron-icon"></ion-icon>
+    </ion-item>
 
-        <ion-list>
-          <ion-item
-            button
-            *ngFor="let m of municipiosFiltrados"
-            (click)="selecionarMunicipio(m.nome)">
-            {{ m.nome }}
-          </ion-item>
-        </ion-list>
+    <div class="item-divider"></div>
 
-      </ion-content>
+    <!-- Povoado / Região — Orizona -->
+    <ng-container *ngIf="municipio?.toLowerCase() === 'orizona'; else campoRegiaoNormal">
+
+      <ng-container *ngIf="!modoManualPovoado">
+        <ion-item lines="none" class="custom-item">
+          <ion-icon name="map-outline" slot="start" class="field-icon"></ion-icon>
+          <div class="field-wrap">
+            <ion-label class="field-label">Povoado</ion-label>
+            <ion-select
+              [(ngModel)]="povoado"
+              placeholder="Selecione o povoado"
+              class="custom-select">
+              <ion-select-option *ngFor="let p of povoadoOrz" [value]="p">{{ p }}</ion-select-option>
+            </ion-select>
+          </div>
+        </ion-item>
+      </ng-container>
+
+      <ng-container *ngIf="modoManualPovoado">
+        <ion-item lines="none" class="custom-item">
+          <ion-icon name="map-outline" slot="start" class="field-icon"></ion-icon>
+          <div class="field-wrap">
+            <ion-label class="field-label">Povoado</ion-label>
+            <ion-input
+              [(ngModel)]="povoado"
+              placeholder="Digite o povoado"
+              class="custom-input">
+            </ion-input>
+          </div>
+        </ion-item>
+      </ng-container>
+
+    </ng-container>
+
+    <!-- Povoado — outros municípios -->
+    <ng-template #campoRegiaoNormal>
+      <ion-item lines="none" class="custom-item">
+        <ion-icon name="map-outline" slot="start" class="field-icon"></ion-icon>
+        <div class="field-wrap">
+          <ion-label class="field-label">Povoado</ion-label>
+          <ion-input
+            [(ngModel)]="regiao"
+            placeholder="Digite o povoado"
+            class="custom-input">
+          </ion-input>
+        </div>
+      </ion-item>
     </ng-template>
-  </ion-modal>
 
-  <!-- ================= REGIÃO / POVOADO ================= -->
+  </div>
 
-  <!-- Se for Orizona -->
-  <ng-container *ngIf="municipio?.toLowerCase() === 'orizona'; else campoRegiaoNormal">
+  <!-- Botão "não encontrei meu povoado" — só aparece em Orizona -->
+  <ion-button
+    *ngIf="municipio?.toLowerCase() === 'orizona' && !modoManualPovoado"
+    fill="clear"
+    size="small"
+    class="link-btn-small"
+    (click)="modoManualPovoado = true">
+    Não encontrei meu povoado
+  </ion-button>
 
-    <!-- Select padrão -->
-    <ion-item *ngIf="!modoManualPovoado">
-      <ion-label position="stacked">Povoado</ion-label>
-      <ion-select
-        [(ngModel)]="povoado"
-        placeholder="Selecione o povoado">
-
-        <ion-select-option
-          *ngFor="let p of povoadoOrz"
-          [value]="p">
-          {{ p }}
-        </ion-select-option>
-
-      </ion-select>
-    </ion-item>
-
-    <!-- Botão liberar digitação -->
-    <ion-button
-      *ngIf="!modoManualPovoado"
-      fill="clear"
-      size="small"
-      (click)="modoManualPovoado = true">
-      Não encontrei meu povoado
-    </ion-button>
-
-    <!-- Input manual -->
-    <ion-item *ngIf="modoManualPovoado">
-      <ion-label position="stacked">Povoado</ion-label>
-      <ion-input
-        [(ngModel)]="povoado"
-        placeholder="Digite o povoado">
-      </ion-input>
-    </ion-item>
-
-  </ng-container>
-
-  <!-- Se NÃO for Orizona -->
-  <ng-template #campoRegiaoNormal>
-    <ion-item>
-      <ion-label position="stacked">Povoado</ion-label>
-      <ion-input
-        [(ngModel)]="regiao"
-        placeholder="Digite o Povoado">
-      </ion-input>
-    </ion-item>
-  </ng-template>
+  <!-- Erro -->
+  @if (erro) {
+    <div class="alert-danger">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <span>{{ erro }}</span>
+    </div>
+  }
 
   <!-- Botão salvar -->
   <ion-button
     color="primary"
     expand="full"
+    class="save-btn"
     (click)="cadastrarPropriedade()">
-    Salvar
+    <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+    Salvar Propriedade
   </ion-button>
 
-  <p style="color:red">{{ erro }}</p>
+  <div style="height: 40px;"></div>
 
 </ion-content>
+
+<!-- Modal Municípios -->
+<ion-modal [isOpen]="modalAberto" (didDismiss)="modalAberto = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Selecionar Município</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="modalAberto = false">Fechar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-searchbar
+        placeholder="Buscar município..."
+        [(ngModel)]="filtroMunicipio"
+        (ionInput)="filtrarMunicipios()">
+      </ion-searchbar>
+      <ion-list>
+        <ion-item
+          button
+          *ngFor="let m of municipiosFiltrados"
+          (click)="selecionarMunicipio(m.nome)">
+          {{ m.nome }}
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-modal>
