@@ -69,7 +69,7 @@ userSchema.methods = {
     let fields = ['id', 'name', 'picture']
 
     if (full) {
-      fields = [...fields, 'email', 'role', 'createdAt']
+      fields = [...fields, 'email', 'role', 'createdAt'] // ← role adicionado
     }
 
     fields.forEach((field) => { view[field] = this[field] })
@@ -80,7 +80,6 @@ userSchema.methods = {
   authenticate (password) {
     return bcrypt.compare(password, this.password).then((valid) => valid ? this : false)
   }
-
 }
 
 userSchema.statics = {

@@ -6,6 +6,7 @@ import dados from './dados'
 import cadastroContas from './cadastroConta'
 import cadastroParametros from './cadastroParametros'
 import cadastroPropriedade from './cadastroPropriedade'
+import cotacoes from './cotacoes'
 
 const router = new Router()
 
@@ -39,5 +40,5 @@ router.use('/dados', dados)
 router.use('/cadastroContas', cadastroContas)
 router.use('/cadastroParametros', cadastroParametros)
 router.use('/cadastroPropriedade', cadastroPropriedade)
-
+router.use('/cotacoes', cotacoes)
 export default router
