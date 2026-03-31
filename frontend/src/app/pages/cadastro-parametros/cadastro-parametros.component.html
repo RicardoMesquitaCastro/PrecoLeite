@@ -2,92 +2,191 @@
   <ion-toolbar>
     <ion-title>PreçoLeite</ion-title>
     <ion-buttons slot="end">
-      <ion-menu-button autoHide="true"></ion-menu-button>
+      <ion-menu-button autoHide="false"></ion-menu-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-text color="medium">
-    <h2 style="margin-top: 24px;">Cadastro dos Parâmetros</h2>
-  </ion-text>
+<ion-content class="ion-padding parametros-content">
 
-  <!-- 🔽 Laticínio (Select) -->
-  <ion-item>
-    <ion-label position="stacked">Laticínio </ion-label>
-    <ion-select interface="alert" (ionFocus)="removerFoco($event)" [(ngModel)]="laticinio"
-      placeholder="Selecione o laticínio">
+  <!-- Título -->
+  <div class="page-header">
+    <div class="page-title-row">
+      <ion-icon name="document-text-outline" class="page-icon"></ion-icon>
+      <h2 class="page-title">Cadastro de Parâmetros</h2>
+    </div>
+    <p class="page-subtitle">Preencha os dados do mês de referência</p>
+  </div>
 
-      @for (item of laticinios; track item) {
-      <ion-select-option [value]="item">
-        {{ item }}
-      </ion-select-option>
-      }
+  <!-- ── Bloco 1: Identificação ── -->
+  <div class="section-label">
+    <ion-icon name="information-circle-outline"></ion-icon>
+    Identificação
+  </div>
 
-    </ion-select>
-  </ion-item>
+  <div class="card-group">
+    <ion-item lines="none" class="custom-item">
+      <ion-icon name="business-outline" slot="start" class="field-icon"></ion-icon>
+      <div class="field-wrap">
+        <ion-label class="field-label">Laticínio</ion-label>
+        <ion-select
+          interface="alert"
+          (ionFocus)="removerFoco($event)"
+          [(ngModel)]="laticinio"
+          placeholder="Selecione o laticínio"
+          class="custom-select">
+          @for (item of laticinios; track item) {
+            <ion-select-option [value]="item">{{ item }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+    </ion-item>
 
-  <ion-item>
-<ion-label position="stacked">Mês de Referência</ion-label>
-    <ion-select interface="alert" (ionFocus)="removerFoco($event)" [(ngModel)]="mesReferencia"
-      placeholder="Selecionar">
+    <div class="item-divider"></div>
 
-      @for (mes of mesesDisponiveis; track mes.valor) {
-      <ion-select-option [value]="mes.valor">
-        {{ mes.nome }}
-      </ion-select-option>
-      }
+    <ion-item lines="none" class="custom-item">
+      <ion-icon name="calendar-outline" slot="start" class="field-icon"></ion-icon>
+      <div class="field-wrap">
+        <ion-label class="field-label">Mês de Referência</ion-label>
+        <ion-select
+          interface="alert"
+          (ionFocus)="removerFoco($event)"
+          [(ngModel)]="mesReferencia"
+          placeholder="Selecionar mês"
+          (ngModelChange)="onMesChange()"
+          class="custom-select">
+          @for (mes of mesesDisponiveis; track mes.valor) {
+            <ion-select-option [value]="mes.valor">{{ mes.nome }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+    </ion-item>
+  </div>
 
-    </ion-select>
-  </ion-item>
+  <!-- Aviso mês duplicado -->
+  @if (mensagemMesDuplicado) {
+    <div class="alert-warning">
+      <ion-icon name="warning-outline"></ion-icon>
+      <span>{{ mensagemMesDuplicado }}</span>
+    </div>
+  }
 
-  <ion-item>
-  <ion-label position="stacked">Preço do leite (R$/L)</ion-label>
- <ion-input
-  type="tel"
-  [value]="precoLitro"
-  inputmode="numeric"
-  (ionInput)="formatarMoeda($event, 'precoLitro')">
-</ion-input>
-</ion-item>
+  <!-- ── Bloco 2: Valores Financeiros ── -->
+  <div class="section-label">
+    <ion-icon name="cash-outline"></ion-icon>
+    Financeiro
+  </div>
 
-<ion-item>
-  <ion-label position="stacked">Produção diária (litros)</ion-label>
-  <ion-input [(ngModel)]="producaoLitros" type="number"></ion-input>
-</ion-item>
+  <div class="card-group">
+    <ion-item lines="none" class="custom-item">
+      <ion-icon name="pricetag-outline" slot="start" class="field-icon"></ion-icon>
+      <div class="field-wrap">
+        <ion-label class="field-label">Preço do leite (R$/L)</ion-label>
+        <ion-input
+          type="tel"
+          [value]="precoLitro"
+          inputmode="numeric"
+          (ionInput)="formatarMoeda($event, 'precoLitro')"
+          class="custom-input">
+        </ion-input>
+      </div>
+    </ion-item>
 
-<ion-item>
-  <ion-label position="stacked">CCS (x1000 cél./mL)</ion-label>
-  <ion-input [(ngModel)]="ccs" type="number"></ion-input>
-</ion-item>
+    <div class="item-divider"></div>
 
-<ion-item>
-  <ion-label position="stacked">CBT (UFC/mL)</ion-label>
-  <ion-input [(ngModel)]="cbt" type="number"></ion-input>
-</ion-item>
+    <ion-item lines="none" class="custom-item">
+      <ion-icon name="water-outline" slot="start" class="field-icon"></ion-icon>
+      <div class="field-wrap">
+        <ion-label class="field-label">Produção diária (litros)</ion-label>
+        <ion-input
+          [(ngModel)]="producaoLitros"
+          type="number"
+          placeholder="0"
+          class="custom-input">
+        </ion-input>
+      </div>
+    </ion-item>
+  </div>
 
-<ion-item>
-  <ion-label position="stacked">Gordura (%)</ion-label>
-  <ion-input
-   type="tel"
-  [value]="gordura"
- inputmode="numeric"
-  (ionInput)="formatarMoeda($event, 'gordura')">
-</ion-input>
+  <!-- ── Bloco 3: Qualidade ── -->
+  <div class="section-label">
+    <ion-icon name="flask-outline"></ion-icon>
+    Qualidade do Leite
+  </div>
 
-</ion-item>
+  <div class="card-group">
+    <ion-item lines="none" class="custom-item">
+      <ion-icon name="cellular-outline" slot="start" class="field-icon"></ion-icon>
+      <div class="field-wrap">
+        <ion-label class="field-label">CCS (x1000 cél./mL)</ion-label>
+        <ion-input
+          [(ngModel)]="ccs"
+          type="number"
+          placeholder="0"
+          class="custom-input">
+        </ion-input>
+      </div>
+    </ion-item>
 
-<ion-item>
-  <ion-label position="stacked">Proteína (%)</ion-label>
- <ion-input
-  type="tel"
- [value]="proteina"
- inputmode="numeric"
-  (ionInput)="formatarMoeda($event, 'proteina')">
-</ion-input>
-</ion-item>
+    <div class="item-divider"></div>
 
-  <ion-button color="primary" expand="full" (click)="cadastrarParametros()" [disabled]="!todosCamposPreenchidos()">
-    Salvar
+    <ion-item lines="none" class="custom-item">
+      <ion-icon name="bug-outline" slot="start" class="field-icon"></ion-icon>
+      <div class="field-wrap">
+        <ion-label class="field-label">CBT (UFC/mL)</ion-label>
+        <ion-input
+          [(ngModel)]="cbt"
+          type="number"
+          placeholder="0"
+          class="custom-input">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <div class="item-divider"></div>
+
+    <ion-item lines="none" class="custom-item">
+      <ion-icon name="stats-chart-outline" slot="start" class="field-icon"></ion-icon>
+      <div class="field-wrap">
+        <ion-label class="field-label">Gordura (%)</ion-label>
+        <ion-input
+          type="tel"
+          [value]="gordura"
+          inputmode="numeric"
+          (ionInput)="formatarMoeda($event, 'gordura')"
+          class="custom-input">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <div class="item-divider"></div>
+
+    <ion-item lines="none" class="custom-item">
+      <ion-icon name="fitness-outline" slot="start" class="field-icon"></ion-icon>
+      <div class="field-wrap">
+        <ion-label class="field-label">Proteína (%)</ion-label>
+        <ion-input
+          type="tel"
+          [value]="proteina"
+          inputmode="numeric"
+          (ionInput)="formatarMoeda($event, 'proteina')"
+          class="custom-input">
+        </ion-input>
+      </div>
+    </ion-item>
+  </div>
+
+  <!-- Botão Salvar -->
+  <ion-button
+    color="primary"
+    expand="full"
+    class="save-btn"
+    (click)="cadastrarParametros()"
+    [disabled]="!todosCamposPreenchidos() || mesDuplicado()">
+    <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+    Salvar Parâmetros
   </ion-button>
+
+  <div style="height: 32px;"></div>
+
 </ion-content>

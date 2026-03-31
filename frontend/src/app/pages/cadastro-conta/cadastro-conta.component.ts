@@ -41,7 +41,7 @@ export class CadastroContaComponent {
           next: () => {
             this.carregando = false;
             this.sucesso = 'Conta criada com sucesso!';
-            setTimeout(() => this.router.navigate(['/home']), 1500);
+            setTimeout(() => this.router.navigate(['/cadastro-propriedade']), 1500);
           },
           error: () => {
             // Cadastrou mas não logou — manda pro login manualmente

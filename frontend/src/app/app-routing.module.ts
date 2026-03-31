@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { authGuard } from './services/auth.guard';
 import { propriedadeGuard } from './services/propriedade.guard';
+import { parametrosGuard } from './services/parametros.guard';
 
 const routes: Routes = [
   {
@@ -25,13 +26,15 @@ const routes: Routes = [
   },
   {
     path: 'cadastro-parametros',
-    loadComponent: () => import('./pages/cadastro-parametros/cadastro-parametros.component').then((m) => m.CadastroParametrosComponent),
+    loadComponent: () =>
+      import('./pages/cadastro-parametros/cadastro-parametros.component').then(m => m.CadastroParametrosComponent),
+    canActivate: [authGuard, propriedadeGuard], // 🔒 precisa ter propriedade antes
   },
-   {
+  {
     path: 'data-parametros',
     loadComponent: () =>
       import('./pages/data-parametros/data-parametros.component').then(m => m.DataParametrosPage),
-    canActivate: [authGuard, propriedadeGuard], // 🔒 logado + tem propriedade
+    canActivate: [authGuard, propriedadeGuard, parametrosGuard], // 🔒 logado + propriedade + parâmetros
   },
   {
     path: '',

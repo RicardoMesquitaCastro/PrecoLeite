@@ -92,7 +92,7 @@ export class CadastroPropriedadeComponent implements OnInit {
       this.limparFormulario();
       await this.mostrarToast('Propriedade cadastrada com sucesso!', 'success');
       // Redireciona para home após cadastro
-      this.router.navigate(['/home']);
+      this.router.navigate(['/cadastro-parametros']);
     } catch (err: any) {
       console.error('Erro ao cadastrar:', err);
       await this.mostrarToast('Erro ao cadastrar propriedade.', 'danger');
