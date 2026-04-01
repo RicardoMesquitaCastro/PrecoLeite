@@ -72,7 +72,6 @@ export class DadosService {
   /** 🔹 Cadastrar novo registro */
   create(dado: DadoLeite): Observable<DadoLeite> {
     if (this.usarMock) {
-      console.log('📦 Mock create:', dado);
       list.push(dado);
       return of(dado);
     }

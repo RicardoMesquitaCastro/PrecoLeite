@@ -2,141 +2,156 @@
   <ion-toolbar>
     <ion-title>PreçoLeite</ion-title>
     <ion-buttons slot="end">
-      <ion-menu-button autoHide="true"></ion-menu-button>
+      <ion-menu-button autoHide="false"></ion-menu-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="home-content">
 
-  <!-- WIDGET CEPEA RESPONSIVO -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>COTAÇÃO ATUAL</ion-card-title>
-    </ion-card-header>
-    <ion-card-content style="overflow-x: auto;">
-      <div style="min-width: 100%; overflow-x: auto;">
-        <iframe
-          srcdoc='
-            <html>
-              <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                  body {
-                    margin: 16px;
-                    background: #1e1e1e;
-                    font-family: Arial, sans-serif;
-                  }
-                  table.imagenet-widget-tabela {
-                    background: #1e1e1e;
-                    color: #b9fbc0;
-                    border-radius: 16px;
-                    border-collapse: collapse;
-                    box-shadow: 0 0 20px rgba(0,255,128,0.2);
-                    margin: 0 auto;
-                    font-size: 14px;
-                    width: 100%;
-                  }
-                  th, td {
-                    padding: 8px 12px;
-                  }
-                </style>
-              </head>
-              <body>
-                <script type="text/javascript"
-                  src="https://www.cepea.org.br/br/widgetproduto.js.php?fonte=arial&tamanho=10&largura=100%25&corfundo=1e1e1e&cortexto=b9fbc0&corlinha=00ff80&id_indicador[]=leitep">
-                </script>
-              </body>
-            </html>
-          '
-          style="width: 100%; min-width: 100%; max-width: 100%; height: 180px; border: none; background: transparent;"
-          sandbox="allow-scripts"
-        ></iframe>
+  <!-- ── Cabeçalho ── -->
+  <div class="page-header">
+    <div class="page-title-row">
+      <ion-icon name="trending-up-outline" class="page-icon"></ion-icon>
+      <h2 class="page-title">Início</h2>
+    </div>
+    <p class="page-subtitle">Cotações e indicadores do mercado de leite</p>
+  </div>
+
+  <!-- ── Widget CEPEA ── -->
+  <div class="section-label">
+    <ion-icon name="newspaper-outline"></ion-icon>
+    Cotação Atual Brasil — CEPEA/ESALQ
+  </div>
+
+  <div class="data-card">
+    <div style="overflow-x: auto;">
+      <iframe
+        srcdoc='
+          <html>
+            <head>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body { margin: 12px; background: transparent; font-family: Arial, sans-serif; }
+                table.imagenet-widget-tabela {
+                  background: transparent;
+                  color: #1a2332;
+                  border-collapse: collapse;
+                  font-size: 13px;
+                  width: 100%;
+                }
+                th, td { padding: 6px 10px; }
+              </style>
+            </head>
+            <body>
+              <script type="text/javascript"
+                src="https://www.cepea.org.br/br/widgetproduto.js.php?fonte=arial&tamanho=10&largura=100%25&corfundo=ffffff&cortexto=1a2332&corlinha=e5e7eb&id_indicador[]=leitep">
+              </script>
+            </body>
+          </html>
+        '
+        style="width:100%; height:180px; border:none; background:transparent;"
+        sandbox="allow-scripts">
+      </iframe>
+    </div>
+  </div>
+
+  <!-- ── Gráfico ── -->
+  <div class="section-label" style="margin-top: 20px;">
+    <ion-icon name="bar-chart-outline"></ion-icon>
+    Leite ao Produtor — Goiás (R$/litro)
+  </div>
+
+  <div class="data-card chart-card">
+    <canvas id="cotacoesChart" style="width:100%; height:240px;"></canvas>
+  </div>
+
+  <!-- ── Admin: Gerenciar Cotações ── -->
+  @if (isAdmin) {
+    <div class="section-label" style="margin-top: 20px;">
+      <ion-icon name="settings-outline"></ion-icon>
+      Gerenciar Cotações (Admin)
+    </div>
+
+    <div class="data-card">
+
+      <!-- Formulário -->
+      <div class="admin-form">
+        <ion-item lines="none" class="custom-item">
+          <ion-icon name="calendar-outline" slot="start" class="field-icon"></ion-icon>
+          <div class="field-wrap">
+            <ion-label class="field-label">Mês</ion-label>
+            <ion-input
+              [(ngModel)]="novoMes"
+              placeholder="Ex: Jan/2025"
+              clearInput
+              class="custom-input">
+            </ion-input>
+          </div>
+        </ion-item>
+
+        <div class="item-divider"></div>
+
+        <ion-item lines="none" class="custom-item">
+          <ion-icon name="pricetag-outline" slot="start" class="field-icon"></ion-icon>
+          <div class="field-wrap">
+            <ion-label class="field-label">Preço (R$/L)</ion-label>
+            <ion-input
+              [(ngModel)]="novoPreco"
+              type="number"
+              placeholder="Ex: 2.34"
+              clearInput
+              class="custom-input">
+            </ion-input>
+          </div>
+        </ion-item>
       </div>
-    </ion-card-content>
-  </ion-card>
 
-  <!-- GRÁFICO COTAÇÕES -->
- <ion-card>
-  <ion-card-header>
-    <ion-card-title>
-      LEITE AO PRODUTOR CEPEA/ESALQ (R$/litro) - Goiás
-    </ion-card-title>
-  </ion-card-header>
-  <ion-card-content>
-    <canvas id="cotacoesChart" style="width: 100%; height: 250px;"></canvas>
-  </ion-card-content>
-</ion-card>
-
-<!-- ✅ Inputs visíveis apenas para ADMIN -->
-@if (isAdmin) {
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="settings-outline" style="margin-right: 8px;"></ion-icon>
-        Gerenciar Cotações (Admin)
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-
-      <!-- Formulário de adição -->
-      <ion-item>
-        <ion-input
-          [(ngModel)]="novoMes"
-          placeholder="Mês (ex: Jan/2025)"
-          clearInput>
-        </ion-input>
-      </ion-item>
-
-      <ion-item class="ion-margin-top">
-        <ion-input
-          [(ngModel)]="novoPreco"
-          type="number"
-          placeholder="Preço (ex: 2.34)"
-          clearInput>
-        </ion-input>
-      </ion-item>
-
+      <!-- Feedback -->
       @if (mensagem) {
-        <ion-text [color]="mensagem.includes('sucesso') ? 'success' : 'danger'">
-          <p style="margin-top: 8px; font-size: 14px;">{{ mensagem }}</p>
-        </ion-text>
+        <div class="alert-msg" [class.success]="mensagem.includes('sucesso')" [class.danger]="!mensagem.includes('sucesso')">
+          <ion-icon [name]="mensagem.includes('sucesso') ? 'checkmark-circle-outline' : 'alert-circle-outline'"></ion-icon>
+          <span>{{ mensagem }}</span>
+        </div>
       }
 
       <ion-button
         expand="block"
         color="primary"
-        class="ion-margin-top"
+        class="add-btn"
         (click)="adicionarCotacao()"
         [disabled]="!novoMes || !novoPreco">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
         Adicionar Cotação
       </ion-button>
+    </div>
 
-      <!-- Lista de cotações cadastradas -->
-      @if (cotacoes.length > 0) {
-        <ion-list class="ion-margin-top">
-          <ion-list-header>
-            <ion-label>Cotações Cadastradas</ion-label>
-          </ion-list-header>
-          @for (c of cotacoes; track c.id) {
-            <ion-item>
-              <ion-label>
-                {{ c.mes }} — R$ {{ c.preco | number:'1.2-2' }}
-              </ion-label>
-              <ion-button
-                slot="end"
-                fill="clear"
-                color="danger"
-                (click)="excluirCotacao(c.id)">
+    <!-- Lista de cotações -->
+    @if (cotacoes.length > 0) {
+      <div class="section-label" style="margin-top: 16px;">
+        <ion-icon name="list-outline"></ion-icon>
+        Cotações Cadastradas
+      </div>
+
+      <div class="data-card">
+        @for (c of cotacoes; track c.id) {
+          <div class="data-row">
+            <div class="data-row-left">
+              <ion-icon name="calendar-outline" class="row-icon"></ion-icon>
+              <span>{{ c.mes }}</span>
+            </div>
+            <div class="data-row-right">
+              <span class="data-value">R$ {{ c.preco | number:'1.2-2' }}</span>
+              <ion-button fill="clear" color="danger" size="small" (click)="excluirCotacao(c.id)">
                 <ion-icon name="trash-outline"></ion-icon>
               </ion-button>
-            </ion-item>
-          }
-        </ion-list>
-      }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
 
-    </ion-card-content>
-  </ion-card>
-}
+  <div style="height: 40px;"></div>
 
 </ion-content>

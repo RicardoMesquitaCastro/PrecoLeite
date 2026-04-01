@@ -123,7 +123,6 @@ inicializarFiltros() {
   this.laticiniosDisponiveis = [
   ...new Set(this.dadosList.map(d => d.laticinio))
 ].sort()
-  console.log("🚀 ~ DataParametrosPage ~ inicializarFiltros ~ this.laticiniosDisponiveis:", this.laticiniosDisponiveis)
 }
 
 carregarDados() {

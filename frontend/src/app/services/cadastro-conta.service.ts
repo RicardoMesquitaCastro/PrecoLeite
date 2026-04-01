@@ -34,12 +34,8 @@ private token = 'teste';
 
   /** READ (lista todas) */
  getAll(): Observable<CadastroConta[]> {
-    console.log('➡️ Entrou no método getAll()');
-
-    return this.http.get<CadastroConta[]>(this.apiUrl, { headers: this.getHeaders() }).pipe(
-      tap(res => console.log('📦 CadastroConta recebido do backend:', res)),
+      return this.http.get<CadastroConta[]>(this.apiUrl, { headers: this.getHeaders() }).pipe(
       catchError(err => {
-        console.error('❌ Erro no GET /cadastroContas:', err);
         return of([]); // retorna array vazio pra não quebrar a aplicação
       })
     );

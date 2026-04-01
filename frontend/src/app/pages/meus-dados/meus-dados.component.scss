@@ -1,0 +1,287 @@
+// ── Página ───────────────────────────────────────────
+.meus-dados-content {
+  --background: #f4f6f8;
+}
+
+// ── Cabeçalho ────────────────────────────────────────
+.page-header {
+  margin: 20px 16px 16px;
+}
+
+.page-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.page-icon {
+  font-size: 24px;
+  color: var(--ion-color-primary);
+}
+
+.page-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a2332;
+  letter-spacing: -0.3px;
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #8a95a3;
+  padding-left: 34px;
+}
+
+// ── Rótulo de seção ──────────────────────────────────
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8a95a3;
+  margin: 16px 20px 8px;
+
+  ion-icon {
+    font-size: 14px;
+    color: var(--ion-color-primary);
+  }
+}
+
+// ── Cards ─────────────────────────────────────────────
+.data-card {
+  background: #ffffff;
+  border-radius: 14px;
+  margin: 0 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+}
+
+// ── Cabeçalho do card ────────────────────────────────
+.data-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f2f4;
+
+  .card-icon {
+    font-size: 18px;
+    color: var(--ion-color-primary);
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a2332;
+    flex: 1;
+  }
+
+  .lat-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+}
+
+// ── Badge do mês ─────────────────────────────────────
+.mes-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  background: rgba(var(--ion-color-primary-rgb), 0.08);
+  border-radius: 20px;
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+
+// ── Linhas de dados ───────────────────────────────────
+.data-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f7f8fa;
+
+  &:last-child { border-bottom: none; }
+}
+
+.data-row-label {
+  font-size: 13px;
+  color: #8a95a3;
+  font-weight: 500;
+}
+
+.data-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+
+  &.destaque {
+    font-size: 15px;
+    color: #16a34a;
+  }
+}
+
+.id-text {
+  font-size: 11px;
+  font-weight: 400;
+  color: #9ca3af;
+  font-family: monospace;
+  word-break: break-all;
+  text-align: right;
+  max-width: 60%;
+}
+
+// ── Estado vazio ─────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  color: #9ca3af;
+
+  ion-icon {
+    font-size: 40px;
+    color: #d1d5db;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  ion-spinner {
+    color: var(--ion-color-primary);
+    width: 36px;
+    height: 36px;
+  }
+}
+
+// ── Dark mode ─────────────────────────────────────────
+@media (prefers-color-scheme: dark) {
+  .meus-dados-content {
+    --background: #121212;
+  }
+
+  .page-title {
+    color: #f0f0f0;
+  }
+
+  .page-subtitle {
+    color: #6b7280;
+  }
+
+  .data-card {
+    background: #1e1e1e;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  .data-card-header {
+    border-bottom-color: #2a2a2a;
+
+    .card-title { color: #f0f0f0; }
+  }
+
+  .data-row {
+    border-bottom-color: #242424;
+  }
+
+  .data-row-label {
+    color: #6b7280;
+  }
+
+  .id-text {
+    color: #6b7280;
+  }
+
+  .mes-badge {
+    background: rgba(var(--ion-color-primary-rgb), 0.15);
+  }
+
+  .empty-state {
+    color: #6b7280;
+
+    ion-icon { color: #374151; }
+  }
+
+  // ── Seletor de mês ────────────────────────────────────
+.mes-selector-card {
+  margin-bottom: 10px;
+}
+
+.mes-selector-wrap {
+  padding: 4px 14px 12px;
+}
+
+.mes-select {
+  width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  --placeholder-color: #9ca3af;
+}
+
+// ── Filtros de ano + mês ──────────────────────────────
+.filtro-card {
+  margin-bottom: 10px;
+}
+
+.filtro-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.filtro-item {
+  flex: 1;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filtro-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #8a95a3;
+
+  ion-icon {
+    font-size: 13px;
+    color: var(--ion-color-primary);
+  }
+}
+
+.filtro-select {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a2332;
+  --padding-start: 0;
+}
+
+.filtro-divider-v {
+  width: 1px;
+  background: #f0f2f4;
+  margin: 8px 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .filtro-select { color: #f0f0f0; }
+  .filtro-divider-v { background: #2a2a2a; }
+}
+
+}

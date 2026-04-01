@@ -63,7 +63,6 @@ export class AuthService {
 
   getRole(): string | null {
   const user = localStorage.getItem('auth-user');
-  console.log("🚀 ~ AuthService ~ getRole ~ user:", user)
   if (!user) return null;
   try {
     return JSON.parse(user).role;

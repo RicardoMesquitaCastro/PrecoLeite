@@ -37,6 +37,11 @@ const routes: Routes = [
     canActivate: [authGuard, propriedadeGuard, parametrosGuard], // 🔒 logado + propriedade + parâmetros
   },
   {
+  path: 'meus-dados',
+  loadComponent: () => import('./pages/meus-dados/meus-dados.component')
+    .then(m => m.MeusDadosComponent)
+},
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
