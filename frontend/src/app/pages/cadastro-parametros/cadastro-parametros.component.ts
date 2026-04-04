@@ -7,6 +7,7 @@ import {
   CadastroParametrosService,
   CadastroParametros
 } from 'src/app/services/cadastro-parametros.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-cadastro-parametros',
@@ -29,18 +30,18 @@ export class CadastroParametrosComponent implements OnInit {
   mensagemMesDuplicado = '';
 
   mesesDisponiveis = [
-    { nome: 'Janeiro',   valor: '1'  },
-    { nome: 'Fevereiro', valor: '2'  },
-    { nome: 'Março',     valor: '3'  },
-    { nome: 'Abril',     valor: '4'  },
-    { nome: 'Maio',      valor: '5'  },
-    { nome: 'Junho',     valor: '6'  },
-    { nome: 'Julho',     valor: '7'  },
-    { nome: 'Agosto',    valor: '8'  },
-    { nome: 'Setembro',  valor: '9'  },
-    { nome: 'Outubro',   valor: '10' },
-    { nome: 'Novembro',  valor: '11' },
-    { nome: 'Dezembro',  valor: '12' },
+    { nome: 'Janeiro',   valor: '0'  },
+    { nome: 'Fevereiro', valor: '1'  },
+    { nome: 'Março',     valor: '2'  },
+    { nome: 'Abril',     valor: '3'  },
+    { nome: 'Maio',      valor: '4'  },
+    { nome: 'Junho',     valor: '5'  },
+    { nome: 'Julho',     valor: '6'  },
+    { nome: 'Agosto',    valor: '7'  },
+    { nome: 'Setembro',  valor: '8'  },
+    { nome: 'Outubro',   valor: '9' },
+    { nome: 'Novembro',  valor: '10' },
+    { nome: 'Dezembro',  valor: '11' },
   ];
 
   laticinios: string[] = [
@@ -51,7 +52,8 @@ export class CadastroParametrosComponent implements OnInit {
   constructor(
     private router: Router,
     private cadastroService: CadastroParametrosService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -59,28 +61,33 @@ export class CadastroParametrosComponent implements OnInit {
   }
 
   carregarDadosIniciais() {
+    const user = this.authService.getUser();
+    const meuId = user?.id;
+
     this.cadastroService.getMeus().subscribe({
       next: (res) => {
-        // Meses já cadastrados (para bloqueio)
-        this.mesesJaCadastrados = res.rows.map(p => p.mesReferencia);
+        // Filtra no frontend garantindo que só pega registros do usuário logado
+        const meusDados = res.rows.filter((p: any) => p.contaId === meuId);
 
-        // Pré-seleciona o laticínio do último parâmetro cadastrado (ordenado por data)
-        if (res.rows.length > 0) {
-          const ordenados = [...res.rows].sort((a: any, b: any) =>
+        this.mesesJaCadastrados = meusDados.map((p: any) => String(p.mesReferencia));
+
+        // Pré-seleciona laticínio do último registro do próprio usuário
+        if (meusDados.length > 0) {
+          const ordenados = [...meusDados].sort((a: any, b: any) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
           const ultimoLaticinio = ordenados[0].laticinio;
           setTimeout(() => { this.laticinio = ultimoLaticinio; }, 300);
         }
       },
-      error: () => {
+      error: (err) => {
         this.mesesJaCadastrados = [];
       }
     });
   }
 
   onMesChange() {
-    if (this.mesReferencia && this.mesesJaCadastrados.includes(this.mesReferencia)) {
+    if (this.mesReferencia && this.mesesJaCadastrados.includes(String(this.mesReferencia))) {
       const nomeMes = this.mesesDisponiveis.find(m => m.valor === this.mesReferencia)?.nome;
       this.mensagemMesDuplicado = `Você já cadastrou parâmetros para ${nomeMes}. Escolha outro mês.`;
     } else {
@@ -89,7 +96,7 @@ export class CadastroParametrosComponent implements OnInit {
   }
 
   mesDuplicado(): boolean {
-    return !!this.mesReferencia && this.mesesJaCadastrados.includes(this.mesReferencia);
+    return !!this.mesReferencia && this.mesesJaCadastrados.includes(String(this.mesReferencia));
   }
 
   async cadastrarParametros() {
@@ -167,7 +174,6 @@ export class CadastroParametrosComponent implements OnInit {
   }
 
   limparFormulario() {
-    // Mantém o laticínio pré-selecionado após salvar
     this.mesReferencia        = null;
     this.precoLitro           = '0.00';
     this.producaoLitros       = '';

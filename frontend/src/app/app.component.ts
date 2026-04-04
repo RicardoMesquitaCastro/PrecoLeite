@@ -10,7 +10,9 @@ import { filter } from 'rxjs';
   standalone: false,
 })
 export class AppComponent implements OnInit {
-  isLogado = false;
+  isLogado   = false;
+  isProdutor = false;
+  isAdmin = false
 
   constructor(
     private authService: AuthService,
@@ -19,13 +21,17 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.isLogado = this.authService.isAuthenticated();
+    this.atualizarEstado();
 
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(() => {
-        this.isLogado = this.authService.isAuthenticated();
-      });
+      .subscribe(() => this.atualizarEstado());
+  }
+
+  private atualizarEstado() {
+    this.isLogado   = this.authService.isAuthenticated();
+    this.isProdutor = this.authService.isProdutor();
+     this.isAdmin = this.authService.isAdmin();
   }
 
   fecharMenu() {

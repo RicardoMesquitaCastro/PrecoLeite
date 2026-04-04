@@ -18,7 +18,42 @@
   <!-- Formulário -->
   <div class="form-card">
 
+    <!-- ── Tipo de conta ── -->
     <div class="section-label">
+      <ion-icon name="people-outline"></ion-icon>
+      Você é
+    </div>
+
+    <div class="tipo-conta-wrap">
+
+      <div
+        class="tipo-card"
+        [class.selected]="tipoConta === 'produtor'"
+        (click)="tipoConta = 'produtor'">
+        <ion-icon name="leaf-outline" class="tipo-icon"></ion-icon>
+        <span class="tipo-titulo">Produtor</span>
+        <span class="tipo-desc">Cadastra propriedade e acompanha sua produção</span>
+        <div class="tipo-check">
+          <ion-icon name="checkmark-circle" *ngIf="tipoConta === 'produtor'"></ion-icon>
+        </div>
+      </div>
+
+      <div
+        class="tipo-card"
+        [class.selected]="tipoConta === 'visitante'"
+        (click)="tipoConta = 'visitante'">
+        <ion-icon name="eye-outline" class="tipo-icon"></ion-icon>
+        <span class="tipo-titulo">Visitante</span>
+        <span class="tipo-desc">Consulta estatísticas e cotações do mercado</span>
+        <div class="tipo-check">
+          <ion-icon name="checkmark-circle" *ngIf="tipoConta === 'visitante'"></ion-icon>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Dados Pessoais ── -->
+    <div class="section-label" style="margin-top: 20px;">
       <ion-icon name="person-outline"></ion-icon>
       Dados Pessoais
     </div>
@@ -92,7 +127,7 @@
       expand="full"
       class="save-btn"
       (click)="cadastrarConta()"
-      [disabled]="!name || !email || !password || carregando">
+      [disabled]="!name || !email || !password || !tipoConta || carregando">
       @if (carregando) {
         <ion-spinner name="crescent" slot="start"></ion-spinner>
         Cadastrando...

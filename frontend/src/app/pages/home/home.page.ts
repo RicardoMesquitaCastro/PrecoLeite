@@ -4,7 +4,7 @@ import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Chart, registerables } from 'chart.js';
-import { AuthService } from 'src/app/services/auth.service'; // ajuste o caminho
+import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment.prod';
 
 Chart.register(...registerables);
@@ -32,7 +32,6 @@ export class HomePage implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Widget CEPEA
     const container = document.getElementById('cepea-widget');
     if (container) {
       container.innerHTML = '';
@@ -51,7 +50,6 @@ export class HomePage implements OnInit, AfterViewInit {
         this.renderizarGrafico(dados);
       },
       error: () => {
-        // fallback com dados fixos se API falhar
         const fallback = [
           { mes: 'Set', preco: 2.34 },
           { mes: 'Out', preco: 2.21 },

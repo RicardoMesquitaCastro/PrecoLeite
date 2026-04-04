@@ -1,11 +1,10 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
 import { FaixaValidaPipe } from './faixa-valida.pipe';
-import { list } from './dados';
-//import { DadoLeite } from './dado-leite.model';
+
 import { DadosService, DadoLeite } from 'src/app/services/dados.service';
 
 Chart.register(...registerables);
@@ -19,7 +18,7 @@ Chart.register(...registerables);
 })
 
 
-export class DataParametrosPage implements OnInit, AfterViewInit  {
+export class DataParametrosPage implements AfterViewInit  {
 
   constructor(private dadosService: DadosService) {}
 private _graficoRegiaoRef!: ElementRef<HTMLCanvasElement>;
@@ -49,7 +48,7 @@ set graficoRegiaoSetter(ref: ElementRef<HTMLCanvasElement> | undefined) {
   municipiosDisponiveis: string[] = [];
   mesSelecionado: string = 'geral';
   currentYear = new Date().getFullYear();
-  anoSelecionado: number = 2025; // ano atual
+  anoSelecionado: number = 2026; // ano atual
   anosDisponiveis: number[] = [];
   laticinioSelecionado: string = 'todos'
 laticiniosDisponiveis: string[] = []
@@ -64,47 +63,31 @@ laticiniosDisponiveis: string[] = []
   proteina: number | null = null;
 
   mesesDisponiveis = [
-    { nome: 'Janeiro', valor: 1 },
-    { nome: 'Fevereiro', valor: 2 },
-    { nome: 'Março', valor: 3 },
-    { nome: 'Abril', valor: 4 },
-    { nome: 'Maio', valor: 5 },
-    { nome: 'Junho', valor: 6 },
-    { nome: 'Julho', valor: 7 },
-    { nome: 'Agosto', valor: 8 },
-    { nome: 'Setembro', valor: 9 },
-    { nome: 'Outubro', valor: 10 },
-    { nome: 'Novembro', valor: 11 },
-    { nome: 'Dezembro', valor: 12 },
+    { nome: 'Janeiro', valor: 0 },
+    { nome: 'Fevereiro', valor: 1 },
+    { nome: 'Março', valor: 2 },
+    { nome: 'Abril', valor: 3 },
+    { nome: 'Maio', valor: 4 },
+    { nome: 'Junho', valor: 5 },
+    { nome: 'Julho', valor: 6 },
+    { nome: 'Agosto', valor: 7 },
+    { nome: 'Setembro', valor: 8 },
+    { nome: 'Outubro', valor: 9 },
+    { nome: 'Novembro', valor: 10 },
+    { nome: 'Dezembro', valor: 11 },
   ];
 
   laticinioIcons: Record<string, string> = {
     'JL': 'assets/icon/valeza.png',
     'CCPR': 'assets/icon/ccpr.png',
     'Piracanjuba': 'assets/icon/piracanjuba.png',
-    'ITALAC': 'assets/icon/italac.png',
+    'Italac': 'assets/icon/italac.png',
     'Nestle' : 'assets/icon/nestle.jpg',
     'Marajoara' : 'assets/icon/marajoara.jpg',
   };
 
   faixaMin: number | null = null;
   faixaMax: number | null = null;
-
-//   ngOnInit() {
-//   this.dadosList = list;
-
-//   // Municípios disponíveis
-//   const unicos = new Set(this.dadosList.map(d => d.municipio));
-//   this.municipiosDisponiveis = Array.from(unicos);
-
-//   // Anos disponíveis
-//   const anosUnicos = new Set(this.dadosList.map(d => d.anoReferencia));
-//   this.anosDisponiveis = Array.from(anosUnicos).sort((a, b) => b - a); // do maior para o menor
-// }
-
-ngOnInit() {
-//
-}
 
 ionViewDidEnter() {
   requestAnimationFrame(() => {

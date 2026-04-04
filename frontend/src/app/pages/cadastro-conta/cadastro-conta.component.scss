@@ -66,6 +66,70 @@
   }
 }
 
+// ── Tipo de conta ─────────────────────────────────────
+.tipo-conta-wrap {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.tipo-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 10px 14px;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  cursor: pointer;
+  position: relative;
+  text-align: center;
+  transition: border-color 0.18s, background 0.18s;
+
+  &.selected {
+    border-color: var(--ion-color-primary);
+    background: rgba(var(--ion-color-primary-rgb), 0.05);
+  }
+}
+
+.tipo-icon {
+  font-size: 30px;
+  color: #9ca3af;
+  transition: color 0.18s;
+
+  .tipo-card.selected & {
+    color: var(--ion-color-primary);
+  }
+}
+
+.tipo-titulo {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a2332;
+  transition: color 0.18s;
+
+  .tipo-card.selected & {
+    color: var(--ion-color-primary);
+  }
+}
+
+.tipo-desc {
+  font-size: 11px;
+  color: #9ca3af;
+  line-height: 1.4;
+}
+
+.tipo-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 18px;
+  color: var(--ion-color-primary);
+}
+
 // ── Grupo de campos ──────────────────────────────────
 .card-group {
   background: #ffffff;
@@ -186,6 +250,25 @@
     color: #6b7280;
   }
 
+  .tipo-card {
+    background: #1e1e1e;
+    border-color: #2a2a2a;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+
+    &.selected {
+      border-color: var(--ion-color-primary);
+      background: rgba(var(--ion-color-primary-rgb), 0.1);
+    }
+  }
+
+  .tipo-titulo {
+    color: #f0f0f0;
+
+    .tipo-card.selected & {
+      color: var(--ion-color-primary);
+    }
+  }
+
   .card-group {
     background: #1e1e1e;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
@@ -196,13 +279,8 @@
   }
 
   .custom-item {
-    .custom-input {
-      color: #f0f0f0;
-    }
-
-    .field-label {
-      color: #6b7280;
-    }
+    .custom-input { color: #f0f0f0; }
+    .field-label  { color: #6b7280; }
   }
 
   .alert-danger {

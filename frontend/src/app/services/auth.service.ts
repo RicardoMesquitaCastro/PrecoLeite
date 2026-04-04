@@ -7,16 +7,15 @@ import { environment } from 'src/environments/environment.prod';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private authUrl = `${environment.apiUrl}/auth`;
+  private authUrl  = `${environment.apiUrl}/auth`;
   private usersUrl = `${environment.apiUrl}/users`;
   private tokenKey = 'auth-token';
-    private userKey = 'auth-user';
-
+  private userKey  = 'auth-user';
+  private roleKey  = 'role';
 
   constructor(private http: HttpClient, private router: Router) {}
 
   // ─── LOGIN ────────────────────────────────────────────────────────────────
-  // O backend usa Basic Auth (email:senha) + master token como query param
   login(email: string, password: string): Observable<{ token: string; user: any }> {
     const headers = new HttpHeaders({
       Authorization: 'Basic ' + btoa(`${email}:${password}`)
@@ -29,9 +28,10 @@ export class AuthService {
         { headers }
       )
       .pipe(tap(res => {
-  this.saveToken(res.token);
-  localStorage.setItem('auth-user', JSON.stringify(res.user)); // ← adiciona
-}));
+        this.saveToken(res.token);
+        localStorage.setItem(this.userKey, JSON.stringify(res.user));
+        // NÃO sobrescreve role aqui — preserva o tipoConta salvo no cadastro
+      }));
   }
 
   // ─── REGISTRO ─────────────────────────────────────────────────────────────
@@ -40,6 +40,38 @@ export class AuthService {
       `${this.usersUrl}?access_token=${environment.MASTER_KEY}`,
       { name, email, password }
     );
+  }
+
+  // ─── ROLE ─────────────────────────────────────────────────────────────────
+  saveRole(tipoConta: string): void {
+    const raw = localStorage.getItem(this.userKey);
+    if (!raw) return;
+    try {
+      const user = JSON.parse(raw);
+      user.role = tipoConta;
+      localStorage.setItem(this.userKey, JSON.stringify(user));
+    } catch {}
+  }
+
+  getRole(): string | null {
+    const raw = localStorage.getItem(this.userKey);
+    try {
+      return raw ? JSON.parse(raw).role : null;
+    } catch {
+      return null;
+    }
+  }
+
+  isAdmin(): boolean {
+    return this.getRole() === 'admin';      // ✅ era 'role', corrigido para 'admin'
+  }
+
+  isProdutor(): boolean {
+    return this.getRole() === 'produtor';
+  }
+
+  isVisitante(): boolean {
+    return this.getRole() === 'visitante';
   }
 
   // ─── TOKEN ────────────────────────────────────────────────────────────────
@@ -51,29 +83,15 @@ export class AuthService {
     return localStorage.getItem(this.tokenKey);
   }
 
-  // ─── ROLE ─────────────────────────────────────────────────────────────────
+  // ─── USER ─────────────────────────────────────────────────────────────────
   getUser(): any {
-    const user = localStorage.getItem(this.userKey);
+    const raw = localStorage.getItem(this.userKey);
     try {
-      return user ? JSON.parse(user) : null;
+      return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
     }
   }
-
-  getRole(): string | null {
-  const user = localStorage.getItem('auth-user');
-  if (!user) return null;
-  try {
-    return JSON.parse(user).role;
-  } catch {
-    return null;
-  }
-}
-
-isAdmin(): boolean {
-  return this.getRole() === 'admin';
-}
 
   // ─── AUTH STATE ───────────────────────────────────────────────────────────
   isAuthenticated(): boolean {
@@ -84,8 +102,7 @@ isAdmin(): boolean {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.roleKey);
     this.router.navigate(['/login']);
   }
-
-
 }

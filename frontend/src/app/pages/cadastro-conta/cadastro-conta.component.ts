@@ -1,11 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { CadastroContaService } from '../../services/cadastro-conta.service';
 import { AuthService } from 'src/app/services/auth.service';
-
 
 @Component({
   selector: 'app-cadastro-conta',
@@ -14,20 +12,25 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./cadastro-conta.component.scss'],
 })
 export class CadastroContaComponent {
-  name = '';
-  email = '';
-  password = '';
-  erro = '';
-  sucesso = '';
+  name      = '';
+  email     = '';
+  password  = '';
+  tipoConta: 'produtor' | 'visitante' | '' = '';
+  erro      = '';
+  sucesso   = '';
   carregando = false;
 
-  constructor(private router: Router, private authService: AuthService, private toastController: ToastController, ) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private toastController: ToastController,
+  ) {}
 
   async cadastrarConta() {
-    this.erro = '';
+    this.erro    = '';
     this.sucesso = '';
 
-    if (!this.name || !this.email || !this.password) {
+    if (!this.name || !this.email || !this.password || !this.tipoConta) {
       await this.mostrarToast('Preencha todos os campos.', 'danger');
       return;
     }
@@ -36,15 +39,21 @@ export class CadastroContaComponent {
 
     this.authService.register(this.name, this.email, this.password).subscribe({
       next: () => {
-        // Login automático após cadastro
         this.authService.login(this.email, this.password).subscribe({
           next: () => {
+            // Login OK — agora salva o tipoConta na chave 'role'
+            this.authService.saveRole(this.tipoConta);
+
             this.carregando = false;
             this.sucesso = 'Conta criada com sucesso!';
-            setTimeout(() => this.router.navigate(['/cadastro-propriedade']), 1500);
+
+            const destino = this.tipoConta === 'produtor'
+              ? '/cadastro-propriedade'
+              : '/home';
+
+            setTimeout(() => this.router.navigate([destino]), 1500);
           },
           error: () => {
-            // Cadastrou mas não logou — manda pro login manualmente
             this.carregando = false;
             this.sucesso = 'Conta criada! Faça login para continuar.';
             setTimeout(() => this.router.navigate(['/login']), 1500);
