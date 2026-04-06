@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
+import { Chart, registerables } from 'chart.js';
 import { MeusDadosService, MeusDadosCadastrais, MeuParametro } from 'src/app/services/meus-dados.service';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-meus-dados',
@@ -38,6 +41,30 @@ export class MeusDadosComponent implements OnInit {
     'Marajoara':   'assets/icon/marajoara.jpg',
   };
 
+  @ViewChild('graficoParametros') graficoRef!: ElementRef<HTMLCanvasElement>;
+  private grafico: Chart | null = null;
+
+  // ── Tabs do gráfico ──────────────────────────────────
+  chartTabs: { key: string; label: string; unidade: string; cor: string; campo: keyof MeuParametro }[] = [
+    { key: 'precoLeite',     label: 'Preço',    unidade: 'R$/L',   cor: '#0B5A68', campo: 'precoLeite'     },
+    { key: 'producaoLitros', label: 'Produção', unidade: 'Litros', cor: '#FF7400', campo: 'producaoLitros' },
+    { key: 'ccs',            label: 'CCS',      unidade: 'x1000',  cor: '#E00809', campo: 'ccs'            },
+    { key: 'cbt',            label: 'CBT',      unidade: 'x1000',  cor: '#9966FF', campo: 'cbt'            },
+    { key: 'gordura',        label: 'Gordura',  unidade: '%',      cor: '#FF9F40', campo: 'gordura'        },
+    { key: 'proteina',       label: 'Proteína', unidade: '%',      cor: '#4BC0C0', campo: 'proteina'       },
+  ];
+
+  tabAtiva: string = 'precoLeite';
+
+  get tabAtual() {
+    return this.chartTabs.find(t => t.key === this.tabAtiva) ?? null;
+  }
+
+  mudarTab(key: string): void {
+    this.tabAtiva = key;
+    setTimeout(() => this.montarGrafico());
+  }
+
   constructor(private meusDadosService: MeusDadosService) {}
 
   ngOnInit(): void {
@@ -46,6 +73,7 @@ export class MeusDadosComponent implements OnInit {
         this.dados = res;
         this.inicializarFiltros(res.parametros);
         this.carregando = false;
+        setTimeout(() => this.montarGrafico());
       },
       error: () => {
         this.erro = 'Erro ao carregar seus dados. Tente novamente.';
@@ -69,6 +97,73 @@ export class MeusDadosComponent implements OnInit {
   }
 
   /** Recalcula meses disponíveis para o ano selecionado e define o último */
+  /** Monta o gráfico de linha para o parâmetro da tab ativa, agrupado por mês */
+  montarGrafico(): void {
+    if (!this.graficoRef?.nativeElement || !this.dados) return;
+
+    const tab = this.tabAtual;
+    if (!tab) return;
+
+    // Agrupa por mês: para cada mês pega a média do campo selecionado
+    const parametrosDoAno = this.dados.parametros.filter(
+      p => new Date(p.createdAt).getFullYear() === this.anoSelecionado
+    );
+
+    // Todos os meses presentes no ano
+    const mesesUnicos = [...new Set(parametrosDoAno.map(p => Number(p.mesReferencia)))].sort((a, b) => a - b);
+
+    const labels = mesesUnicos.map(m => this.mesesNomes[m] ?? `Mês ${m}`);
+
+    const data = mesesUnicos.map(mes => {
+      const registros = parametrosDoAno.filter(p => Number(p.mesReferencia) === mes);
+      const soma = registros.reduce((acc, p) => acc + Number(p[tab.campo] ?? 0), 0);
+      return registros.length > 0 ? +(soma / registros.length).toFixed(3) : null;
+    });
+
+    if (this.grafico) this.grafico.destroy();
+
+    this.grafico = new Chart(this.graficoRef.nativeElement, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: `${tab.label} (${tab.unidade})`,
+          data,
+          borderColor: tab.cor,
+          backgroundColor: tab.cor + '22',
+          pointBackgroundColor: tab.cor,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          fill: true,
+          tension: 0.3,
+          spanGaps: true,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${tab.label}: ${ctx.raw} ${tab.unidade}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { autoSkip: false, font: { size: 11 } },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          y: {
+            beginAtZero: false,
+            ticks: { font: { size: 11 } },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          }
+        }
+      }
+    });
+  }
+
   atualizarMeses(): void {
     if (!this.dados) return;
 
@@ -88,6 +183,8 @@ export class MeusDadosComponent implements OnInit {
     this.mesSelecionado = mesesUnicos.length > 0
       ? mesesUnicos[mesesUnicos.length - 1]
       : null;
+
+    setTimeout(() => this.montarGrafico());
   }
 
   /** Registros filtrados por ano + mês */

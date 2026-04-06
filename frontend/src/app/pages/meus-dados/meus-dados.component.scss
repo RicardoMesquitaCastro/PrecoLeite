@@ -285,3 +285,72 @@
 }
 
 }
+
+// ── Gráfico de parâmetros ────────────────────────────
+.chart-tabs-card {
+  margin-top: 0;
+  padding-bottom: 4px;
+}
+
+.chart-tabs {
+  display: flex;
+  overflow-x: auto;
+  gap: 6px;
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid #f0f2f4;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.chart-tab {
+  flex-shrink: 0;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #e5e7eb;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.active {
+    background: var(--ion-color-primary);
+    border-color: var(--ion-color-primary);
+    color: #ffffff;
+  }
+}
+
+.chart-wrap {
+  padding: 14px 10px 6px;
+}
+
+.chart-footer {
+  padding: 2px 14px 12px;
+  text-align: right;
+}
+
+.chart-unit {
+  font-size: 11px;
+  color: #8a95a3;
+  font-style: italic;
+}
+
+// ── Dark mode do gráfico ─────────────────────────────
+@media (prefers-color-scheme: dark) {
+  .chart-tabs {
+    border-bottom-color: #2a2a2a;
+  }
+
+  .chart-tab {
+    border-color: #3a3a3a;
+    color: #8a95a3;
+
+    &.active {
+      background: var(--ion-color-primary);
+      border-color: var(--ion-color-primary);
+      color: #ffffff;
+    }
+  }
+}

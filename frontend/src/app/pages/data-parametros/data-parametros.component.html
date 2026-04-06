@@ -239,6 +239,10 @@
           @for (faixa of (grupo.faixas | faixaValida); track trackByFaixa($index, faixa)) {
             <div class="data-row">
               <span class="data-row-label">{{ faixa.faixa }} litros</span>
+              <!-- <span class="data-row-count">
+                Registros:
+                {{ faixa.quantidadeDados }}
+              </span> -->
               <span class="data-value">R$ {{ faixa.mediaPreco | number:'1.2-2' }}</span>
             </div>
           }

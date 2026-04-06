@@ -162,6 +162,36 @@
         </div>
       }
 
+      <!-- ── Gráfico de Evolução ── -->
+      <div class="section-label" style="margin-top: 20px;">
+        <ion-icon name="bar-chart-outline"></ion-icon>
+        Evolução dos Parâmetros ({{ anoSelecionado }})
+      </div>
+
+      <div class="data-card chart-tabs-card">
+        <!-- Tabs de parâmetro -->
+        <div class="chart-tabs">
+          @for (tab of chartTabs; track tab.key) {
+            <button
+              class="chart-tab"
+              [class.active]="tabAtiva === tab.key"
+              (click)="mudarTab(tab.key)">
+              {{ tab.label }}
+            </button>
+          }
+        </div>
+
+        <div class="chart-wrap">
+          <canvas #graficoParametros style="width:100%; height:280px;"></canvas>
+        </div>
+
+        @if (tabAtual) {
+          <div class="chart-footer">
+            <span class="chart-unit">Unidade: {{ tabAtual.unidade }}</span>
+          </div>
+        }
+      </div>
+
     } @else {
       <div class="empty-state">
         <ion-icon name="stats-chart-outline"></ion-icon>

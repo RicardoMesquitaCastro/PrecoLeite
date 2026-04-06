@@ -473,20 +473,27 @@ criarGrafico() {
     const resultado = Object.entries(grupos).map(([laticinio, items]) => {
       let faixas;
 
+      const makeFaixa = (label: string, min: number, max: number) => {
+        const r = this.mediaFaixa(items, min, max);
+        return { faixa: label, mediaPreco: r.media, quantidadeDados: r.quantidade };
+      };
+
       if (this.isFaixaValida()) {
+        const r = this.mediaFaixa(items, this.faixaMin!, this.faixaMax!);
         faixas = [{
           faixa: `${this.faixaMin} - ${this.faixaMax} L`,
-          mediaPreco: this.mediaFaixa(items, this.faixaMin!, this.faixaMax!)
+          mediaPreco: r.media,
+          quantidadeDados: r.quantidade
         }];
       } else {
         faixas = [
-          { faixa: '0 - 100', mediaPreco: this.mediaFaixa(items, 0, 100) },
-          { faixa: '100 - 200', mediaPreco: this.mediaFaixa(items, 101, 200) },
-          { faixa: '200 - 400', mediaPreco: this.mediaFaixa(items, 201, 400) },
-          { faixa: '400 - 600', mediaPreco: this.mediaFaixa(items, 401, 600) },
-          { faixa: '600 - 800', mediaPreco: this.mediaFaixa(items, 601, 800) },
-          { faixa: '800 - 1000', mediaPreco: this.mediaFaixa(items, 801, 1000) },
-          { faixa: '1000 - 2000', mediaPreco: this.mediaFaixa(items, 1001, 2000) }
+          makeFaixa('0 - 100', 0, 100),
+          makeFaixa('100 - 200', 101, 200),
+          makeFaixa('200 - 400', 201, 400),
+          makeFaixa('400 - 600', 401, 600),
+          makeFaixa('600 - 800', 601, 800),
+          makeFaixa('800 - 1000', 801, 1000),
+          makeFaixa('1000 - 2000', 1001, 2000)
         ];
       }
 
@@ -503,9 +510,10 @@ criarGrafico() {
     );
   }
 
-  mediaFaixa(items: any[], min: number, max: number) {
+  mediaFaixa(items: any[], min: number, max: number): { media: number; quantidade: number } {
     const filtrados = items.filter(i => i.producaoLitros > min - 1 && i.producaoLitros <= max);
-    return filtrados.reduce((acc, curr) => acc + curr.precoLitro, 0) / Math.max(filtrados.length, 1);
+    const media = filtrados.reduce((acc, curr) => acc + curr.precoLitro, 0) / Math.max(filtrados.length, 1);
+    return { media, quantidade: filtrados.length };
   }
 
   get dadosPorMes() {

@@ -234,6 +234,23 @@
   color: #6b7280;
 }
 
+.data-row-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8a95a3;
+  background: #f0f2f4;
+  border-radius: 20px;
+  padding: 2px 8px;
+  margin: 0 auto 0 8px;
+
+  ion-icon {
+    font-size: 12px;
+  }
+}
+
 .data-value {
   font-size: 14px;
   font-weight: 700;
@@ -313,6 +330,11 @@
 
   .data-row {
     border-bottom-color: #242424;
+  }
+
+  .data-row-count {
+    background: #2a2a2a;
+    color: #6b7280;
   }
 
   .data-row-left {
