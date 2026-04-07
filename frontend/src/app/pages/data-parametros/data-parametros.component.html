@@ -239,10 +239,6 @@
           @for (faixa of (grupo.faixas | faixaValida); track trackByFaixa($index, faixa)) {
             <div class="data-row">
               <span class="data-row-label">{{ faixa.faixa }} litros</span>
-              <!-- <span class="data-row-count">
-                Registros:
-                {{ faixa.quantidadeDados }}
-              </span> -->
               <span class="data-value">R$ {{ faixa.mediaPreco | number:'1.2-2' }}</span>
             </div>
           }
@@ -276,10 +272,13 @@
       </div>
 
       @for (grupo of dadosPorMes; track trackByLaticinio($index, grupo)) {
-        <div class="data-card">
+        <div class="data-card" [class.mes-atual]="grupo.isAtual">
           <div class="data-card-header">
             <ion-icon name="calendar-outline" class="card-icon"></ion-icon>
             <span class="card-title">{{ grupo.mes }}</span>
+            @if (grupo.isAtual) {
+              <span class="mes-badge">Atual</span>
+            }
           </div>
           @for (item of grupo.items; track trackByFaixa($index, item)) {
             <div class="data-row">
@@ -293,6 +292,15 @@
           }
         </div>
       }
+
+      <!-- ── Gráfico por Mês ── -->
+      <div class="data-card chart-card">
+        <div class="data-card-header">
+          <ion-icon name="bar-chart-outline" class="card-icon"></ion-icon>
+          <span class="card-title">Gráfico por Mês</span>
+        </div>
+        <canvas #graficoMes style="width:100%; height:340px; display:block;"></canvas>
+      </div>
 
     } @else {
       <div class="empty-state">

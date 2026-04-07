@@ -37,7 +37,19 @@ set graficoRegiaoSetter(ref: ElementRef<HTMLCanvasElement> | undefined) {
     this.montarGraficoRegiao();
   }
 }
+
+  private _graficoMesRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('graficoMes')
+  set graficoMesSetter(ref: ElementRef<HTMLCanvasElement> | undefined) {
+    if (!ref) return;
+    this._graficoMesRef = ref;
+    if (this.agrupamentoSelecionado === 'mes') {
+      this.montarGraficoMes();
+    }
+  }
+
   graficoRegiao!: Chart;
+  graficoMes!: Chart;
   grafico: Chart | null = null;
   graficoIniciado = false;
   agrupamentoSelecionado: string = 'laticinio';
@@ -89,6 +101,18 @@ laticiniosDisponiveis: string[] = []
   faixaMin: number | null = null;
   faixaMax: number | null = null;
 
+  /** Retorna cores corretas para o Chart.js respeitando dark/light mode do sistema */
+  private chartColors() {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
+      title:    dark ? '#f0f0f0' : '#1a2332',
+      legend:   dark ? '#d1d5db' : '#374151',
+      axis:     dark ? '#9ca3af' : '#6b7280',
+      ticks:    dark ? '#d1d5db' : '#4b5563',
+      grid:     dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)',
+    };
+  }
+
 ionViewDidEnter() {
   requestAnimationFrame(() => {
     this.criarGrafico();
@@ -133,8 +157,13 @@ carregarDados() {
 
     this.inicializarFiltros();
 
-    setTimeout(() => {
-      this.criarGrafico();
+    // Dois frames para garantir que o Angular renderizou o canvas no DOM
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.criarGrafico();
+        this.montarGraficoRegiao();
+        this.montarGraficoMes();
+      });
     });
   });
 }
@@ -209,7 +238,7 @@ carregarDados() {
     const CORES = ['#0B5A68', '#0078BD', '#FF7400', '#E00809', '#9966FF', '#FF9F40', '#10b981', '#f59e0b'];
 
     const makeGrad = (cor: string): CanvasGradient => {
-      const g = ctx.createLinearGradient(0, 0, 0, canvas.height || 320);
+      const g = ctx.createLinearGradient(0, 0, 0, 320);
       g.addColorStop(0, cor + 'DD');
       g.addColorStop(1, cor + '66');
       return g;
@@ -268,18 +297,18 @@ carregarDados() {
               'Preço Médio por Região',
               `${this.municipioSelecionado || ''} ${this.mesReferencia !== null ? '— ' + this.obterNomeMes(this.mesReferencia + 1) : ''} ${this.anoSelecionado}`.trim()
             ].filter(Boolean),
-            font: { size: 16, weight: 'bold', family: "'Segoe UI', sans-serif" },
-            color: '#ffffff',
+            font: { size: 14, weight: 'bold', family: "'Segoe UI', sans-serif" },
+            color: this.chartColors().title,
             padding: { top: 8, bottom: 14 },
           },
           legend: {
             position: 'bottom',
             labels: {
-              padding: 20,
+              padding: 16,
               usePointStyle: true,
               pointStyle: 'rectRounded',
-              font: { size: 13 },
-              color: '#e5e7eb',
+              font: { size: 12 },
+              color: this.chartColors().legend,
             },
           },
           tooltip: {
@@ -302,16 +331,16 @@ carregarDados() {
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: '#d1d5db', font: { size: 12 } },
+            ticks: { color: this.chartColors().ticks, font: { size: 11 } },
           },
           y: {
-            title: { display: true, text: 'Preço Médio (R$/L)', color: '#9ca3af', font: { size: 13, weight: 'bold' } },
+            title: { display: true, text: 'Preço Médio (R$/L)', color: this.chartColors().axis, font: { size: 11 } },
             min: yMin,
             max: yMax,
-            grid: { color: 'rgba(255,255,255,0.07)' },
+            grid: { color: this.chartColors().grid },
             ticks: {
-              color: '#d1d5db',
-              font: { size: 12 },
+              color: this.chartColors().ticks,
+              font: { size: 11 },
               callback: (v) => `R$ ${Number(v).toFixed(2)}`,
             },
           },
@@ -361,6 +390,7 @@ carregarDados() {
    atualizarFiltros() {
     this.criarGrafico();
     this.montarGraficoRegiao();
+    this.montarGraficoMes();
   }
 
 criarGrafico() {
@@ -393,12 +423,17 @@ criarGrafico() {
   );
 
   const canvas = document.getElementById('graficoLitrosPreco') as HTMLCanvasElement;
-  const ctx = canvas?.getContext('2d');
+  if (!canvas) {
+    // Canvas ainda não está no DOM; aguarda o próximo frame
+    requestAnimationFrame(() => this.criarGrafico());
+    return;
+  }
+  const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  // Cria gradientes por laticínio
+  // Usa altura fixa — canvas.height é 0 antes do layout do browser
   const makeGradient = (cor: string, alpha1 = 0.85, alpha2 = 0.45): CanvasGradient => {
-    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height || 320);
+    const grad = ctx.createLinearGradient(0, 0, 0, 320);
     grad.addColorStop(0, cor + Math.round(alpha1 * 255).toString(16).padStart(2, '0'));
     grad.addColorStop(1, cor + Math.round(alpha2 * 255).toString(16).padStart(2, '0'));
     return grad;
@@ -482,18 +517,18 @@ criarGrafico() {
         title: {
           display: true,
           text: tituloLinhas,
-          font: { size: 16, weight: 'bold', family: "'Segoe UI', sans-serif" },
-          color: '#ffffff',
+          font: { size: 14, weight: 'bold', family: "'Segoe UI', sans-serif" },
+          color: this.chartColors().title,
           padding: { top: 8, bottom: 16 },
         },
         legend: {
           position: 'bottom',
           labels: {
-            padding: 20,
+            padding: 16,
             usePointStyle: true,
             pointStyle: 'rectRounded',
-            font: { size: 13 },
-            color: '#e5e7eb',
+            font: { size: 12 },
+            color: this.chartColors().legend,
             filter: (item) => item.text !== 'Média Geral' || mediaGeral > 0,
           },
         },
@@ -519,18 +554,18 @@ criarGrafico() {
       },
       scales: {
         x: {
-          title: { display: true, text: 'Faixa de Produção (litros/mês)', color: '#9ca3af', font: { size: 13, weight: 'bold' } },
+          title: { display: true, text: 'Faixa de Produção (litros/mês)', color: this.chartColors().axis, font: { size: 11 } },
           grid: { display: false },
-          ticks: { color: '#d1d5db', font: { size: 12 } },
+          ticks: { color: this.chartColors().ticks, font: { size: 11 } },
         },
         y: {
-          title: { display: true, text: 'Preço Médio (R$/L)', color: '#9ca3af', font: { size: 13, weight: 'bold' } },
+          title: { display: true, text: 'Preço Médio (R$/L)', color: this.chartColors().axis, font: { size: 11 } },
           min: yMin,
           max: yMax,
-          grid: { color: 'rgba(255,255,255,0.07)' },
+          grid: { color: this.chartColors().grid },
           ticks: {
-            color: '#d1d5db',
-            font: { size: 12 },
+            color: this.chartColors().ticks,
+            font: { size: 11 },
             callback: (v) => `R$ ${Number(v).toFixed(2)}`,
           },
         },
@@ -682,34 +717,50 @@ criarGrafico() {
   }
 
   get dadosPorMes() {
+    const mesAtual = new Date().getMonth(); // 0-11
+
+    // Janela: 2 meses antes até 2 meses depois (circular), valores 0-11
+    const mesesVisiveis = new Set<number>();
+    for (let offset = -2; offset <= 2; offset++) {
+      mesesVisiveis.add((mesAtual + offset + 12) % 12);
+    }
+
     const grupos: Record<number, any[]> = {};
     this.dadosListFiltrados.forEach(item => {
+      if (!mesesVisiveis.has(item.mesReferencia)) return;
       if (!grupos[item.mesReferencia]) grupos[item.mesReferencia] = [];
       grupos[item.mesReferencia].push(item);
     });
 
-    return Object.entries(grupos).map(([mes, items]) => {
-      // Agrupar por laticínio dentro do mês
-      const porLaticinio: Record<string, { soma: number; count: number }> = {};
+    // Ordena pelos meses visíveis na ordem da janela
+    const ordemMeses = [-2, -1, 0, 1, 2].map(o => (mesAtual + o + 12) % 12);
 
-      items.forEach(item => {
-        if (!porLaticinio[item.laticinio]) {
-          porLaticinio[item.laticinio] = { soma: 0, count: 0 };
-        }
-        porLaticinio[item.laticinio].soma += item.precoLitro;
-        porLaticinio[item.laticinio].count++;
+    return ordemMeses
+      .filter(mes => grupos[mes])
+      .map(mes => {
+        const items = grupos[mes];
+        const porLaticinio: Record<string, { soma: number; count: number }> = {};
+
+        items.forEach((item: any) => {
+          if (!porLaticinio[item.laticinio]) {
+            porLaticinio[item.laticinio] = { soma: 0, count: 0 };
+          }
+          porLaticinio[item.laticinio].soma += item.precoLitro;
+          porLaticinio[item.laticinio].count++;
+        });
+
+        const laticinios = Object.entries(porLaticinio).map(([laticinio, { soma, count }]) => ({
+          laticinio,
+          mediaPrecoDoLaticinio: soma / count
+        }));
+
+        return {
+          mes: this.obterNomeMes(mes + 1),
+          mesNumero: mes,
+          items: laticinios,
+          isAtual: mes === mesAtual
+        };
       });
-
-      const laticinios = Object.entries(porLaticinio).map(([laticinio, { soma, count }]) => ({
-        laticinio,
-        mediaPrecoDoLaticinio: soma / count
-      }));
-
-      return {
-        mes: this.obterNomeMes(Number(mes)),
-        items: laticinios
-      };
-    });
   }
 
   get mediaPrecoPorLaticinioMes(): Record<string, Record<number, number>> {
@@ -773,31 +824,181 @@ trackByLaticinio(index: number, item: any): string {
     return `${item.laticinio}-${item.mediaPreco}-${item.faixa}`; // Ajuste conforme as propriedades disponíveis
   }
 
+  montarGraficoMes() {
+    if (!this._graficoMesRef?.nativeElement) return;
+
+    const canvas = this._graficoMesRef.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Agrupa dados por mês e laticínio (reutiliza o getter dadosPorMes)
+    const dadosMes = this.dadosPorMes;
+    if (!dadosMes.length) return;
+
+    const CORES = ['#0B5A68', '#FF7400', '#E00809', '#0078BD', '#9966FF', '#FF9F40', '#10b981', '#f59e0b'];
+
+    // Coleta todos os laticínios presentes
+    const laticiniosSet = new Set<string>();
+    dadosMes.forEach(grupo => grupo.items.forEach((it: any) => laticiniosSet.add(it.laticinio)));
+    const laticinios = Array.from(laticiniosSet);
+
+    const labels = dadosMes.map(g => g.mes);
+
+    const makeGrad = (cor: string): CanvasGradient => {
+      const g = ctx.createLinearGradient(0, 0, 0, 320);
+      g.addColorStop(0, cor + 'DD');
+      g.addColorStop(1, cor + '55');
+      return g;
+    };
+
+    const datasets = laticinios.map((lat, i) => {
+      const cor = CORES[i % CORES.length];
+      return {
+        label: lat,
+        data: dadosMes.map(grupo => {
+          const item = grupo.items.find((it: any) => it.laticinio === lat);
+          return item ? +item.mediaPrecoDoLaticinio.toFixed(4) : null;
+        }),
+        backgroundColor: makeGrad(cor),
+        borderColor: cor,
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false,
+        hoverBorderWidth: 3,
+      };
+    });
+
+    // Linha de média geral
+    const todosValores: number[] = [];
+    dadosMes.forEach(g => g.items.forEach((it: any) => todosValores.push(it.mediaPrecoDoLaticinio)));
+    const mediaGeral = todosValores.length
+      ? todosValores.reduce((a: number, b: number) => a + b, 0) / todosValores.length
+      : 0;
+
+    if (mediaGeral > 0) {
+      datasets.push({
+        label: `Média Geral (R$ ${mediaGeral.toFixed(2)})`,
+        type: 'line' as any,
+        data: labels.map(() => +mediaGeral.toFixed(4)),
+        borderColor: '#10b981',
+        borderWidth: 2,
+        borderDash: [6, 4],
+        pointRadius: 0,
+        fill: false,
+        tension: 0,
+        order: 0,
+        backgroundColor: 'transparent',
+        borderSkipped: false,
+        borderRadius: 0,
+        hoverBorderWidth: 2,
+      } as any);
+    }
+
+    const yMin = todosValores.length ? Math.max(0, Math.min(...todosValores) - 0.2) : 0;
+    const yMax = todosValores.length ? Math.max(...todosValores) + 0.25 : 5;
+
+    if (this.graficoMes) this.graficoMes.destroy();
+
+    const tituloLinhas = ['Evolução de Preço por Mês'];
+    if (this.municipioSelecionado && this.municipioSelecionado !== 'geral')
+      tituloLinhas.push(`Município: ${this.municipioSelecionado}`);
+    if (this.laticinioSelecionado !== 'todos')
+      tituloLinhas.push(`Laticínio: ${this.laticinioSelecionado}`);
+    if (this.anoSelecionado) tituloLinhas.push(`Ano: ${this.anoSelecionado}`);
+
+    this.graficoMes = new Chart(canvas, {
+      type: 'bar',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 550, easing: 'easeOutQuart' },
+        plugins: {
+          title: {
+            display: true,
+            text: tituloLinhas,
+            font: { size: 14, weight: 'bold', family: "'Segoe UI', sans-serif" },
+            color: this.chartColors().title,
+            padding: { top: 8, bottom: 14 },
+          },
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 16,
+              usePointStyle: true,
+              pointStyle: 'rectRounded',
+              font: { size: 12 },
+              color: this.chartColors().legend,
+            },
+          },
+          tooltip: {
+            backgroundColor: 'rgba(17,24,39,0.92)',
+            titleColor: '#f9fafb',
+            bodyColor: '#d1fae5',
+            borderColor: '#10b981',
+            borderWidth: 1,
+            cornerRadius: 10,
+            padding: 12,
+            callbacks: {
+              label: (ctx) => {
+                if (ctx.dataset.label?.startsWith('Média Geral'))
+                  return ` ${ctx.dataset.label}`;
+                const v = ctx.raw as number | null;
+                return v != null
+                  ? ` ${ctx.dataset.label}: R$ ${v.toFixed(2)}/L`
+                  : ` ${ctx.dataset.label}: sem dados`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: this.chartColors().ticks, font: { size: 11 } },
+          },
+          y: {
+            title: { display: true, text: 'Preço Médio (R$/L)', color: this.chartColors().axis, font: { size: 11 } },
+            min: yMin,
+            max: yMax,
+            grid: { color: this.chartColors().grid },
+            ticks: {
+              color: this.chartColors().ticks,
+              font: { size: 11 },
+              callback: (v) => `R$ ${Number(v).toFixed(2)}`,
+            },
+          },
+        },
+      },
+    });
+  }
+
   onSegmentChange() {
-
-  // Destrói gráficos antigos
-  if (this.grafico) {
-    this.grafico.destroy();
-    this.grafico = null;
-  }
-
-  if (this.graficoRegiao) {
-    this.graficoRegiao.destroy();
-    this.graficoRegiao = undefined as any;
-  }
-
-  // Espera o Angular recriar o canvas
-  requestAnimationFrame(() => {
-
-    if (this.agrupamentoSelecionado === 'laticinio') {
-      this.criarGrafico();
+    if (this.grafico) {
+      this.grafico.destroy();
+      this.grafico = null;
     }
 
-    if (this.agrupamentoSelecionado === 'regiao' &&
-        this.municipioSelecionado !== 'geral') {
-      this.montarGraficoRegiao();
+    if (this.graficoRegiao) {
+      this.graficoRegiao.destroy();
+      this.graficoRegiao = undefined as any;
     }
 
-  });
-}
+    if (this.graficoMes) {
+      this.graficoMes.destroy();
+      this.graficoMes = undefined as any;
+    }
+
+    requestAnimationFrame(() => {
+      if (this.agrupamentoSelecionado === 'laticinio') {
+        this.criarGrafico();
+      }
+      if (this.agrupamentoSelecionado === 'regiao' && this.municipioSelecionado !== 'geral') {
+        this.montarGraficoRegiao();
+      }
+      if (this.agrupamentoSelecionado === 'mes') {
+        this.montarGraficoMes();
+      }
+    });
+  }
+
 }

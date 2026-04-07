@@ -355,3 +355,21 @@
     color: #d1d5db;
   }
 }
+
+// ── Mês atual destaque ────────────────────────────────
+.mes-atual {
+  border: 2px solid var(--ion-color-primary);
+  box-shadow: 0 2px 12px rgba(11, 90, 104, 0.15);
+}
+
+.mes-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--ion-color-primary);
+  background: rgba(11, 90, 104, 0.08);
+  border-radius: 20px;
+  padding: 2px 8px;
+}
