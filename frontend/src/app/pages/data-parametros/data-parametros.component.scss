@@ -265,7 +265,21 @@
 }
 
 .chart-card {
-  padding: 14px;
+  padding: 16px 12px 20px;
+
+  canvas {
+    width: 100% !important;
+    height: 340px !important;
+    display: block;
+  }
+}
+
+// Fundo sutil com gradiente nos cards de gráfico
+.chart-card .data-card-header {
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(11,90,104,0.04) 0%, transparent 100%);
+  border-radius: 8px;
+  padding: 10px 12px;
 }
 
 // ── Estado vazio ─────────────────────────────────────

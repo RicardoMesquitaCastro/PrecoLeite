@@ -196,42 +196,126 @@ carregarDados() {
     );
 
     const dadosAgrupados = this.agruparPorRegiao(dadosFiltrados);
+    dadosAgrupados.sort((a, b) => b.mediaPreco - a.mediaPreco);
 
     const labels = dadosAgrupados.map(g => g.regiao);
-    const data = dadosAgrupados.map(g => g.mediaPreco);
+    const valores = dadosAgrupados.map(g => +g.mediaPreco.toFixed(4));
 
-    const backgroundColors = [
-      'rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)',
-      'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)',
-      'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)'
-    ];
-    const borderColors = backgroundColors.map(c => c.replace('0.6', '1'));
+    const canvas = this._graficoRegiaoRef.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Paleta coerente com a identidade do app
+    const CORES = ['#0B5A68', '#0078BD', '#FF7400', '#E00809', '#9966FF', '#FF9F40', '#10b981', '#f59e0b'];
+
+    const makeGrad = (cor: string): CanvasGradient => {
+      const g = ctx.createLinearGradient(0, 0, 0, canvas.height || 320);
+      g.addColorStop(0, cor + 'DD');
+      g.addColorStop(1, cor + '66');
+      return g;
+    };
+
+    const bgColors   = labels.map((_, i) => makeGrad(CORES[i % CORES.length]));
+    const brdColors  = labels.map((_, i) => CORES[i % CORES.length]);
+
+    const mediaGeral = valores.length
+      ? valores.reduce((a, b) => a + b, 0) / valores.length
+      : 0;
+
+    const yMin = valores.length ? Math.max(0, Math.min(...valores) - 0.2) : 0;
+    const yMax = valores.length ? Math.max(...valores) + 0.25 : 5;
 
     if (this.graficoRegiao) this.graficoRegiao.destroy();
 
-    this.graficoRegiao = new Chart(this._graficoRegiaoRef.nativeElement, {
+    this.graficoRegiao = new Chart(canvas, {
       type: 'bar',
       data: {
         labels,
-        datasets: [{
-        label: ` (R$) Média regional de ${this.municipioSelecionado} ${this.mesSelecionado !== 'geral' ? this.mesSelecionado : ''} ${this.anoSelecionado}`,
-          data,
-          backgroundColor: backgroundColors.slice(0, data.length),
-          borderColor: borderColors.slice(0, data.length),
-          borderWidth: 1
-        }]
+        datasets: [
+          {
+            label: 'Preço Médio (R$/L)',
+            data: valores,
+            backgroundColor: bgColors,
+            borderColor: brdColors,
+            borderWidth: 2,
+            borderRadius: 10,
+            borderSkipped: false,
+            hoverBorderWidth: 3,
+            order: 1,
+          },
+          {
+            label: `Média Geral (R$ ${mediaGeral.toFixed(2)})`,
+            type: 'line' as const,
+            data: labels.map(() => +mediaGeral.toFixed(4)),
+            borderColor: '#10b981',
+            borderWidth: 2,
+            borderDash: [6, 4],
+            pointRadius: 0,
+            fill: false,
+            tension: 0,
+            order: 0,
+          }
+        ]
       },
       options: {
         responsive: true,
-        plugins: { legend: { display: true, position: 'top' } },
-        scales: {
-          y: {
-            beginAtZero: false,
-            min: 1.5,
-            ticks: { stepSize: 0.1, precision: 2, callback: value => typeof value === 'number' ? value.toFixed(2) : value }
+        maintainAspectRatio: false,
+        animation: { duration: 550, easing: 'easeOutQuart' },
+        plugins: {
+          title: {
+            display: true,
+            text: [
+              'Preço Médio por Região',
+              `${this.municipioSelecionado || ''} ${this.mesReferencia !== null ? '— ' + this.obterNomeMes(this.mesReferencia + 1) : ''} ${this.anoSelecionado}`.trim()
+            ].filter(Boolean),
+            font: { size: 16, weight: 'bold', family: "'Segoe UI', sans-serif" },
+            color: '#ffffff',
+            padding: { top: 8, bottom: 14 },
           },
-          x: { ticks: { autoSkip: false } }
-        }
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              pointStyle: 'rectRounded',
+              font: { size: 13 },
+              color: '#e5e7eb',
+            },
+          },
+          tooltip: {
+            backgroundColor: 'rgba(17,24,39,0.92)',
+            titleColor: '#f9fafb',
+            bodyColor: '#d1fae5',
+            borderColor: '#10b981',
+            borderWidth: 1,
+            cornerRadius: 10,
+            padding: 12,
+            callbacks: {
+              label: (ctx) => {
+                if (ctx.dataset.label?.startsWith('Média Geral'))
+                  return ` ${ctx.dataset.label}`;
+                return ` R$ ${(ctx.raw as number).toFixed(2)}/L`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#d1d5db', font: { size: 12 } },
+          },
+          y: {
+            title: { display: true, text: 'Preço Médio (R$/L)', color: '#9ca3af', font: { size: 13, weight: 'bold' } },
+            min: yMin,
+            max: yMax,
+            grid: { color: 'rgba(255,255,255,0.07)' },
+            ticks: {
+              color: '#d1d5db',
+              font: { size: 12 },
+              callback: (v) => `R$ ${Number(v).toFixed(2)}`,
+            },
+          },
+        },
       }
     });
   }
@@ -280,97 +364,178 @@ carregarDados() {
   }
 
 criarGrafico() {
-  const cores = ['#FF7400', '#E00809', '#0B5A68', '#0078BD', '#9966FF', '#FF9F40'];
-  let dados = this.dadosListFiltrados;
+  const coresSolidas = ['#0B5A68', '#FF7400', '#E00809', '#0078BD', '#9966FF', '#FF9F40'];
 
+  let dados = this.dadosListFiltrados;
   const laticinios = Array.from(new Set(dados.map(d => d.laticinio)));
 
   const usarFaixaCustom = this.faixaMin !== null && this.faixaMax !== null;
   const faixas = usarFaixaCustom
-    ? [{ label: `${this.faixaMin}-${this.faixaMax} L`, min: this.faixaMin!, max: this.faixaMax! }]
+    ? [{ label: `${this.faixaMin}–${this.faixaMax} L`, min: this.faixaMin!, max: this.faixaMax! }]
     : [
-        { label: '0 - 100 L', min: 0, max: 100 },
-        { label: '100 - 200 L', min: 101, max: 200 },
-        { label: '200 - 400 L', min: 201, max: 400 },
-        { label: '400 - 600 L', min: 401, max: 600 },
-        { label: '600 - 800 L', min: 601, max: 800 },
-        { label: '800 - 1000 L', min: 801, max: 1000 },
-        { label: '1000 - 2000 L', min: 1001, max: 2000 }
+        { label: '0–100 L',     min: 0,    max: 100  },
+        { label: '100–200 L',   min: 101,  max: 200  },
+        { label: '200–400 L',   min: 201,  max: 400  },
+        { label: '400–600 L',   min: 401,  max: 600  },
+        { label: '600–800 L',   min: 601,  max: 800  },
+        { label: '800–1000 L',  min: 801,  max: 1000 },
+        { label: '1000–2000 L', min: 1001, max: 2000 }
       ];
 
   const mediaFaixaPorLaticinio = (items: any[], laticinio: string, min: number, max: number): number => {
     const filtrados = items.filter(i => i.laticinio === laticinio && i.producaoLitros >= min && i.producaoLitros <= max);
     if (filtrados.length === 0) return 0;
-    const soma = filtrados.reduce((acc, curr) => acc + curr.precoLitro, 0);
-    return soma / filtrados.length;
+    return filtrados.reduce((acc, curr) => acc + curr.precoLitro, 0) / filtrados.length;
   };
 
-  // Filtra faixas que tenham pelo menos 1 valor diferente de 0 em algum laticínio
   const faixasFiltradas = faixas.filter(f =>
     laticinios.some(lat => mediaFaixaPorLaticinio(dados, lat, f.min, f.max) > 0)
   );
 
-  const datasets = laticinios.map((lat, i) => ({
-    label: lat,
-    data: faixasFiltradas.map(f => mediaFaixaPorLaticinio(dados, lat, f.min, f.max)),
-    backgroundColor: cores[i % cores.length],
-    borderWidth: 1
-  }));
+  const canvas = document.getElementById('graficoLitrosPreco') as HTMLCanvasElement;
+  const ctx = canvas?.getContext('2d');
+  if (!ctx) return;
 
-  // Monta o título como array de linhas
+  // Cria gradientes por laticínio
+  const makeGradient = (cor: string, alpha1 = 0.85, alpha2 = 0.45): CanvasGradient => {
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height || 320);
+    grad.addColorStop(0, cor + Math.round(alpha1 * 255).toString(16).padStart(2, '0'));
+    grad.addColorStop(1, cor + Math.round(alpha2 * 255).toString(16).padStart(2, '0'));
+    return grad;
+  };
+
+  // Calcula a média geral para linha de referência
+  const todasMedias = laticinios.reduce((acc: number[], lat: string) =>
+    acc.concat(faixasFiltradas.map(f => mediaFaixaPorLaticinio(dados, lat, f.min, f.max)).filter((v: number) => v > 0))
+  , []);
+  const mediaGeral = todasMedias.length
+    ? todasMedias.reduce((a: number, b: number) => a + b, 0) / todasMedias.length
+    : 0;
+
+  const datasets: any[] = laticinios.map((lat, i) => {
+    const cor = coresSolidas[i % coresSolidas.length];
+    return {
+      label: lat,
+      data: faixasFiltradas.map(f => {
+        const v = mediaFaixaPorLaticinio(dados, lat, f.min, f.max);
+        return v > 0 ? +v.toFixed(4) : null;
+      }),
+      backgroundColor: makeGradient(cor),
+      borderColor: cor,
+      borderWidth: 2,
+      borderRadius: 8,
+      borderSkipped: false,
+      hoverBackgroundColor: cor + 'FF',
+      hoverBorderWidth: 3,
+    };
+  });
+
+  // Dataset de linha de média geral
+  if (mediaGeral > 0) {
+    datasets.push({
+      label: 'Média Geral',
+      type: 'line' as const,
+      data: faixasFiltradas.map(() => +mediaGeral.toFixed(4)),
+      borderColor: '#10b981',
+      borderWidth: 2,
+      borderDash: [6, 4],
+      pointRadius: 0,
+      fill: false,
+      tension: 0,
+      order: 0,
+    });
+  }
+
   const tituloLinhas: string[] = [];
-  if (usarFaixaCustom) {
-    tituloLinhas.push(`Comparativo ${this.faixaMin}-${this.faixaMax} Litros`);
-  } else {
-    tituloLinhas.push('Gráfico Comparativo');
-  }
-
-  if (this.municipioSelecionado && this.municipioSelecionado !== 'geral') {
+  if (usarFaixaCustom) tituloLinhas.push(`Comparativo ${this.faixaMin}–${this.faixaMax} L`);
+  else tituloLinhas.push('Preço por Faixa de Produção');
+  if (this.municipioSelecionado && this.municipioSelecionado !== 'geral')
     tituloLinhas.push(`Município: ${this.municipioSelecionado}`);
-  }
-
   if (this.mesReferencia !== null) {
     const mesNome = this.mesesDisponiveis.find(m => m.valor === this.mesReferencia)?.nome;
     if (mesNome) tituloLinhas.push(`Mês: ${mesNome}`);
   }
+  if (this.anoSelecionado !== null) tituloLinhas.push(`Ano: ${this.anoSelecionado}`);
 
-  if (this.anoSelecionado !== null) {
-    tituloLinhas.push(`Ano: ${this.anoSelecionado}`);
-  }
-
-  // Atribui ao título do gráfico
-  this.tituloGrafico = tituloLinhas.join(' | '); // opcional, se quiser exibir em algum HTML
-
-  const ctx = (document.getElementById('graficoLitrosPreco') as HTMLCanvasElement)?.getContext('2d');
-  if (!ctx) return;
+  this.tituloGrafico = tituloLinhas.join(' | ');
 
   if (this.grafico) this.grafico.destroy();
+
+  // Calcula eixo Y dinâmico
+  const todosValores = laticinios.reduce((acc: number[], lat: string) =>
+    acc.concat(faixasFiltradas.map(f => mediaFaixaPorLaticinio(dados, lat, f.min, f.max)).filter((v: number) => v > 0))
+  , []);
+  const yMin = todosValores.length ? Math.max(0, Math.min(...todosValores) - 0.2) : 0;
+  const yMax = todosValores.length ? Math.max(...todosValores) + 0.2 : 5;
 
   this.grafico = new Chart(ctx, {
     type: 'bar',
     data: { labels: faixasFiltradas.map(f => f.label), datasets },
     options: {
-      indexAxis: 'x',
       responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 600,
+        easing: 'easeOutQuart',
+      },
       plugins: {
         title: {
           display: true,
-          text: tituloLinhas, // <-- array de linhas para multi-linha
-          font: { size: 16, weight: 'bold' },
-          padding: { top: 10, bottom: 20 }
+          text: tituloLinhas,
+          font: { size: 16, weight: 'bold', family: "'Segoe UI', sans-serif" },
+          color: '#ffffff',
+          padding: { top: 8, bottom: 16 },
+        },
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 20,
+            usePointStyle: true,
+            pointStyle: 'rectRounded',
+            font: { size: 13 },
+            color: '#e5e7eb',
+            filter: (item) => item.text !== 'Média Geral' || mediaGeral > 0,
+          },
         },
         tooltip: {
+          backgroundColor: 'rgba(17, 24, 39, 0.92)',
+          titleColor: '#f9fafb',
+          bodyColor: '#d1fae5',
+          borderColor: '#10b981',
+          borderWidth: 1,
+          cornerRadius: 10,
+          padding: 12,
           callbacks: {
-            label: context => `Preço médio: R$${context.raw}`
-          }
+            label: (ctx) => {
+              if (ctx.dataset.label === 'Média Geral')
+                return ` Média Geral: R$ ${(ctx.raw as number).toFixed(2)}`;
+              const v = ctx.raw as number | null;
+              return v != null
+                ? ` ${ctx.dataset.label}: R$ ${v.toFixed(2)}/L`
+                : ` ${ctx.dataset.label}: sem dados`;
+            },
+          },
         },
-        legend: { position: 'top' }
       },
       scales: {
-        x: { title: { display: true, text: 'Faixa de Litros' }, beginAtZero: true },
-        y: { title: { display: true, text: 'Preço Médio (R$)' } }
-      }
-    }
+        x: {
+          title: { display: true, text: 'Faixa de Produção (litros/mês)', color: '#9ca3af', font: { size: 13, weight: 'bold' } },
+          grid: { display: false },
+          ticks: { color: '#d1d5db', font: { size: 12 } },
+        },
+        y: {
+          title: { display: true, text: 'Preço Médio (R$/L)', color: '#9ca3af', font: { size: 13, weight: 'bold' } },
+          min: yMin,
+          max: yMax,
+          grid: { color: 'rgba(255,255,255,0.07)' },
+          ticks: {
+            color: '#d1d5db',
+            font: { size: 12 },
+            callback: (v) => `R$ ${Number(v).toFixed(2)}`,
+          },
+        },
+      },
+    },
   });
 }
 
