@@ -1,0 +1,172 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/data-parametros"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ tituloPage }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="detalhe-content">
+
+  @if (carregando) {
+    <div class="loading-wrap">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando dados…</p>
+    </div>
+  }
+
+  @if (!carregando && stats) {
+
+    <!-- ── Cabeçalho visual ── -->
+    <div class="detalhe-hero">
+      <div class="hero-icon-wrap">
+        @if (filtro.tipo === 'laticinio' && laticinioIcon) {
+          <img [src]="laticinioIcon" alt="{{ filtro.laticinio }}" class="hero-img" />
+        } @else {
+          <ion-icon [name]="heroIcon" class="hero-ion-icon"></ion-icon>
+        }
+      </div>
+      <div class="hero-info">
+        <h2 class="hero-title">{{ heroTitulo }}</h2>
+        <p class="hero-sub">{{ heroSubtitulo }}</p>
+      </div>
+    </div>
+
+    <!-- ── KPIs ── -->
+    <div class="section-label">
+      <ion-icon name="stats-chart-outline"></ion-icon>
+      Resumo
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-destaque">
+        <span class="kpi-label">Preço Médio</span>
+        <span class="kpi-value">R$ {{ stats.mediaPreco | number:'1.2-2' }}</span>
+        <span class="kpi-unit">por litro</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Mínimo</span>
+        <span class="kpi-value kpi-min">R$ {{ stats.minPreco | number:'1.2-2' }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Máximo</span>
+        <span class="kpi-value kpi-max">R$ {{ stats.maxPreco | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- ── Qualidade do Leite ── -->
+    <div class="section-label">
+      <ion-icon name="flask-outline"></ion-icon>
+      Qualidade Média
+    </div>
+
+    <div class="data-card">
+      <div class="qual-row">
+        <ion-icon name="water-outline" class="qual-icon"></ion-icon>
+        <span class="qual-label">Produção Média</span>
+        <span class="qual-value">{{ stats.mediaProducao | number:'1.0-0' }} L</span>
+      </div>
+      <div class="qual-divider"></div>
+      <div class="qual-row">
+        <ion-icon name="bug-outline" class="qual-icon"></ion-icon>
+        <span class="qual-label">CCS Médio</span>
+        <span class="qual-value">{{ stats.mediaCCS | number:'1.0-0' }}</span>
+      </div>
+      <div class="qual-divider"></div>
+      <div class="qual-row">
+        <ion-icon name="cellular-outline" class="qual-icon"></ion-icon>
+        <span class="qual-label">CBT Médio</span>
+        <span class="qual-value">{{ stats.mediaCBT | number:'1.0-0' }}</span>
+      </div>
+      <div class="qual-divider"></div>
+      <div class="qual-row">
+        <ion-icon name="ellipse-outline" class="qual-icon"></ion-icon>
+        <span class="qual-label">Gordura Média</span>
+        <span class="qual-value">{{ stats.mediaGordura | number:'1.2-2' }}%</span>
+      </div>
+      <div class="qual-divider"></div>
+      <div class="qual-row">
+        <ion-icon name="fitness-outline" class="qual-icon"></ion-icon>
+        <span class="qual-label">Proteína Média</span>
+        <span class="qual-value">{{ stats.mediaProteina | number:'1.2-2' }}%</span>
+      </div>
+    </div>
+
+    <!-- ── Gráfico de Preço por Município ── -->
+    @if (dadosPorMunicipio.length > 1) {
+      <div class="section-label">
+        <ion-icon name="bar-chart-outline"></ion-icon>
+        Preço por Município
+      </div>
+      <div class="data-card chart-card">
+        <canvas #graficoMunicipio style="width:100%; height:300px; display:block;"></canvas>
+      </div>
+    }
+
+    <!-- ── Lista de registros ── -->
+<div class="section-label">
+  <ion-icon name="list-outline"></ion-icon>
+  Registros ({{ stats.totalRegistros }})
+</div>
+
+@for (grupo of registrosAgrupados; track grupo.chave) {
+  <!-- Cabeçalho do grupo mês/ano -->
+  <div class="section-label" style="margin-top: 8px;">
+    <ion-icon name="calendar-outline"></ion-icon>
+    {{ grupo.mesNome }}/{{ grupo.ano }}
+  </div>
+
+  @for (item of grupo.itens; track $index) {
+    <div class="data-card registro-card">
+      <div class="reg-header">
+        <div class="reg-header-left">
+          @if (laticinioIcons[item.laticinio]) {
+            <img [src]="laticinioIcons[item.laticinio]" alt="{{ item.laticinio }}" class="reg-icon" />
+          } @else {
+            <ion-icon name="business-outline" class="reg-icon-ion"></ion-icon>
+          }
+          <div>
+            <span class="reg-laticinio">{{ item.laticinio }}</span>
+            <span class="reg-local">{{ item.municipio }} · {{ item.regiao }}</span>
+          </div>
+        </div>
+        <span class="reg-preco">R$ {{ item.precoLitro | number:'1.2-2' }}</span>
+      </div>
+      <div class="reg-chips">
+        <span class="reg-chip">
+          <ion-icon name="water-outline"></ion-icon>
+          {{ item.producaoLitros | number:'1.0-0' }} L
+        </span>
+        <span class="reg-chip">
+          <ion-icon name="bug-outline"></ion-icon>
+          CCS {{ item.ccs | number:'1.0-0' }}
+        </span>
+        <span class="reg-chip">
+          <ion-icon name="cellular-outline"></ion-icon>
+          CBT {{ item.cbt | number:'1.0-0' }}
+        </span>
+        <span class="reg-chip">
+          <ion-icon name="ellipse-outline"></ion-icon>
+          Gord. {{ item.gordura | number:'1.2-2' }}%
+        </span>
+        <span class="reg-chip">
+          <ion-icon name="fitness-outline"></ion-icon>
+          Prot. {{ item.proteina | number:'1.2-2' }}%
+        </span>
+      </div>
+    </div>
+  }
+}
+
+    <div style="height: 40px;"></div>
+  }
+
+  @if (!carregando && !stats) {
+    <div class="empty-state">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>Nenhum dado encontrado para os filtros selecionados.</p>
+    </div>
+  }
+
+</ion-content>

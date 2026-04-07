@@ -41,6 +41,13 @@ const routes: Routes = [
   loadComponent: () => import('./pages/meus-dados/meus-dados.component')
     .then(m => m.MeusDadosComponent)
 },
+{
+    path: 'detalhe-estatistica',
+    loadComponent: () =>
+      import('./pages/detalhe-estatistica/detalhe-estatistica.component').then(
+        m => m.DetalheEstatisticaPage
+      ),
+  },
   {
     path: '',
     redirectTo: 'home',

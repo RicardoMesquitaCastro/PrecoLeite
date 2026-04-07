@@ -6,13 +6,15 @@ import { Chart, registerables } from 'chart.js';
 import { FaixaValidaPipe } from './faixa-valida.pipe';
 
 import { DadosService, DadoLeite } from 'src/app/services/dados.service';
+import { Router } from '@angular/router';
+import { EstatisticasService } from 'src/app/services/estatisticas.service';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-data-parametros',
   standalone: true,
-  imports: [IonicModule, FormsModule, CommonModule, FaixaValidaPipe],
+  imports: [IonicModule, FormsModule, CommonModule],
   templateUrl: './data-parametros.component.html',
   styleUrls: ['./data-parametros.component.scss']
 })
@@ -20,7 +22,11 @@ Chart.register(...registerables);
 
 export class DataParametrosPage implements AfterViewInit  {
 
-  constructor(private dadosService: DadosService) {}
+  constructor(
+  private dadosService: DadosService,
+  private router: Router,
+  private estatisticasService: EstatisticasService,
+) {}
 private _graficoRegiaoRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('graficoRegiao')
 set graficoRegiaoSetter(ref: ElementRef<HTMLCanvasElement> | undefined) {
@@ -133,39 +139,15 @@ inicializarFiltros() {
 }
 
 carregarDados() {
-  this.dadosService.getAll().subscribe((res: any) => {
-    const propriedades = res.cadastroPropriedade;
-    const parametros = res.cadastroParametros;
-
-    this.dadosList = parametros.map((p: any) => {
-      const prop = propriedades.find((pr: any) => pr.contaId === p.contaId) || {};
-
-      return {
-        laticinio: p.laticinio,
-        regiao: prop.regiao ?? "",
-        municipio: prop.municipio ?? "",
-        mesReferencia: Number(p.mesReferencia),
-        anoReferencia: new Date(p.createdAt).getFullYear(),
-        producaoLitros: Number(p.producaoLitros),
-        precoLitro: Number(p.precoLeite),
-        ccs: Number(p.ccs),
-        cbt: Number(p.cbt),
-        gordura: Number(p.gordura),
-        proteina: Number(p.proteina)
-      };
-    });
-
-    this.inicializarFiltros();
-
-    // Dois frames para garantir que o Angular renderizou o canvas no DOM
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
+  this.estatisticasService.getDados().subscribe(dados => {
+      this.dadosList = dados;
+      this.inicializarFiltros();
+      requestAnimationFrame(() => requestAnimationFrame(() => {
         this.criarGrafico();
         this.montarGraficoRegiao();
         this.montarGraficoMes();
-      });
+      }));
     });
-  });
 }
 
  ngAfterViewInit() {
@@ -188,6 +170,42 @@ carregarDados() {
       this.graficoIniciado = true;
     }
   }
+
+  abrirDetalheLaticinio(laticinio: string) {
+  this.router.navigate(['/detalhe-estatistica'], {
+    state: {
+      tipo:      'laticinio',
+      laticinio,
+      municipio: this.municipioSelecionado,
+      ano:       this.anoSelecionado,
+      faixaMin:  this.faixaMin,
+      faixaMax:  this.faixaMax,
+    },
+  });
+}
+
+abrirDetalheMes(mesNumero: number, mesNome: string) {
+  this.router.navigate(['/detalhe-estatistica'], {
+    state: {
+      tipo:      'mes',
+      mesNumero,
+      mesNome,
+      municipio: this.municipioSelecionado,
+      ano:       this.anoSelecionado,
+    },
+  });
+}
+
+abrirDetalheRegiao(regiao: string) {
+  this.router.navigate(['/detalhe-estatistica'], {
+    state: {
+      tipo:      'regiao',
+      regiao,
+      municipio: this.municipioSelecionado,
+      ano:       this.anoSelecionado,
+    },
+  });
+}
 
   atualizarTitulo() {
     let partes: string[] = [];

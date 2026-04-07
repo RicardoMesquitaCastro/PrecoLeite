@@ -184,10 +184,14 @@
     @if (municipioSelecionado && municipioSelecionado.toLowerCase() !== 'geral') {
       @for (grupo of dadosPorRegiao; track trackByLaticinio($index, grupo)) {
         <div class="data-card">
-          <div class="data-card-header">
-            <ion-icon name="map-outline" class="card-icon"></ion-icon>
-            <span class="card-title">{{ grupo.regiao }}</span>
-          </div>
+         <div class="data-card-header card-clickable"
+     (click)="abrirDetalheRegiao(grupo.regiao)"
+     role="button" tabindex="0"
+     (keyup.enter)="abrirDetalheRegiao(grupo.regiao)">
+  <ion-icon name="map-outline" class="card-icon"></ion-icon>
+  <span class="card-title">{{ grupo.regiao }}</span>
+  <ion-icon name="chevron-forward-outline" class="card-chevron"></ion-icon>
+</div>
           @for (lat of grupo.laticinios; track trackByFaixa($index, lat)) {
             <div class="data-row">
               <div class="data-row-left">
@@ -220,46 +224,60 @@
     }
   }
 
-  <!-- ========================= POR LATICÍNIO ========================= -->
-  @if (agrupamentoSelecionado === 'laticinio') {
-    @if (temDadosFaixas()) {
-      <div class="results-header">
-        <h3 class="results-title">Média de Preço por Faixas</h3>
-        @if (tituloGraficoFiltrado) {
-          <p class="results-subtitle" [innerHTML]="tituloGraficoFiltrado"></p>
-        }
-      </div>
-
-      @for (grupo of dadosPorLaticinioFaixas; track trackByLaticinio($index, grupo)) {
-        <div class="data-card">
-          <div class="data-card-header">
-            <img [src]="laticinioIcons[grupo.laticinio]" alt="{{ grupo.laticinio }}" class="lat-icon" />
-            <span class="card-title">{{ grupo.laticinio }}</span>
-          </div>
-          @for (faixa of (grupo.faixas | faixaValida); track trackByFaixa($index, faixa)) {
-            <div class="data-row">
-              <span class="data-row-label">{{ faixa.faixa }} litros</span>
-              <span class="data-value">R$ {{ faixa.mediaPreco | number:'1.2-2' }}</span>
-            </div>
-          }
-        </div>
+ <!-- ========================= POR LATICÍNIO ========================= -->
+@if (agrupamentoSelecionado === 'laticinio') {
+  @if (temDadosFaixas()) {
+    <div class="results-header">
+      <h3 class="results-title">Média de Preço por Faixas</h3>
+      @if (tituloGraficoFiltrado) {
+        <p class="results-subtitle" [innerHTML]="tituloGraficoFiltrado"></p>
       }
+    </div>
 
-      <div class="data-card chart-card">
-        <div class="data-card-header">
-          <ion-icon name="bar-chart-outline" class="card-icon"></ion-icon>
-          <span class="card-title">Gráfico por Litros</span>
+    @for (grupo of dadosPorLaticinioFaixas; track trackByLaticinio($index, grupo)) {
+      <div class="data-card">
+
+        <!-- Header clicável -->
+        <div class="data-card-header card-clickable"
+          (click)="abrirDetalheLaticinio(grupo.laticinio)"
+          role="button" tabindex="0"
+          (keyup.enter)="abrirDetalheLaticinio(grupo.laticinio)">
+          <img [src]="laticinioIcons[grupo.laticinio]" alt="{{ grupo.laticinio }}" class="lat-icon" />
+          <span class="card-title">{{ grupo.laticinio }}</span>
+          <ion-icon name="chevron-forward-outline" class="card-chevron"></ion-icon>
         </div>
-        <canvas id="graficoLitrosPreco" style="width:100%; height:340px; display:block;"></canvas>
-      </div>
 
-    } @else {
-      <div class="empty-state">
-        <ion-icon name="business-outline"></ion-icon>
-        <p>Nenhum dado disponível para o município ou intervalo selecionado.</p>
+        <!-- Faixas internas -->
+       @for (faixa of grupo.faixas; track $index) {
+  @if (faixa.mediaPreco > 0) {
+    <div class="data-row">
+      <div class="data-row-left">
+        <span>{{ faixa.faixa }} L</span>
+      </div>
+      <span class="data-value">R$ {{ faixa.mediaPreco | number:'1.2-2' }}</span>
+    </div>
+  }
+
+ }
       </div>
     }
+
+
+    <div class="data-card chart-card">
+      <div class="data-card-header">
+        <ion-icon name="bar-chart-outline" class="card-icon"></ion-icon>
+        <span class="card-title">Gráfico por Litros</span>
+      </div>
+      <canvas id="graficoLitrosPreco" style="width:100%; height:340px; display:block;"></canvas>
+    </div>
+
+  } @else {
+    <div class="empty-state">
+      <ion-icon name="business-outline"></ion-icon>
+      <p>Nenhum dado disponível para o município ou intervalo selecionado.</p>
+    </div>
   }
+}
 
   <!-- ========================= POR MÊS ========================= -->
   @if (agrupamentoSelecionado === 'mes') {
@@ -271,27 +289,34 @@
         }
       </div>
 
-      @for (grupo of dadosPorMes; track trackByLaticinio($index, grupo)) {
-        <div class="data-card" [class.mes-atual]="grupo.isAtual">
-          <div class="data-card-header">
-            <ion-icon name="calendar-outline" class="card-icon"></ion-icon>
-            <span class="card-title">{{ grupo.mes }}</span>
-            @if (grupo.isAtual) {
-              <span class="mes-badge">Atual</span>
-            }
-          </div>
-          @for (item of grupo.items; track trackByFaixa($index, item)) {
-            <div class="data-row">
-              <div class="data-row-left">
-                <img [src]="laticinioIcons[item.laticinio] || 'assets/icon/default.svg'"
-                  alt="{{ item.laticinio }}" class="lat-icon" />
-                <span>{{ item.laticinio }}</span>
-              </div>
-              <span class="data-value">R$ {{ item.mediaPrecoDoLaticinio | number:'1.2-2' }}</span>
-            </div>
-          }
-        </div>
+     @for (grupo of dadosPorMes; track trackByLaticinio($index, grupo)) {
+  <div class="data-card">
+
+    <div class="data-card-header card-clickable"
+      (click)="abrirDetalheMes(grupo.mesNumero, grupo.mes)"
+      role="button" tabindex="0"
+      (keyup.enter)="abrirDetalheMes(grupo.mesNumero, grupo.mes)">
+      <ion-icon name="calendar-outline" class="card-icon"></ion-icon>
+      <span class="card-title">{{ grupo.mes }}</span>
+      @if (grupo.isAtual) {
+        <span class="mes-badge">Atual</span>
       }
+      <ion-icon name="chevron-forward-outline" class="card-chevron"></ion-icon>
+    </div>
+
+ @for (lat of grupo.items; track $index) {
+  <div class="data-row">
+    <div class="data-row-left">
+      <img [src]="laticinioIcons[lat.laticinio] || 'assets/icon/default.svg'"
+        alt="{{ lat.laticinio }}" class="lat-icon" />
+      <span>{{ lat.laticinio }}</span>
+    </div>
+    <span class="data-value">R$ {{ lat.mediaPrecoDoLaticinio | number:'1.2-2' }}</span>
+  </div>
+}
+
+  </div>
+}
 
       <!-- ── Gráfico por Mês ── -->
       <div class="data-card chart-card">
