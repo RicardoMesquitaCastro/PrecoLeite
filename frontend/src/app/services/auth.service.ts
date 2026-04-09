@@ -15,7 +15,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  // ─── LOGIN ────────────────────────────────────────────────────────────────
+  // ─── LOGIN EMAIL / SENHA ──────────────────────────────────────────────────
   login(email: string, password: string): Observable<{ token: string; user: any }> {
     const headers = new HttpHeaders({
       Authorization: 'Basic ' + btoa(`${email}:${password}`)
@@ -30,7 +30,26 @@ export class AuthService {
       .pipe(tap(res => {
         this.saveToken(res.token);
         localStorage.setItem(this.userKey, JSON.stringify(res.user));
-        // NÃO sobrescreve role aqui — preserva o tipoConta salvo no cadastro
+      }));
+  }
+
+  // ─── LOGIN GOOGLE ─────────────────────────────────────────────────────────
+  // Recebe o idToken do Google Identity Services e envia ao backend.
+  // O backend valida o token na API do Google e retorna { token, user }
+  // no mesmo formato do login normal.
+  //
+  // Endpoint esperado: POST /auth/google?access_token=MASTER_KEY
+  // Body:              { idToken: string }
+  // Resposta:          { token: string; user: any }
+  loginComGoogle(code: string): Observable<{ token: string; user: any }> {
+    return this.http
+      .post<{ token: string; user: any }>(
+        `${this.authUrl}/google?access_token=${environment.MASTER_KEY}`,
+        { code }
+      )
+      .pipe(tap(res => {
+        this.saveToken(res.token);
+        localStorage.setItem(this.userKey, JSON.stringify(res.user));
       }));
   }
 
@@ -63,7 +82,7 @@ export class AuthService {
   }
 
   isAdmin(): boolean {
-    return this.getRole() === 'admin';      // ✅ era 'role', corrigido para 'admin'
+    return this.getRole() === 'admin';
   }
 
   isProdutor(): boolean {
