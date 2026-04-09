@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { login } from './controller'
+import { login, loginGoogle } from './controller'
 import { password, master } from '../../services/passport'
 
 const router = new Router()
@@ -19,5 +19,21 @@ router.post('/',
   master(),
   password(),
   login)
+
+/**
+ * @api {post} /auth/google Authenticate with Google
+ * @apiName AuthenticateGoogle
+ * @apiGroup Auth
+ * @apiPermission master
+ * @apiParam {String} access_token Master access_token.
+ * @apiParam {String} idToken Google ID Token obtido pelo frontend.
+ * @apiSuccess (Success 201) {String} token User `access_token`.
+ * @apiSuccess (Success 201) {Object} user Current user's data.
+ * @apiError 400 idToken is required.
+ * @apiError 401 Invalid Google token.
+ */
+router.post('/google',
+  master(),
+  loginGoogle)
 
 export default router
