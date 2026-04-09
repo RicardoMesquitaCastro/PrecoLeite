@@ -20,8 +20,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   carregandoGoogle = false;
 
   private readonly GOOGLE_CLIENT_ID = '705490533967-6m43gdlp6fgv7agsr5aulngmda3dq3n5.apps.googleusercontent.com';
-
-  // URL de redirect após o popup Google fechar — deve ser a própria página de login
   private readonly REDIRECT_URI = window.location.origin + '/login';
 
   constructor(
@@ -32,12 +30,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {}
 
   // ─── VERIFICA SE VOLTOU DO POPUP GOOGLE ──────────────────────────────────
-  // O popup redireciona de volta para /login?code=XXX — capturamos o code aqui
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       const code = params['code'];
       if (code) {
-        // Limpa a URL sem recarregar a página
         window.history.replaceState({}, '', '/login');
         this.carregandoGoogle = true;
         this.trocarCodePorToken(code);
@@ -73,7 +69,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   // ─── LOGIN GOOGLE (OAuth2 popup) ──────────────────────────────────────────
-  // Usa google.accounts.oauth2 — mais compatível com localhost que o One Tap
   loginComGoogle() {
     this.erro = '';
 
@@ -91,7 +86,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       callback: (response: any) => {
         this.ngZone.run(() => {
           if (response?.code) {
-            // Envia o authorization code para o backend trocar por token
             this.trocarCodePorToken(response.code);
           } else {
             this.carregandoGoogle = false;
@@ -106,12 +100,25 @@ export class LoginComponent implements OnInit, OnDestroy {
     client.requestCode();
   }
 
-  // Envia o authorization code para o backend
+  // ─── TROCA O CODE PELO TOKEN E DECIDE O DESTINO ──────────────────────────
+  // O backend deve retornar { isNewUser: boolean } (ou campo equivalente)
+  // para que possamos saber se é o primeiro acesso via Google.
   private trocarCodePorToken(code: string) {
     this.authService.loginComGoogle(code).subscribe({
-      next: () => {
+      next: (res: any) => {
         this.carregandoGoogle = false;
-        this.ngZone.run(() => this.router.navigate(['/home']));
+
+        this.ngZone.run(() => {
+          // Se o backend indicar que é um usuário novo, redireciona para
+          // cadastro-conta em modo "somente tipo" (sem dados pessoais).
+          if (res?.isNewUser) {
+            this.router.navigate(['/cadastro-conta'], {
+              queryParams: { origem: 'google' }
+            });
+          } else {
+            this.router.navigate(['/home']);
+          }
+        });
       },
       error: (err) => {
         this.carregandoGoogle = false;

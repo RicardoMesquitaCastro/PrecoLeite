@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, map } from 'rxjs';
 import { environment } from 'src/environments/environment.prod';
 
 
@@ -34,23 +34,27 @@ export class AuthService {
   }
 
   // ─── LOGIN GOOGLE ─────────────────────────────────────────────────────────
-  // Recebe o idToken do Google Identity Services e envia ao backend.
-  // O backend valida o token na API do Google e retorna { token, user }
-  // no mesmo formato do login normal.
-  //
-  // Endpoint esperado: POST /auth/google?access_token=MASTER_KEY
-  // Body:              { idToken: string }
-  // Resposta:          { token: string; user: any }
-  loginComGoogle(code: string): Observable<{ token: string; user: any }> {
+  // Detecta primeiro acesso verificando se o user retornado ainda não tem role.
+  // Nenhuma mudança necessária no backend.
+  loginComGoogle(code: string): Observable<{ token: string; user: any; isNewUser: boolean }> {
     return this.http
       .post<{ token: string; user: any }>(
         `${this.authUrl}/google?access_token=${environment.MASTER_KEY}`,
         { code }
       )
-      .pipe(tap(res => {
-        this.saveToken(res.token);
-        localStorage.setItem(this.userKey, JSON.stringify(res.user));
-      }));
+      .pipe(
+        tap(res => {
+          this.saveToken(res.token);
+          localStorage.setItem(this.userKey, JSON.stringify(res.user));
+        }),
+        map(res => ({
+          ...res,
+          // É novo usuário se a conta foi criada há menos de 60 segundos
+          isNewUser: res.user?.createdAt
+            ? (Date.now() - new Date(res.user.createdAt).getTime()) < 60_000
+            : false
+        }))
+      );
   }
 
   // ─── REGISTRO ─────────────────────────────────────────────────────────────

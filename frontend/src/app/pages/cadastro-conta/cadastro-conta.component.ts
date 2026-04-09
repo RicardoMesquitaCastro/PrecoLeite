@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
 
@@ -11,7 +11,7 @@ import { AuthService } from 'src/app/services/auth.service';
   imports: [IonicModule, FormsModule, CommonModule],
   styleUrls: ['./cadastro-conta.component.scss'],
 })
-export class CadastroContaComponent {
+export class CadastroContaComponent implements OnInit {
   name      = '';
   email     = '';
   password  = '';
@@ -20,12 +20,24 @@ export class CadastroContaComponent {
   sucesso   = '';
   carregando = false;
 
+  // ── Modo Google: usuário já autenticado, só precisa escolher o tipo ──
+  modoGoogle = false;
+
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService,
     private toastController: ToastController,
   ) {}
 
+  ngOnInit() {
+    // Detecta se veio do fluxo Google (?origem=google)
+    this.route.queryParams.subscribe(params => {
+      this.modoGoogle = params['origem'] === 'google';
+    });
+  }
+
+  // ─── CADASTRO NORMAL (email + senha) ─────────────────────────────────────
   async cadastrarConta() {
     this.erro    = '';
     this.sucesso = '';
@@ -41,9 +53,7 @@ export class CadastroContaComponent {
       next: () => {
         this.authService.login(this.email, this.password).subscribe({
           next: () => {
-            // Login OK — agora salva o tipoConta na chave 'role'
             this.authService.saveRole(this.tipoConta);
-
             this.carregando = false;
             this.sucesso = 'Conta criada com sucesso!';
 
@@ -71,6 +81,31 @@ export class CadastroContaComponent {
         }
       }
     });
+  }
+
+  // ─── CONFIRMAR TIPO (modo Google) ────────────────────────────────────────
+  // O usuário já está autenticado — só precisamos salvar o role e redirecionar.
+  async confirmarTipoGoogle() {
+    this.erro = '';
+
+    if (!this.tipoConta) {
+      await this.mostrarToast('Selecione o tipo de conta.', 'danger');
+      return;
+    }
+
+    this.carregando = true;
+
+    // Salva o role localmente (e/ou no backend, conforme implementação do AuthService)
+    this.authService.saveRole(this.tipoConta);
+
+    this.sucesso = 'Tudo pronto!';
+    this.carregando = false;
+
+    const destino = this.tipoConta === 'produtor'
+      ? '/cadastro-propriedade'
+      : '/home';
+
+    setTimeout(() => this.router.navigate([destino]), 1000);
   }
 
   irParaLogin() {

@@ -699,7 +699,7 @@ criarGrafico() {
       if (this.isFaixaValida()) {
         const r = this.mediaFaixa(items, this.faixaMin!, this.faixaMax!);
         faixas = [{
-          faixa: `${this.faixaMin} - ${this.faixaMax} L`,
+          faixa: `${this.faixaMin} - ${this.faixaMax}`,
           mediaPreco: r.media,
           quantidadeDados: r.quantidade
         }];

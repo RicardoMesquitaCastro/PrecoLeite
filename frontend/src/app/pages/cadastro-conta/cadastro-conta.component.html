@@ -6,148 +6,241 @@
 
 <ion-content class="conta-content">
 
-  <!-- Cabeçalho visual -->
-  <div class="hero-section">
-    <div class="hero-icon">
-      <ion-icon name="person-add-outline"></ion-icon>
-    </div>
-    <h1 class="hero-title">Crie sua Conta</h1>
-    <p class="hero-subtitle">Acesse dados e estatísticas do PreçoLeite</p>
-  </div>
+  <!-- ══════════════════════════════════════════════════════════════════════
+       MODO GOOGLE — só exibe seleção de tipo de conta
+  ══════════════════════════════════════════════════════════════════════ -->
+  @if (modoGoogle) {
 
-  <!-- Formulário -->
-  <div class="form-card">
-
-    <!-- ── Tipo de conta ── -->
-    <div class="section-label">
-      <ion-icon name="people-outline"></ion-icon>
-      Você é
+    <!-- Cabeçalho visual -->
+    <div class="hero-section">
+      <div class="hero-icon">
+        <ion-icon name="person-circle-outline"></ion-icon>
+      </div>
+      <h1 class="hero-title">Quase lá!</h1>
+      <p class="hero-subtitle">Só precisamos saber como você vai usar o PreçoLeite</p>
     </div>
 
-    <div class="tipo-conta-wrap">
+    <div class="form-card">
 
-      <div
-        class="tipo-card"
-        [class.selected]="tipoConta === 'produtor'"
-        (click)="tipoConta = 'produtor'">
-        <ion-icon name="leaf-outline" class="tipo-icon"></ion-icon>
-        <span class="tipo-titulo">Produtor</span>
-        <span class="tipo-desc">Cadastra propriedade e acompanha sua produção</span>
-        <div class="tipo-check">
-          <ion-icon name="checkmark-circle" *ngIf="tipoConta === 'produtor'"></ion-icon>
-        </div>
+      <!-- Seleção de tipo -->
+      <div class="section-label">
+        <ion-icon name="people-outline"></ion-icon>
+        Você é
       </div>
 
-      <div
-        class="tipo-card"
-        [class.selected]="tipoConta === 'visitante'"
-        (click)="tipoConta = 'visitante'">
-        <ion-icon name="eye-outline" class="tipo-icon"></ion-icon>
-        <span class="tipo-titulo">Visitante</span>
-        <span class="tipo-desc">Consulta estatísticas e cotações do mercado</span>
-        <div class="tipo-check">
-          <ion-icon name="checkmark-circle" *ngIf="tipoConta === 'visitante'"></ion-icon>
+      <div class="tipo-conta-wrap">
+
+        <div
+          class="tipo-card"
+          [class.selected]="tipoConta === 'produtor'"
+          (click)="tipoConta = 'produtor'">
+          <ion-icon name="leaf-outline" class="tipo-icon"></ion-icon>
+          <span class="tipo-titulo">Produtor</span>
+          <span class="tipo-desc">Cadastra propriedade e acompanha sua produção</span>
+          <div class="tipo-check">
+            <ion-icon name="checkmark-circle" *ngIf="tipoConta === 'produtor'"></ion-icon>
+          </div>
         </div>
+
+        <div
+          class="tipo-card"
+          [class.selected]="tipoConta === 'visitante'"
+          (click)="tipoConta = 'visitante'">
+          <ion-icon name="eye-outline" class="tipo-icon"></ion-icon>
+          <span class="tipo-titulo">Visitante</span>
+          <span class="tipo-desc">Consulta estatísticas e cotações do mercado</span>
+          <div class="tipo-check">
+            <ion-icon name="checkmark-circle" *ngIf="tipoConta === 'visitante'"></ion-icon>
+          </div>
+        </div>
+
       </div>
 
-    </div>
-
-    <!-- ── Dados Pessoais ── -->
-    <div class="section-label" style="margin-top: 20px;">
-      <ion-icon name="person-outline"></ion-icon>
-      Dados Pessoais
-    </div>
-
-    <div class="card-group">
-      <ion-item lines="none" class="custom-item">
-        <ion-icon name="person-outline" slot="start" class="field-icon"></ion-icon>
-        <div class="field-wrap">
-          <ion-label class="field-label">Nome</ion-label>
-          <ion-input
-            [(ngModel)]="name"
-            placeholder="Seu nome completo"
-            clearInput
-            class="custom-input">
-          </ion-input>
+      <!-- Erro -->
+      @if (erro) {
+        <div class="alert-danger">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ erro }}</span>
         </div>
-      </ion-item>
-
-      <div class="item-divider"></div>
-
-      <ion-item lines="none" class="custom-item">
-        <ion-icon name="mail-outline" slot="start" class="field-icon"></ion-icon>
-        <div class="field-wrap">
-          <ion-label class="field-label">E-mail</ion-label>
-          <ion-input
-            [(ngModel)]="email"
-            type="email"
-            placeholder="seu@email.com"
-            clearInput
-            class="custom-input">
-          </ion-input>
-        </div>
-      </ion-item>
-
-      <div class="item-divider"></div>
-
-      <ion-item lines="none" class="custom-item">
-        <ion-icon name="lock-closed-outline" slot="start" class="field-icon"></ion-icon>
-        <div class="field-wrap">
-          <ion-label class="field-label">Senha</ion-label>
-          <ion-input
-            [(ngModel)]="password"
-            type="password"
-            placeholder="Mínimo 6 caracteres"
-            clearInput
-            class="custom-input">
-          </ion-input>
-        </div>
-      </ion-item>
-    </div>
-
-    <!-- Erro -->
-    @if (erro) {
-      <div class="alert-danger">
-        <ion-icon name="alert-circle-outline"></ion-icon>
-        <span>{{ erro }}</span>
-      </div>
-    }
-
-    <!-- Sucesso -->
-    @if (sucesso) {
-      <div class="alert-success">
-        <ion-icon name="checkmark-circle-outline"></ion-icon>
-        <span>{{ sucesso }}</span>
-      </div>
-    }
-
-    <!-- Botão cadastrar -->
-    <ion-button
-      color="primary"
-      expand="full"
-      class="save-btn"
-      (click)="cadastrarConta()"
-      [disabled]="!name || !email || !password || !tipoConta || carregando">
-      @if (carregando) {
-        <ion-spinner name="crescent" slot="start"></ion-spinner>
-        Cadastrando...
-      } @else {
-        <ion-icon name="person-add-outline" slot="start"></ion-icon>
-        Criar Conta
       }
-    </ion-button>
 
-    <!-- Link login -->
-    <ion-button
-      fill="clear"
-      expand="full"
-      class="link-btn"
-      (click)="irParaLogin()">
-      Já tem uma conta?
-      <strong style="margin-left: 4px;">Entrar</strong>
-    </ion-button>
+      <!-- Sucesso -->
+      @if (sucesso) {
+        <div class="alert-success">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>{{ sucesso }}</span>
+        </div>
+      }
 
-  </div>
+      <!-- Botão confirmar -->
+      <ion-button
+        color="primary"
+        expand="full"
+        class="save-btn"
+        (click)="confirmarTipoGoogle()"
+        [disabled]="!tipoConta || carregando">
+        @if (carregando) {
+          <ion-spinner name="crescent" slot="start"></ion-spinner>
+          Salvando...
+        } @else {
+          <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+          Confirmar e Entrar
+        }
+      </ion-button>
+
+    </div>
+
+  }
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       MODO NORMAL — cadastro completo (email + senha)
+  ══════════════════════════════════════════════════════════════════════ -->
+  @else {
+
+    <!-- Cabeçalho visual -->
+    <div class="hero-section">
+      <div class="hero-icon">
+        <ion-icon name="person-add-outline"></ion-icon>
+      </div>
+      <h1 class="hero-title">Crie sua Conta</h1>
+      <p class="hero-subtitle">Acesse dados e estatísticas do PreçoLeite</p>
+    </div>
+
+    <!-- Formulário -->
+    <div class="form-card">
+
+      <!-- ── Tipo de conta ── -->
+      <div class="section-label">
+        <ion-icon name="people-outline"></ion-icon>
+        Você é
+      </div>
+
+      <div class="tipo-conta-wrap">
+
+        <div
+          class="tipo-card"
+          [class.selected]="tipoConta === 'produtor'"
+          (click)="tipoConta = 'produtor'">
+          <ion-icon name="leaf-outline" class="tipo-icon"></ion-icon>
+          <span class="tipo-titulo">Produtor</span>
+          <span class="tipo-desc">Cadastra propriedade e acompanha sua produção</span>
+          <div class="tipo-check">
+            <ion-icon name="checkmark-circle" *ngIf="tipoConta === 'produtor'"></ion-icon>
+          </div>
+        </div>
+
+        <div
+          class="tipo-card"
+          [class.selected]="tipoConta === 'visitante'"
+          (click)="tipoConta = 'visitante'">
+          <ion-icon name="eye-outline" class="tipo-icon"></ion-icon>
+          <span class="tipo-titulo">Visitante</span>
+          <span class="tipo-desc">Consulta estatísticas e cotações do mercado</span>
+          <div class="tipo-check">
+            <ion-icon name="checkmark-circle" *ngIf="tipoConta === 'visitante'"></ion-icon>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Dados Pessoais ── -->
+      <div class="section-label" style="margin-top: 20px;">
+        <ion-icon name="person-outline"></ion-icon>
+        Dados Pessoais
+      </div>
+
+      <div class="card-group">
+        <ion-item lines="none" class="custom-item">
+          <ion-icon name="person-outline" slot="start" class="field-icon"></ion-icon>
+          <div class="field-wrap">
+            <ion-label class="field-label">Nome</ion-label>
+            <ion-input
+              [(ngModel)]="name"
+              placeholder="Seu nome completo"
+              clearInput
+              class="custom-input">
+            </ion-input>
+          </div>
+        </ion-item>
+
+        <div class="item-divider"></div>
+
+        <ion-item lines="none" class="custom-item">
+          <ion-icon name="mail-outline" slot="start" class="field-icon"></ion-icon>
+          <div class="field-wrap">
+            <ion-label class="field-label">E-mail</ion-label>
+            <ion-input
+              [(ngModel)]="email"
+              type="email"
+              placeholder="seu@email.com"
+              clearInput
+              class="custom-input">
+            </ion-input>
+          </div>
+        </ion-item>
+
+        <div class="item-divider"></div>
+
+        <ion-item lines="none" class="custom-item">
+          <ion-icon name="lock-closed-outline" slot="start" class="field-icon"></ion-icon>
+          <div class="field-wrap">
+            <ion-label class="field-label">Senha</ion-label>
+            <ion-input
+              [(ngModel)]="password"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              clearInput
+              class="custom-input">
+            </ion-input>
+          </div>
+        </ion-item>
+      </div>
+
+      <!-- Erro -->
+      @if (erro) {
+        <div class="alert-danger">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ erro }}</span>
+        </div>
+      }
+
+      <!-- Sucesso -->
+      @if (sucesso) {
+        <div class="alert-success">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>{{ sucesso }}</span>
+        </div>
+      }
+
+      <!-- Botão cadastrar -->
+      <ion-button
+        color="primary"
+        expand="full"
+        class="save-btn"
+        (click)="cadastrarConta()"
+        [disabled]="!name || !email || !password || !tipoConta || carregando">
+        @if (carregando) {
+          <ion-spinner name="crescent" slot="start"></ion-spinner>
+          Cadastrando...
+        } @else {
+          <ion-icon name="person-add-outline" slot="start"></ion-icon>
+          Criar Conta
+        }
+      </ion-button>
+
+      <!-- Link login -->
+      <ion-button
+        fill="clear"
+        expand="full"
+        class="link-btn"
+        (click)="irParaLogin()">
+        Já tem uma conta?
+        <strong style="margin-left: 4px;">Entrar</strong>
+      </ion-button>
+
+    </div>
+
+  }
 
   <div style="height: 40px;"></div>
 

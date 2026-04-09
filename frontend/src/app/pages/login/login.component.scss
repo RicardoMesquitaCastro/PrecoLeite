@@ -232,8 +232,28 @@
   color: #6b7280;
 }
 
+.dev-credit {
+  text-align: center;
+  font-size: 11px;
+  color: #b0b8c4;
+  margin-top: 24px;
+  letter-spacing: 0.3px;
+
+  span {
+    font-weight: 700;
+    color: #8a95a3;
+  }
+}
+
 // ── Dark mode ────────────────────────────────────────
 @media (prefers-color-scheme: dark) {
+  .dev-credit {
+  color: #4b5563;
+
+  span {
+    color: #6b7280;
+  }
+}
   .login-content {
     --background: #121212;
   }
