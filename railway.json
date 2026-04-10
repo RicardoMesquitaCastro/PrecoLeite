@@ -1,0 +1,9 @@
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "npm install && npx ng build --configuration production"
+  },
+  "deploy": {
+    "startCommand": "node server.js"
+  }
+}
