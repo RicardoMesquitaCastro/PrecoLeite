@@ -1,0 +1,120 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>PreçoLeite</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="conta-content">
+
+  <div class="hero-section">
+    <div class="hero-icon">
+      <ion-icon name="key-outline"></ion-icon>
+    </div>
+    <h1 class="hero-title">Nova senha</h1>
+    <p class="hero-subtitle">Escolha uma senha segura para sua conta</p>
+  </div>
+
+  <div class="form-card">
+
+    <!-- Sucesso -->
+    @if (sucesso) {
+      <div class="alert-success" style="margin-bottom: 24px;">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <span>Senha redefinida com sucesso! Redirecionando...</span>
+      </div>
+    }
+
+    <!-- Erro de token inválido -->
+    @if (!token && !sucesso) {
+      <div class="alert-danger" style="margin-bottom: 24px;">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>Link inválido ou expirado. Solicite um novo.</span>
+      </div>
+
+      <ion-button
+        color="primary"
+        expand="full"
+        class="save-btn"
+        (click)="irParaLogin()">
+        Voltar para o login
+      </ion-button>
+    }
+
+    <!-- Formulário -->
+    @if (token && !sucesso) {
+
+      <div class="section-label">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        Defina sua nova senha
+      </div>
+
+      <div class="card-group">
+        <ion-item lines="none" class="custom-item">
+          <ion-icon name="lock-closed-outline" slot="start" class="field-icon"></ion-icon>
+          <div class="field-wrap">
+            <ion-label class="field-label">Nova senha</ion-label>
+            <ion-input
+              [(ngModel)]="password"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              clearInput
+              class="custom-input">
+            </ion-input>
+          </div>
+        </ion-item>
+
+        <div class="item-divider"></div>
+
+        <ion-item lines="none" class="custom-item">
+          <ion-icon name="lock-closed-outline" slot="start" class="field-icon"></ion-icon>
+          <div class="field-wrap">
+            <ion-label class="field-label">Confirmar senha</ion-label>
+            <ion-input
+              [(ngModel)]="passwordConfirm"
+              type="password"
+              placeholder="Repita a senha"
+              clearInput
+              class="custom-input">
+            </ion-input>
+          </div>
+        </ion-item>
+      </div>
+
+      <!-- Erro -->
+      @if (erro) {
+        <div class="alert-danger">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ erro }}</span>
+        </div>
+      }
+
+      <ion-button
+        color="primary"
+        expand="full"
+        class="save-btn"
+        (click)="redefinirSenha()"
+        [disabled]="!password || !passwordConfirm || carregando">
+        @if (carregando) {
+          <ion-spinner name="crescent" slot="start"></ion-spinner>
+          Salvando...
+        } @else {
+          <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+          Redefinir senha
+        }
+      </ion-button>
+
+      <ion-button
+        fill="clear"
+        expand="full"
+        class="link-btn"
+        (click)="irParaLogin()">
+        Voltar para o login
+      </ion-button>
+
+    }
+
+  </div>
+
+  <div style="height: 40px;"></div>
+
+</ion-content>

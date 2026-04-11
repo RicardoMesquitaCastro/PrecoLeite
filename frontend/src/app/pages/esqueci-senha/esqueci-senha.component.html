@@ -1,0 +1,99 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login"></ion-back-button>
+    </ion-buttons>
+    <ion-title>PreçoLeite</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="conta-content">
+
+  <div class="hero-section">
+    <div class="hero-icon">
+      <ion-icon name="lock-open-outline"></ion-icon>
+    </div>
+    <h1 class="hero-title">Esqueci minha senha</h1>
+    <p class="hero-subtitle">Enviaremos um link para redefinir sua senha</p>
+  </div>
+
+  <div class="form-card">
+
+    <!-- Sucesso -->
+    @if (enviado) {
+      <div class="alert-success" style="margin-bottom: 24px;">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <span>E-mail enviado! Verifique sua caixa de entrada.</span>
+      </div>
+
+      <ion-button
+        fill="clear"
+        expand="full"
+        class="link-btn"
+        (click)="irParaLogin()">
+        Voltar para o login
+      </ion-button>
+    }
+
+    <!-- Formulário -->
+    @if (!enviado) {
+
+      <div class="section-label">
+        <ion-icon name="mail-outline"></ion-icon>
+        Seu e-mail cadastrado
+      </div>
+
+      <div class="card-group">
+        <ion-item lines="none" class="custom-item">
+          <ion-icon name="mail-outline" slot="start" class="field-icon"></ion-icon>
+          <div class="field-wrap">
+            <ion-label class="field-label">E-mail</ion-label>
+            <ion-input
+              [(ngModel)]="email"
+              type="email"
+              placeholder="seu@email.com"
+              clearInput
+              class="custom-input">
+            </ion-input>
+          </div>
+        </ion-item>
+      </div>
+
+      <!-- Erro -->
+      @if (erro) {
+        <div class="alert-danger">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ erro }}</span>
+        </div>
+      }
+
+      <ion-button
+        color="primary"
+        expand="full"
+        class="save-btn"
+        (click)="enviarEmail()"
+        [disabled]="!email || carregando">
+        @if (carregando) {
+          <ion-spinner name="crescent" slot="start"></ion-spinner>
+          Enviando...
+        } @else {
+          <ion-icon name="send-outline" slot="start"></ion-icon>
+          Enviar link de recuperação
+        }
+      </ion-button>
+
+      <ion-button
+        fill="clear"
+        expand="full"
+        class="link-btn"
+        (click)="irParaLogin()">
+        Voltar para o login
+      </ion-button>
+
+    }
+
+  </div>
+
+  <div style="height: 40px;"></div>
+
+</ion-content>

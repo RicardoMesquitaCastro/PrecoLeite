@@ -137,4 +137,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   irParaCadastro() {
     this.router.navigate(['/cadastro-conta']);
   }
+  irParaEsqueciSenha() {
+  this.router.navigate(['/esqueci-senha']);
+}
 }

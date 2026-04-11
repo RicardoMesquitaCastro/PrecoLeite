@@ -7,14 +7,14 @@ import { parametrosGuard } from './services/parametros.guard';
 const routes: Routes = [
   {
     path: 'home',
-    loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule),
-     canActivate: [authGuard]
+    loadChildren: () => import('./pages/home/home.module').then(m => m.HomePageModule),
+    canActivate: [authGuard]
   },
-   {
+  {
     path: 'login',
     loadComponent: () => import('./pages/login/login.component').then((m) => m.LoginComponent),
   },
-   {
+  {
     path: 'cadastro-conta',
     loadComponent: () => import('./pages/cadastro-conta/cadastro-conta.component').then((m) => m.CadastroContaComponent),
   },
@@ -37,17 +37,19 @@ const routes: Routes = [
     canActivate: [authGuard, propriedadeGuard, parametrosGuard], // 🔒 logado + propriedade + parâmetros
   },
   {
-  path: 'meus-dados',
-  loadComponent: () => import('./pages/meus-dados/meus-dados.component')
-    .then(m => m.MeusDadosComponent)
-},
-{
+    path: 'meus-dados',
+    loadComponent: () => import('./pages/meus-dados/meus-dados.component')
+      .then(m => m.MeusDadosComponent)
+  },
+  {
     path: 'detalhe-estatistica',
     loadComponent: () =>
       import('./pages/detalhe-estatistica/detalhe-estatistica.component').then(
         m => m.DetalheEstatisticaPage
       ),
   },
+  { path: 'esqueci-senha', loadComponent: () => import('./pages/esqueci-senha/esqueci-senha.component').then(m => m.EsqueciSenhaComponent) },
+  { path: 'redefinir-senha/:token', loadComponent: () => import('./pages/redefinir-senha/redefinir-senha.component').then(m => m.RedefinirSenhaComponent) },
   {
     path: '',
     redirectTo: 'home',
