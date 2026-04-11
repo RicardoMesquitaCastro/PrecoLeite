@@ -10,30 +10,49 @@
     </ion-header>
 
     <ion-content>
-      <ion-list>
+
+      <!-- Perfil do usuário logado -->
+      @if (isLogado) {
+        <div class="menu-profile">
+          @if (userPicture) {
+            <img [src]="userPicture" class="menu-avatar" referrerpolicy="no-referrer" />
+          } @else {
+            <div class="menu-avatar-placeholder">
+              <ion-icon name="person-outline"></ion-icon>
+            </div>
+          }
+          <div class="menu-user-info">
+            <span class="menu-user-name">{{ userName }}</span>
+            <span class="menu-user-role">{{ isAdmin ? 'Administrador' : isProdutor ? 'Produtor' : 'Visitante' }}</span>
+          </div>
+        </div>
+        <div class="menu-divider"></div>
+      }
+
+      <ion-list lines="none">
 
         <!-- Sempre visível -->
-        <ion-item routerLink="/home" routerDirection="root" lines="none" detail="false" (click)="fecharMenu()">
+        <ion-item routerLink="/home" routerDirection="root" detail="false" (click)="fecharMenu()">
           <ion-icon name="home-outline" slot="start"></ion-icon>
           Início
         </ion-item>
 
         <!-- Logado: visível para todos -->
         @if (isLogado) {
-          <ion-item routerLink="/data-parametros" routerDirection="forward" lines="none" detail="false" (click)="fecharMenu()">
+          <ion-item routerLink="/data-parametros" routerDirection="forward" detail="false" (click)="fecharMenu()">
             <ion-icon name="stats-chart-outline" slot="start"></ion-icon>
             Estatísticas
           </ion-item>
         }
 
-        <!-- Logado: visível apenas para produtor -->
+        <!-- Logado: visível apenas para produtor/admin -->
         @if (isLogado && isProdutor || isAdmin) {
-          <ion-item routerLink="/meus-dados" routerDirection="forward" lines="none" detail="false" (click)="fecharMenu()">
+          <ion-item routerLink="/meus-dados" routerDirection="forward" detail="false" (click)="fecharMenu()">
             <ion-icon name="person-circle-outline" slot="start"></ion-icon>
             Meus Dados
           </ion-item>
 
-          <ion-item routerLink="/cadastro-parametros" routerDirection="forward" lines="none" detail="false" (click)="fecharMenu()">
+          <ion-item routerLink="/cadastro-parametros" routerDirection="forward" detail="false" (click)="fecharMenu()">
             <ion-icon name="document-text-outline" slot="start"></ion-icon>
             Cadastrar Parâmetros
           </ion-item>
@@ -41,7 +60,7 @@
 
         <!-- Logado: sair -->
         @if (isLogado) {
-          <ion-item lines="none" detail="false" (click)="sair()">
+          <ion-item detail="false" (click)="sair()" class="menu-sair">
             <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
             <ion-label color="danger">Sair</ion-label>
           </ion-item>
@@ -49,12 +68,12 @@
 
         <!-- Não logado -->
         @if (!isLogado) {
-          <ion-item routerLink="/login" routerDirection="root" lines="none" detail="false" (click)="fecharMenu()">
+          <ion-item routerLink="/login" routerDirection="root" detail="false" (click)="fecharMenu()">
             <ion-icon name="log-in-outline" slot="start"></ion-icon>
             Login
           </ion-item>
 
-          <ion-item routerLink="/cadastro-conta" routerDirection="forward" lines="none" detail="false" (click)="fecharMenu()">
+          <ion-item routerLink="/cadastro-conta" routerDirection="forward" detail="false" (click)="fecharMenu()">
             <ion-icon name="person-add-outline" slot="start"></ion-icon>
             Criar Conta
           </ion-item>

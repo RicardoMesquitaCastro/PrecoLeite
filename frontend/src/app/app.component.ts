@@ -7,12 +7,15 @@ import { filter } from 'rxjs';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
+  styleUrls: ['./app.component.scss'],
   standalone: false,
 })
 export class AppComponent implements OnInit {
   isLogado   = false;
   isProdutor = false;
-  isAdmin = false
+  isAdmin    = false;
+  userName   = '';
+  userPicture = '';
 
   constructor(
     private authService: AuthService,
@@ -29,9 +32,13 @@ export class AppComponent implements OnInit {
   }
 
   private atualizarEstado() {
-    this.isLogado   = this.authService.isAuthenticated();
-    this.isProdutor = this.authService.isProdutor();
-     this.isAdmin = this.authService.isAdmin();
+    this.isLogado    = this.authService.isAuthenticated();
+    this.isProdutor  = this.authService.isProdutor();
+    this.isAdmin     = this.authService.isAdmin();
+
+    const user = this.authService.getUser();
+    this.userName    = user?.name || '';
+    this.userPicture = user?.picture || '';
   }
 
   fecharMenu() {
