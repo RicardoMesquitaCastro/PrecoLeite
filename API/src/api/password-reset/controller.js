@@ -27,7 +27,7 @@ export const create = ({ bodymen: { body: { email, link } } }, res, next) =>
     <p style="color: #9ca3af; font-size: 12px; text-align: center;">PreçoLeite · Monitoramento do mercado de leite</p>
   </div>
 `
-      return sendMail({ toEmail: email, subject: 'API - Password Reset', content })
+      return sendMail({ toEmail: email, subject: 'PreçoLeite - Redefinição de senha', content })
     })
     .then(([response]) => response ? res.status(response.statusCode).end() : null)
     .catch(next)
