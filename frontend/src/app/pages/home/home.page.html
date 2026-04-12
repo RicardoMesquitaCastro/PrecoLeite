@@ -17,9 +17,8 @@
     </div>
     <p class="page-subtitle">Cotações e indicadores do mercado de leite</p>
   </div>
-
   <!-- ── Widget CEPEA ── -->
-  <div class="section-label">
+  <div class="section-label" style="margin-top: 20px;">
     <ion-icon name="newspaper-outline"></ion-icon>
     Cotação Atual Brasil — CEPEA/ESALQ
   </div>
@@ -29,41 +28,89 @@
       <iframe
         srcdoc='
           <html>
-              <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                  body {
-                    margin: 16px;
-                    background: #1e1e1e;
-                    font-family: Arial, sans-serif;
-                  }
-                  table.imagenet-widget-tabela {
-                    background: #1e1e1e;
-                    color: #b9fbc0;
-                    border-radius: 16px;
-                    border-collapse: collapse;
-                    box-shadow: 0 0 20px rgba(0,255,128,0.2);
-                    margin: 0 auto;
-                    font-size: 20px;
-                    width: 100%;
-                  }
-                  th, td {
-                    padding: 8px 12px;
-                  }
-                </style>
-              </head>
-              <body>
-                <script type="text/javascript"
-                  src="https://www.cepea.org.br/br/widgetproduto.js.php?fonte=arial&tamanho=10&largura=100%25&corfundo=1e1e1e&cortexto=b9fbc0&corlinha=00ff80&id_indicador[]=leitep">
-                </script>
-              </body>
-            </html>
+            <head>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body { margin: 16px; background: #1e1e1e; font-family: Arial, sans-serif; }
+                table.imagenet-widget-tabela {
+                  background: #1e1e1e; color: #b9fbc0; border-radius: 16px;
+                  border-collapse: collapse; box-shadow: 0 0 20px rgba(0,255,128,0.2);
+                  margin: 0 auto; font-size: 20px; width: 100%;
+                }
+                th, td { padding: 8px 12px; }
+              </style>
+            </head>
+            <body>
+              <script type="text/javascript"
+                src="https://www.cepea.org.br/br/widgetproduto.js.php?fonte=arial&tamanho=10&largura=100%25&corfundo=1e1e1e&cortexto=b9fbc0&corlinha=00ff80&id_indicador[]=leitep">
+              </script>
+            </body>
+          </html>
         '
-        style="width:100%; height:180px; border:none; background:transparent; "
+        style="width:100%; height:180px; border:none; background:transparent;"
         sandbox="allow-scripts">
       </iframe>
     </div>
   </div>
+
+    <!-- ── Cards de Indicadores ── -->
+  <!-- @if (precoAtual !== null) {
+    <div class="section-label">
+      <ion-icon name="pulse-outline"></ion-icon>
+      Indicadores do Período
+    </div>
+
+    <div class="indicators-grid">
+
+
+      <div class="indicator-card accent">
+        <div class="indicator-top">
+          <span class="indicator-label">Preço Atual</span>
+          <ion-icon
+            [name]="tendencia === 'alta' ? 'trending-up-outline' : tendencia === 'baixa' ? 'trending-down-outline' : 'remove-outline'"
+            [class]="'trend-icon ' + tendencia">
+          </ion-icon>
+        </div>
+        <span class="indicator-value">R$ {{ precoAtual | number:'1.4-4' }}</span>
+        @if (variacaoPercent !== null) {
+          <span class="indicator-sub" [class.positivo]="variacaoPercent >= 0" [class.negativo]="variacaoPercent < 0">
+            {{ variacaoPercent >= 0 ? '+' : '' }}{{ variacaoPercent | number:'1.2-2' }}% vs mês anterior
+          </span>
+        }
+      </div>
+
+
+      <div class="indicator-card">
+        <div class="indicator-top">
+          <span class="indicator-label">Média</span>
+          <ion-icon name="analytics-outline" class="indicator-icon"></ion-icon>
+        </div>
+        <span class="indicator-value">R$ {{ precoMedio | number:'1.4-4' }}</span>
+        <span class="indicator-sub neutral">{{ mesInicio }} a {{ mesFim }}</span>
+      </div>
+
+
+      <div class="indicator-card">
+        <div class="indicator-top">
+          <span class="indicator-label">Máximo</span>
+          <ion-icon name="arrow-up-circle-outline" class="indicator-icon positivo"></ion-icon>
+        </div>
+        <span class="indicator-value">R$ {{ precoMaximo | number:'1.4-4' }}</span>
+        <span class="indicator-sub neutral">{{ mesInicio }} a {{ mesFim }}</span>
+      </div>
+
+
+      <div class="indicator-card">
+        <div class="indicator-top">
+          <span class="indicator-label">Mínimo</span>
+          <ion-icon name="arrow-down-circle-outline" class="indicator-icon negativo"></ion-icon>
+        </div>
+        <span class="indicator-value">R$ {{ precoMinimo | number:'1.4-4' }}</span>
+       <span class="indicator-sub neutral">{{ mesInicio }} a {{ mesFim }}</span>
+      </div>
+
+    </div>
+  } -->
 
   <!-- ── Gráfico ── -->
   <div class="section-label" style="margin-top: 20px;">
@@ -75,6 +122,38 @@
     <canvas id="cotacoesChart" style="width:100%; height:240px;"></canvas>
   </div>
 
+  <!-- ── Variação do período ── -->
+  @if (cotacoes.length >= 2) {
+    <div class="section-label" style="margin-top: 20px;">
+      <ion-icon name="swap-vertical-outline"></ion-icon>
+      Variação Mês a Mês em Goiás
+    </div>
+
+    <div class="data-card">
+      @for (c of cotacoes; track c.mes; let i = $index) {
+        @if (i > 0) {
+          <div class="variacao-row">
+            <div class="variacao-mes">
+              <ion-icon name="calendar-outline" class="row-icon"></ion-icon>
+              <span>{{ c.mes }}</span>
+            </div>
+            <div class="variacao-valor">
+              <span class="data-value">R$ {{ c.preco | number:'1.4-4' }}</span>
+              @if (cotacoes[i-1].preco) {
+                <span class="variacao-badge"
+                  [class.positivo]="c.preco >= cotacoes[i-1].preco"
+                  [class.negativo]="c.preco < cotacoes[i-1].preco">
+                  <ion-icon [name]="c.preco >= cotacoes[i-1].preco ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
+                  {{ (((c.preco - cotacoes[i-1].preco) / cotacoes[i-1].preco) * 100) | number:'1.2-2' }}%
+                </span>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+
   <!-- ── Admin: Gerenciar Cotações ── -->
   @if (isAdmin) {
     <div class="section-label" style="margin-top: 20px;">
@@ -83,19 +162,12 @@
     </div>
 
     <div class="data-card">
-
-      <!-- Formulário -->
       <div class="admin-form">
         <ion-item lines="none" class="custom-item">
           <ion-icon name="calendar-outline" slot="start" class="field-icon"></ion-icon>
           <div class="field-wrap">
             <ion-label class="field-label">Mês</ion-label>
-            <ion-input
-              [(ngModel)]="novoMes"
-              placeholder="Ex: Jan/2025"
-              clearInput
-              class="custom-input">
-            </ion-input>
+            <ion-input [(ngModel)]="novoMes" placeholder="Ex: Jan/2025" clearInput class="custom-input"></ion-input>
           </div>
         </ion-item>
 
@@ -105,18 +177,11 @@
           <ion-icon name="pricetag-outline" slot="start" class="field-icon"></ion-icon>
           <div class="field-wrap">
             <ion-label class="field-label">Preço (R$/L)</ion-label>
-            <ion-input
-              [(ngModel)]="novoPreco"
-              type="number"
-              placeholder="Ex: 2.34"
-              clearInput
-              class="custom-input">
-            </ion-input>
+            <ion-input [(ngModel)]="novoPreco" type="number" placeholder="Ex: 2.34" clearInput class="custom-input"></ion-input>
           </div>
         </ion-item>
       </div>
 
-      <!-- Feedback -->
       @if (mensagem) {
         <div class="alert-msg" [class.success]="mensagem.includes('sucesso')" [class.danger]="!mensagem.includes('sucesso')">
           <ion-icon [name]="mensagem.includes('sucesso') ? 'checkmark-circle-outline' : 'alert-circle-outline'"></ion-icon>
@@ -124,18 +189,12 @@
         </div>
       }
 
-      <ion-button
-        expand="block"
-        color="primary"
-        class="add-btn"
-        (click)="adicionarCotacao()"
-        [disabled]="!novoMes || !novoPreco">
+      <ion-button expand="block" color="primary" class="add-btn" (click)="adicionarCotacao()" [disabled]="!novoMes || !novoPreco">
         <ion-icon name="add-circle-outline" slot="start"></ion-icon>
         Adicionar Cotação
       </ion-button>
     </div>
 
-    <!-- Lista de cotações -->
     @if (cotacoes.length > 0) {
       <div class="section-label" style="margin-top: 16px;">
         <ion-icon name="list-outline"></ion-icon>

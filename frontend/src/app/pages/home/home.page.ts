@@ -20,9 +20,19 @@ export class HomePage implements OnInit, AfterViewInit {
   isAdmin = false;
   cotacoes: any[] = [];
   novoMes = '';
+  mesInicio = '';
+  mesFim = '';
   novoPreco: number | null = null;
   mensagem = '';
   grafico: Chart | null = null;
+
+  // ── Indicadores ──────────────────────────────────────
+  precoAtual: number | null = null;
+  precoMaximo: number | null = null;
+  precoMinimo: number | null = null;
+  precoMedio: number | null = null;
+  variacaoPercent: number | null = null;
+  tendencia: 'alta' | 'baixa' | 'estavel' = 'estavel';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -47,6 +57,7 @@ export class HomePage implements OnInit, AfterViewInit {
     this.http.get<any[]>(`${environment.apiUrl}/cotacoes`).subscribe({
       next: (dados) => {
         this.cotacoes = dados;
+        this.calcularIndicadores(dados);
         this.renderizarGrafico(dados);
       },
       error: () => {
@@ -57,10 +68,45 @@ export class HomePage implements OnInit, AfterViewInit {
           { mes: 'Dez', preco: 1.88 },
           { mes: 'Jan', preco: 2.02 },
         ];
+        this.calcularIndicadores(fallback);
         this.renderizarGrafico(fallback);
       }
     });
   }
+
+ calcularIndicadores(dados: any[]) {
+  if (!dados.length) return;
+
+  const precos = dados.map(d => d.preco);
+  const hoje = new Date();
+  const diaAtual = hoje.getDate();
+
+  // Antes do dia 25: mês atual ainda não consolidado
+  // Usa os 2 últimos meses disponíveis na base
+  const idxFim = diaAtual < 25 ? dados.length - 2 : dados.length - 1;
+  const idxInicio = Math.max(0, idxFim - 1);
+
+  const dadoAtual   = dados[idxFim];
+  const dadoAnterior = dados[idxInicio];
+
+  this.precoAtual  = dadoAtual?.preco ?? null;
+  this.mesInicio   = dadoAnterior?.mes || '';
+  this.mesFim      = dadoAtual?.mes || '';
+
+  // Indicadores do intervalo visível
+  const precosVisiveis = dados.slice(0, idxFim + 1).map(d => d.preco);
+  this.precoMaximo = Math.max(...precosVisiveis);
+  this.precoMinimo = Math.min(...precosVisiveis);
+  this.precoMedio  = precosVisiveis.reduce((a, b) => a + b, 0) / precosVisiveis.length;
+
+  // Variação entre os dois meses de referência
+  if (dadoAnterior?.preco) {
+    this.variacaoPercent = (((this.precoAtual ?? 0) - dadoAnterior.preco) / dadoAnterior.preco) * 100;
+    this.tendencia = this.variacaoPercent > 0.5 ? 'alta'
+                   : this.variacaoPercent < -0.5 ? 'baixa'
+                   : 'estavel';
+  }
+}
 
   renderizarGrafico(dados: any[]) {
     if (this.grafico) {
