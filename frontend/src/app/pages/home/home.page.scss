@@ -53,6 +53,40 @@
   }
 }
 
+// ── Alerta cadastro pendente ──────────────────────────
+.alerta-cadastro {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 180, 0, 0.12);
+  border: 1px solid rgba(255, 180, 0, 0.4);
+  border-radius: 12px;
+  margin: 12px 16px;
+  padding: 14px;
+
+  .alerta-icon {
+    font-size: 28px;
+    color: #f59e0b;
+    flex-shrink: 0;
+  }
+
+  .alerta-texto {
+    flex: 1;
+
+    strong {
+      font-size: 14px;
+      color: #f59e0b;
+      display: block;
+    }
+
+    p {
+      font-size: 12px;
+      margin: 2px 0 0;
+      color: var(--ion-color-medium);
+    }
+  }
+}
+
 // ── Grid de Indicadores ──────────────────────────────
 .indicators-grid {
   display: grid;
@@ -112,8 +146,8 @@
 .trend-icon {
   font-size: 20px;
 
-  &.alta   { color: #86efac; }
-  &.baixa  { color: #fca5a5; }
+  &.alta    { color: #86efac; }
+  &.baixa   { color: #fca5a5; }
   &.estavel { color: rgba(255,255,255,0.6); }
 }
 
@@ -298,8 +332,13 @@
 @media (prefers-color-scheme: dark) {
   .home-content { --background: #121212; }
 
-  .page-title   { color: #f0f0f0; }
+  .page-title    { color: #f0f0f0; }
   .page-subtitle { color: #6b7280; }
+
+  .alerta-cadastro {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.3);
+  }
 
   .indicator-card {
     background: #1e1e1e;

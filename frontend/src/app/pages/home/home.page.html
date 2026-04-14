@@ -9,6 +9,20 @@
 
 <ion-content class="home-content">
 
+  <!-- ── Alerta cadastro pendente ── -->
+  @if (mostrarAlertaCadastro) {
+    <div class="alerta-cadastro">
+      <ion-icon name="warning-outline" class="alerta-icon"></ion-icon>
+      <div class="alerta-texto">
+        <strong>Cadastro pendente!</strong>
+        <p>Você ainda não registrou os parâmetros deste mês. Cadastre antes do fim do dia.</p>
+      </div>
+      <ion-button fill="solid" size="small" color="warning" routerLink="/cadastro-parametros">
+        Cadastrar
+      </ion-button>
+    </div>
+  }
+
   <!-- ── Cabeçalho ── -->
   <div class="page-header">
     <div class="page-title-row">
@@ -17,6 +31,7 @@
     </div>
     <p class="page-subtitle">Cotações e indicadores do mercado de leite</p>
   </div>
+
   <!-- ── Widget CEPEA ── -->
   <div class="section-label" style="margin-top: 20px;">
     <ion-icon name="newspaper-outline"></ion-icon>
@@ -52,65 +67,6 @@
       </iframe>
     </div>
   </div>
-
-    <!-- ── Cards de Indicadores ── -->
-  <!-- @if (precoAtual !== null) {
-    <div class="section-label">
-      <ion-icon name="pulse-outline"></ion-icon>
-      Indicadores do Período
-    </div>
-
-    <div class="indicators-grid">
-
-
-      <div class="indicator-card accent">
-        <div class="indicator-top">
-          <span class="indicator-label">Preço Atual</span>
-          <ion-icon
-            [name]="tendencia === 'alta' ? 'trending-up-outline' : tendencia === 'baixa' ? 'trending-down-outline' : 'remove-outline'"
-            [class]="'trend-icon ' + tendencia">
-          </ion-icon>
-        </div>
-        <span class="indicator-value">R$ {{ precoAtual | number:'1.4-4' }}</span>
-        @if (variacaoPercent !== null) {
-          <span class="indicator-sub" [class.positivo]="variacaoPercent >= 0" [class.negativo]="variacaoPercent < 0">
-            {{ variacaoPercent >= 0 ? '+' : '' }}{{ variacaoPercent | number:'1.2-2' }}% vs mês anterior
-          </span>
-        }
-      </div>
-
-
-      <div class="indicator-card">
-        <div class="indicator-top">
-          <span class="indicator-label">Média</span>
-          <ion-icon name="analytics-outline" class="indicator-icon"></ion-icon>
-        </div>
-        <span class="indicator-value">R$ {{ precoMedio | number:'1.4-4' }}</span>
-        <span class="indicator-sub neutral">{{ mesInicio }} a {{ mesFim }}</span>
-      </div>
-
-
-      <div class="indicator-card">
-        <div class="indicator-top">
-          <span class="indicator-label">Máximo</span>
-          <ion-icon name="arrow-up-circle-outline" class="indicator-icon positivo"></ion-icon>
-        </div>
-        <span class="indicator-value">R$ {{ precoMaximo | number:'1.4-4' }}</span>
-        <span class="indicator-sub neutral">{{ mesInicio }} a {{ mesFim }}</span>
-      </div>
-
-
-      <div class="indicator-card">
-        <div class="indicator-top">
-          <span class="indicator-label">Mínimo</span>
-          <ion-icon name="arrow-down-circle-outline" class="indicator-icon negativo"></ion-icon>
-        </div>
-        <span class="indicator-value">R$ {{ precoMinimo | number:'1.4-4' }}</span>
-       <span class="indicator-sub neutral">{{ mesInicio }} a {{ mesFim }}</span>
-      </div>
-
-    </div>
-  } -->
 
   <!-- ── Gráfico ── -->
   <div class="section-label" style="margin-top: 20px;">

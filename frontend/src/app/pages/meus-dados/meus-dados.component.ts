@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
@@ -22,13 +22,14 @@ export class MeusDadosComponent implements OnInit {
 
   // Seletores
   anoSelecionado: number = new Date().getFullYear();
-  mesSelecionado: number | null = null;
+  mesSelecionado: number = -1; // -1 = Todos
 
   anosDisponiveis: number[] = [];
   mesesComRegistro: { valor: number; nome: string }[] = [];
 
+  // Mês 0 = Janeiro, 1 = Fevereiro ... 11 = Dezembro
   private mesesNomes = [
-    '', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
 
@@ -44,7 +45,6 @@ export class MeusDadosComponent implements OnInit {
   @ViewChild('graficoParametros') graficoRef!: ElementRef<HTMLCanvasElement>;
   private grafico: Chart | null = null;
 
-  // ── Tabs do gráfico ──────────────────────────────────
   chartTabs: { key: string; label: string; unidade: string; cor: string; campo: keyof MeuParametro }[] = [
     { key: 'precoLeite',     label: 'Preço',    unidade: 'R$/L',   cor: '#0B5A68', campo: 'precoLeite'     },
     { key: 'producaoLitros', label: 'Produção', unidade: 'Litros', cor: '#FF7400', campo: 'producaoLitros' },
@@ -83,12 +83,10 @@ export class MeusDadosComponent implements OnInit {
   }
 
   private inicializarFiltros(parametros: MeuParametro[]): void {
-    // Anos disponíveis
     const anos = [...new Set(parametros.map(p => new Date(p.createdAt).getFullYear()))]
       .sort((a, b) => a - b);
     this.anosDisponiveis = anos;
 
-    // Se o ano atual não tiver registros, usa o mais recente disponível
     if (!anos.includes(this.anoSelecionado) && anos.length > 0) {
       this.anoSelecionado = anos[anos.length - 1];
     }
@@ -96,23 +94,45 @@ export class MeusDadosComponent implements OnInit {
     this.atualizarMeses();
   }
 
-  /** Recalcula meses disponíveis para o ano selecionado e define o último */
-  /** Monta o gráfico de linha para o parâmetro da tab ativa, agrupado por mês */
+  atualizarMeses(): void {
+    if (!this.dados) return;
+
+    const parametrosDoAno = this.dados.parametros.filter(
+      p => new Date(p.createdAt).getFullYear() === this.anoSelecionado
+    );
+
+    const mesesUnicos = [...new Set(parametrosDoAno.map(p => Number(p.mesReferencia)))]
+      .sort((a, b) => a - b);
+
+    // Sempre começa com "Todos" (-1)
+    this.mesesComRegistro = [
+      { valor: -1, nome: 'Todos' },
+      ...mesesUnicos.map(m => ({
+        valor: m,
+        nome: this.mesesNomes[m] ?? `Mês ${m + 1}`
+      }))
+    ];
+
+    // Seleciona "Todos" por padrão ao trocar de ano
+    this.mesSelecionado = -1;
+
+    setTimeout(() => this.montarGrafico());
+  }
+
   montarGrafico(): void {
     if (!this.graficoRef?.nativeElement || !this.dados) return;
 
     const tab = this.tabAtual;
     if (!tab) return;
 
-    // Agrupa por mês: para cada mês pega a média do campo selecionado
     const parametrosDoAno = this.dados.parametros.filter(
       p => new Date(p.createdAt).getFullYear() === this.anoSelecionado
     );
 
-    // Todos os meses presentes no ano
-    const mesesUnicos = [...new Set(parametrosDoAno.map(p => Number(p.mesReferencia)))].sort((a, b) => a - b);
+    const mesesUnicos = [...new Set(parametrosDoAno.map(p => Number(p.mesReferencia)))]
+      .sort((a, b) => a - b);
 
-    const labels = mesesUnicos.map(m => this.mesesNomes[m] ?? `Mês ${m}`);
+    const labels = mesesUnicos.map(m => this.mesesNomes[m] ?? `Mês ${m + 1}`);
 
     const data = mesesUnicos.map(mes => {
       const registros = parametrosDoAno.filter(p => Number(p.mesReferencia) === mes);
@@ -150,50 +170,24 @@ export class MeusDadosComponent implements OnInit {
           }
         },
         scales: {
-          x: {
-            ticks: { autoSkip: false, font: { size: 11 } },
-            grid: { color: 'rgba(0,0,0,0.05)' }
-          },
-          y: {
-            beginAtZero: false,
-            ticks: { font: { size: 11 } },
-            grid: { color: 'rgba(0,0,0,0.05)' }
-          }
+          x: { ticks: { autoSkip: false, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+          y: { beginAtZero: false, ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
         }
       }
     });
   }
 
-  atualizarMeses(): void {
-    if (!this.dados) return;
-
-    const parametrosDoAno = this.dados.parametros.filter(
-      p => new Date(p.createdAt).getFullYear() === this.anoSelecionado
-    );
-
-    const mesesUnicos = [...new Set(parametrosDoAno.map(p => Number(p.mesReferencia)))]
-      .sort((a, b) => a - b);
-
-    this.mesesComRegistro = mesesUnicos.map(m => ({
-      valor: m,
-      nome: this.mesesNomes[m] ?? `Mês ${m}`
-    }));
-
-    // Seleciona o último mês do ano escolhido
-    this.mesSelecionado = mesesUnicos.length > 0
-      ? mesesUnicos[mesesUnicos.length - 1]
-      : null;
-
-    setTimeout(() => this.montarGrafico());
-  }
-
-  /** Registros filtrados por ano + mês */
   get parametrosFiltrados(): MeuParametro[] {
     if (!this.dados) return [];
 
     return this.dados.parametros.filter(p => {
       const anoParam = new Date(p.createdAt).getFullYear();
       const mesParam = Number(p.mesReferencia);
+
+      // -1 = Todos os meses do ano
+      if (this.mesSelecionado === -1) {
+        return anoParam === this.anoSelecionado;
+      }
       return anoParam === this.anoSelecionado && mesParam === this.mesSelecionado;
     });
   }

@@ -15,7 +15,7 @@
       <ion-icon name="person-circle-outline" class="page-icon"></ion-icon>
       <h2 class="page-title">Meus Dados</h2>
     </div>
-    <p class="page-subtitle"> Registros de Produção</p>
+    <p class="page-subtitle">Registros de Produção</p>
   </div>
 
   <!-- ── Carregando ── -->
@@ -36,6 +36,7 @@
 
   <!-- ── Conteúdo ── -->
   @if (!carregando && !erro && dados) {
+
     <!-- ── Propriedades ── -->
     <div class="section-label">
       <ion-icon name="home-outline"></ion-icon>
@@ -76,7 +77,6 @@
 
       <!-- Seletores de ano + mês -->
       <div class="data-card filtro-card">
-
         <div class="filtro-row">
 
           <!-- Ano -->
@@ -158,7 +158,13 @@
       } @else {
         <div class="empty-state">
           <ion-icon name="calendar-outline"></ion-icon>
-          <p>Nenhum registro para {{ nomeMes(mesSelecionado!) }} de {{ anoSelecionado }}.</p>
+          <p>
+            @if (mesSelecionado === -1) {
+              Nenhum registro para {{ anoSelecionado }}.
+            } @else {
+              Nenhum registro para {{ nomeMes(mesSelecionado) }} de {{ anoSelecionado }}.
+            }
+          </p>
         </div>
       }
 
@@ -169,7 +175,6 @@
       </div>
 
       <div class="data-card chart-tabs-card">
-        <!-- Tabs de parâmetro -->
         <div class="chart-tabs">
           @for (tab of chartTabs; track tab.key) {
             <button

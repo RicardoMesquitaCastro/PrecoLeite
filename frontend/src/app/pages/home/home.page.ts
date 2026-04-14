@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Chart, registerables } from 'chart.js';
 import { AuthService } from 'src/app/services/auth.service';
+import { CadastroParametrosService } from 'src/app/services/cadastro-parametros.service';
 import { environment } from 'src/environments/environment.prod';
 
 Chart.register(...registerables);
@@ -34,11 +35,19 @@ export class HomePage implements OnInit, AfterViewInit {
   variacaoPercent: number | null = null;
   tendencia: 'alta' | 'baixa' | 'estavel' = 'estavel';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  // ── Alerta cadastro pendente ──────────────────────────
+  mostrarAlertaCadastro = false;
+
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private cadastroParametrosService: CadastroParametrosService,
+  ) {}
 
   ngOnInit() {
     this.isAdmin = this.authService.isAdmin();
     this.carregarCotacoes();
+    this.verificarCadastroPendente();
   }
 
   ngAfterViewInit(): void {
@@ -52,6 +61,35 @@ export class HomePage implements OnInit, AfterViewInit {
       container.appendChild(script);
     }
   }
+
+ private verificarCadastroPendente() {
+  if (!this.authService.isProdutor()) {
+    this.mostrarAlertaCadastro = false;
+    return;
+  }
+
+  // const hoje = new Date();
+  // const ultimoDiaMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+  // if (hoje.getDate() !== ultimoDiaMes) {
+  //   this.mostrarAlertaCadastro = false;
+  //   return;
+  // }
+
+  const hoje = new Date();
+  const mesAtual = String(hoje.getMonth());
+  const anoAtual = hoje.getFullYear();
+
+  this.cadastroParametrosService.getMeus().subscribe({
+    next: ({ rows }) => {
+      const jaCadastrou = rows.some(d => {
+        const anoCadastro = new Date(d.createdAt!).getFullYear();
+        return d.mesReferencia === mesAtual && anoCadastro === anoAtual;
+      });
+      this.mostrarAlertaCadastro = !jaCadastrou;
+    },
+    error: () => { this.mostrarAlertaCadastro = false; }
+  });
+}
 
   carregarCotacoes() {
     this.http.get<any[]>(`${environment.apiUrl}/cotacoes`).subscribe({
@@ -74,39 +112,35 @@ export class HomePage implements OnInit, AfterViewInit {
     });
   }
 
- calcularIndicadores(dados: any[]) {
-  if (!dados.length) return;
+  calcularIndicadores(dados: any[]) {
+    if (!dados.length) return;
 
-  const precos = dados.map(d => d.preco);
-  const hoje = new Date();
-  const diaAtual = hoje.getDate();
+    const precos = dados.map(d => d.preco);
+    const hoje = new Date();
+    const diaAtual = hoje.getDate();
 
-  // Antes do dia 25: mês atual ainda não consolidado
-  // Usa os 2 últimos meses disponíveis na base
-  const idxFim = diaAtual < 25 ? dados.length - 2 : dados.length - 1;
-  const idxInicio = Math.max(0, idxFim - 1);
+    const idxFim = diaAtual < 25 ? dados.length - 2 : dados.length - 1;
+    const idxInicio = Math.max(0, idxFim - 1);
 
-  const dadoAtual   = dados[idxFim];
-  const dadoAnterior = dados[idxInicio];
+    const dadoAtual    = dados[idxFim];
+    const dadoAnterior = dados[idxInicio];
 
-  this.precoAtual  = dadoAtual?.preco ?? null;
-  this.mesInicio   = dadoAnterior?.mes || '';
-  this.mesFim      = dadoAtual?.mes || '';
+    this.precoAtual = dadoAtual?.preco ?? null;
+    this.mesInicio  = dadoAnterior?.mes || '';
+    this.mesFim     = dadoAtual?.mes || '';
 
-  // Indicadores do intervalo visível
-  const precosVisiveis = dados.slice(0, idxFim + 1).map(d => d.preco);
-  this.precoMaximo = Math.max(...precosVisiveis);
-  this.precoMinimo = Math.min(...precosVisiveis);
-  this.precoMedio  = precosVisiveis.reduce((a, b) => a + b, 0) / precosVisiveis.length;
+    const precosVisiveis = dados.slice(0, idxFim + 1).map(d => d.preco);
+    this.precoMaximo = Math.max(...precosVisiveis);
+    this.precoMinimo = Math.min(...precosVisiveis);
+    this.precoMedio  = precosVisiveis.reduce((a, b) => a + b, 0) / precosVisiveis.length;
 
-  // Variação entre os dois meses de referência
-  if (dadoAnterior?.preco) {
-    this.variacaoPercent = (((this.precoAtual ?? 0) - dadoAnterior.preco) / dadoAnterior.preco) * 100;
-    this.tendencia = this.variacaoPercent > 0.5 ? 'alta'
-                   : this.variacaoPercent < -0.5 ? 'baixa'
-                   : 'estavel';
+    if (dadoAnterior?.preco) {
+      this.variacaoPercent = (((this.precoAtual ?? 0) - dadoAnterior.preco) / dadoAnterior.preco) * 100;
+      this.tendencia = this.variacaoPercent > 0.5 ? 'alta'
+                     : this.variacaoPercent < -0.5 ? 'baixa'
+                     : 'estavel';
+    }
   }
-}
 
   renderizarGrafico(dados: any[]) {
     if (this.grafico) {

@@ -14,6 +14,7 @@ export interface CadastroParametros {
   cbt: number;
   gordura: number;
   proteina: number;
+  createdAt?: string;
 }
 
 @Injectable({

@@ -735,51 +735,43 @@ criarGrafico() {
   }
 
   get dadosPorMes() {
-    const mesAtual = new Date().getMonth(); // 0-11
+  const mesAtual = new Date().getMonth(); // 0-11
 
-    // Janela: 2 meses antes até 2 meses depois (circular), valores 0-11
-    const mesesVisiveis = new Set<number>();
-    for (let offset = -2; offset <= 2; offset++) {
-      mesesVisiveis.add((mesAtual + offset + 12) % 12);
-    }
+  const grupos: Record<number, any[]> = {};
+  this.dadosListFiltrados.forEach(item => {
+    if (!grupos[item.mesReferencia]) grupos[item.mesReferencia] = [];
+    grupos[item.mesReferencia].push(item);
+  });
 
-    const grupos: Record<number, any[]> = {};
-    this.dadosListFiltrados.forEach(item => {
-      if (!mesesVisiveis.has(item.mesReferencia)) return;
-      if (!grupos[item.mesReferencia]) grupos[item.mesReferencia] = [];
-      grupos[item.mesReferencia].push(item);
-    });
+  // Ordena pelos meses na ordem do ano (0-11)
+  return Object.keys(grupos)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .map(mes => {
+      const items = grupos[mes];
+      const porLaticinio: Record<string, { soma: number; count: number }> = {};
 
-    // Ordena pelos meses visíveis na ordem da janela
-    const ordemMeses = [-2, -1, 0, 1, 2].map(o => (mesAtual + o + 12) % 12);
-
-    return ordemMeses
-      .filter(mes => grupos[mes])
-      .map(mes => {
-        const items = grupos[mes];
-        const porLaticinio: Record<string, { soma: number; count: number }> = {};
-
-        items.forEach((item: any) => {
-          if (!porLaticinio[item.laticinio]) {
-            porLaticinio[item.laticinio] = { soma: 0, count: 0 };
-          }
-          porLaticinio[item.laticinio].soma += item.precoLitro;
-          porLaticinio[item.laticinio].count++;
-        });
-
-        const laticinios = Object.entries(porLaticinio).map(([laticinio, { soma, count }]) => ({
-          laticinio,
-          mediaPrecoDoLaticinio: soma / count
-        }));
-
-        return {
-          mes: this.obterNomeMes(mes + 1),
-          mesNumero: mes,
-          items: laticinios,
-          isAtual: mes === mesAtual
-        };
+      items.forEach((item: any) => {
+        if (!porLaticinio[item.laticinio]) {
+          porLaticinio[item.laticinio] = { soma: 0, count: 0 };
+        }
+        porLaticinio[item.laticinio].soma += item.precoLitro;
+        porLaticinio[item.laticinio].count++;
       });
-  }
+
+      const laticinios = Object.entries(porLaticinio).map(([laticinio, { soma, count }]) => ({
+        laticinio,
+        mediaPrecoDoLaticinio: soma / count
+      }));
+
+      return {
+        mes: this.obterNomeMes(mes + 1),
+        mesNumero: mes,
+        items: laticinios,
+        isAtual: mes === mesAtual
+      };
+    });
+}
 
   get mediaPrecoPorLaticinioMes(): Record<string, Record<number, number>> {
     const total: Record<string, Record<number, { soma: number; count: number }>> = {};
