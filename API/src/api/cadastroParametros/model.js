@@ -27,6 +27,15 @@ const cadastroParametrosSchema = new Schema({
   },
   proteina: {
     type: String
+  },
+  // ─── Campos adicionados para dados coletados pelo admin ───────────────────
+  municipio: {
+    type: String,
+    default: ''
+  },
+  regiao: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true,
@@ -39,7 +48,6 @@ const cadastroParametrosSchema = new Schema({
 cadastroParametrosSchema.methods = {
   view (full) {
     const view = {
-      // simple view
       id: this.id,
       contaId: this.contaId,
       laticinio: this.laticinio,
@@ -50,13 +58,14 @@ cadastroParametrosSchema.methods = {
       cbt: this.cbt,
       gordura: this.gordura,
       proteina: this.proteina,
+      municipio: this.municipio,
+      regiao: this.regiao,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
 
     return full ? {
       ...view
-      // add properties for a full view
     } : view
   }
 }
