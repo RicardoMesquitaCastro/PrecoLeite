@@ -4,11 +4,12 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
+import { AppHeaderComponent } from '../app-header/app-header.component';
 
 @Component({
   selector: 'app-cadastro-conta',
   templateUrl: './cadastro-conta.component.html',
-  imports: [IonicModule, FormsModule, CommonModule],
+  imports: [IonicModule, FormsModule, CommonModule, AppHeaderComponent],
   styleUrls: ['./cadastro-conta.component.scss'],
 })
 export class CadastroContaComponent implements OnInit {

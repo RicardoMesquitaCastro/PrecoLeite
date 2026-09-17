@@ -4,13 +4,14 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Chart, registerables } from 'chart.js';
 import { MeusDadosService, MeusDadosCadastrais, MeuParametro } from 'src/app/services/meus-dados.service';
+import { AppHeaderComponent } from '../app-header/app-header.component';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-meus-dados',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
+  imports: [IonicModule, CommonModule, FormsModule, AppHeaderComponent],
   templateUrl: './meus-dados.component.html',
   styleUrls: ['./meus-dados.component.scss']
 })

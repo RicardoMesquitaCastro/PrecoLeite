@@ -1,0 +1,18 @@
+  <!-- Modo: logo + botão de voltar à esquerda -->
+  <ion-header class="ion-no-border">
+    <div class="curved-header">
+      <div class="header-safe-area"></div>
+      <div class="brand-content">
+        <ion-buttons slot="start" class="back-btn">
+          <ion-back-button [defaultHref]="backHref" text=""></ion-back-button>
+        </ion-buttons>
+        <img src="/assets/icon/logo-precoleite.png" alt="PreçoLeite" class="brand-logo-img" />
+        @if (showMenuButton) {
+          <ion-buttons slot="end" class="menu-btn">
+            <ion-menu-button autoHide="false"></ion-menu-button>
+          </ion-buttons>
+        }
+      </div>
+    </div>
+  </ion-header>
+

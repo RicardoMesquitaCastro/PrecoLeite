@@ -8,13 +8,14 @@ import { FaixaValidaPipe } from './faixa-valida.pipe';
 import { DadosService, DadoLeite } from 'src/app/services/dados.service';
 import { Router } from '@angular/router';
 import { EstatisticasService } from 'src/app/services/estatisticas.service';
+import { AppHeaderComponent } from '../app-header/app-header.component';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-data-parametros',
   standalone: true,
-  imports: [IonicModule, FormsModule, CommonModule],
+  imports: [IonicModule, FormsModule, CommonModule, AppHeaderComponent],
   templateUrl: './data-parametros.component.html',
   styleUrls: ['./data-parametros.component.scss']
 })

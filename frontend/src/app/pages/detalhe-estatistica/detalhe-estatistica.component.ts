@@ -15,6 +15,7 @@ import {
   EstatisticasDetalhe,
   FiltroDetalhe,
 } from '../../services/estatisticas.service';
+import { AppHeaderComponent } from '../app-header/app-header.component';
 
 Chart.register(...registerables);
 
@@ -28,7 +29,7 @@ const CORES = ['#0B5A68','#FF7400','#E00809','#0078BD','#9966FF','#FF9F40','#10b
 @Component({
   selector: 'app-detalhe-estatistica',
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule,AppHeaderComponent ],
   templateUrl: './detalhe-estatistica.component.html',
   styleUrls: ['./detalhe-estatistica.component.scss'],
 })

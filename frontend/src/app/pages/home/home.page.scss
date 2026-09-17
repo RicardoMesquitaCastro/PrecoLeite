@@ -381,3 +381,40 @@
     &.danger  { background: #2d0a0a; color: #fca5a5; }
   }
 }
+
+.curved-header {
+  background: #2e7d32; // ajusta pro verde exato do seu app
+  border-bottom-left-radius: 28px;
+  border-bottom-right-radius: 28px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: visible; // permite a logo "vazar" sem cortar
+}
+
+.header-safe-area {
+  height: env(safe-area-inset-top);
+}
+
+.brand-content {
+  display: flex;
+  align-items: center;
+  justify-content: center; // centraliza a logo
+  position: relative;
+  padding: 14px 20px 22px;
+  overflow: visible;
+}
+
+.brand-logo-img {
+  height: 70px; // aumenta esse valor à vontade
+  width: auto;
+  object-fit: contain;
+  margin: -15px 0; // compensa o espaço extra sem empurrar o header
+}
+
+.menu-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  --color: #fff;
+}

@@ -6,11 +6,12 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { CadastroPropriedade, CadastroPropriedadeService } from 'src/app/services/cadastro-propriedade.service';
 import { firstValueFrom } from 'rxjs';
 import { IbgeService } from 'src/app/services/ibge.service';
+import { AppHeaderComponent } from '../app-header/app-header.component';
 
 @Component({
   selector: 'app-cadastro-propriedade',
   templateUrl: './cadastro-propriedade.component.html',
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [CommonModule, FormsModule, IonicModule, AppHeaderComponent],
   styleUrls: ['./cadastro-propriedade.component.scss'],
 })
 export class CadastroPropriedadeComponent implements OnInit {

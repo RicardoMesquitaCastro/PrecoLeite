@@ -9,11 +9,12 @@ import {
 } from 'src/app/services/cadastro-parametros.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { EstatisticasService } from 'src/app/services/estatisticas.service';
+import { AppHeaderComponent } from '../app-header/app-header.component';
 
 @Component({
   selector: 'app-cadastro-parametros',
   templateUrl: './cadastro-parametros.component.html',
-  imports: [IonicModule, FormsModule, CommonModule],
+  imports: [IonicModule, FormsModule, CommonModule, AppHeaderComponent],
   styleUrls: ['./cadastro-parametros.component.scss'],
 })
 export class CadastroParametrosComponent implements OnInit {
