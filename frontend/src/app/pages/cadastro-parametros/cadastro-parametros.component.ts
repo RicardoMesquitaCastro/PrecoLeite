@@ -8,6 +8,7 @@ import {
   CadastroParametros
 } from 'src/app/services/cadastro-parametros.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { EstatisticasService } from 'src/app/services/estatisticas.service';
 
 @Component({
   selector: 'app-cadastro-parametros',
@@ -26,6 +27,12 @@ export class CadastroParametrosComponent implements OnInit {
   gordura: string = '0.00';
   proteina: string = '0.00';
 
+  // ─── Campos exclusivos do admin ───────────────────────────────────────────
+  municipio: string = '';
+  regiao: string = '';
+
+  isAdmin = false;
+
   mesesJaCadastrados: string[] = [];
   mensagemMesDuplicado = '';
 
@@ -39,7 +46,7 @@ export class CadastroParametrosComponent implements OnInit {
     { nome: 'Julho',     valor: '6'  },
     { nome: 'Agosto',    valor: '7'  },
     { nome: 'Setembro',  valor: '8'  },
-    { nome: 'Outubro',   valor: '9' },
+    { nome: 'Outubro',   valor: '9'  },
     { nome: 'Novembro',  valor: '10' },
     { nome: 'Dezembro',  valor: '11' },
   ];
@@ -49,38 +56,48 @@ export class CadastroParametrosComponent implements OnInit {
     'JL', 'Marajoara', 'Nestlé'
   ];
 
+  regioes: string[] = [
+    'Centro-Oeste', 'Norte', 'Sul', 'Leste', 'Oeste', 'Nordeste', 'Sudeste'
+  ];
+
   constructor(
     private router: Router,
     private cadastroService: CadastroParametrosService,
     private toastController: ToastController,
-    private authService: AuthService
+    private authService: AuthService,
+    private estatisticasService: EstatisticasService,
   ) {}
 
   ngOnInit() {
+    this.isAdmin = this.authService.isAdmin();
     this.carregarDadosIniciais();
   }
 
   carregarDadosIniciais() {
-    const user = this.authService.getUser();
+    const user  = this.authService.getUser();
     const meuId = user?.id;
 
     this.cadastroService.getMeus().subscribe({
       next: (res) => {
-        // Filtra no frontend garantindo que só pega registros do usuário logado
         const meusDados = res.rows.filter((p: any) => p.contaId === meuId);
-
         this.mesesJaCadastrados = meusDados.map((p: any) => String(p.mesReferencia));
 
-        // Pré-seleciona laticínio do último registro do próprio usuário
         if (meusDados.length > 0) {
           const ordenados = [...meusDados].sort((a: any, b: any) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
-          const ultimoLaticinio = ordenados[0].laticinio;
-          setTimeout(() => { this.laticinio = ultimoLaticinio; }, 300);
+          const ultimo = ordenados[0];
+          setTimeout(() => {
+            this.laticinio = ultimo.laticinio;
+            // Pré-preenche municipio/regiao do último cadastro admin
+            if (this.isAdmin) {
+              this.municipio = ultimo.municipio || '';
+              this.regiao    = ultimo.regiao    || '';
+            }
+          }, 300);
         }
       },
-      error: (err) => {
+      error: () => {
         this.mesesJaCadastrados = [];
       }
     });
@@ -111,18 +128,23 @@ export class CadastroParametrosComponent implements OnInit {
     }
 
     const dadosParametros: CadastroParametros = {
-      laticinio: this.laticinio!,
-      mesReferencia: String(this.mesReferencia),
-      precoLeite: parseFloat(this.precoLitro),
+      laticinio:      this.laticinio!,
+      mesReferencia:  String(this.mesReferencia),
+      precoLeite:     parseFloat(this.precoLitro),
       producaoLitros: parseFloat(this.producaoLitros),
-      ccs: parseFloat(this.ccs),
-      cbt: parseFloat(this.cbt),
-      gordura: parseFloat(this.gordura),
-      proteina: parseFloat(this.proteina),
+      ccs:            parseFloat(this.ccs),
+      cbt:            parseFloat(this.cbt),
+      gordura:        parseFloat(this.gordura),
+      proteina:       parseFloat(this.proteina),
+      // Inclui municipio e regiao se for admin
+      municipio:      this.isAdmin ? this.municipio.trim() : '',
+      regiao:         this.isAdmin ? this.regiao.trim()    : '',
     };
 
     try {
       await this.cadastroService.create(dadosParametros).toPromise();
+      // Invalida o cache do EstatisticasService para os gráficos recarregarem
+      this.estatisticasService.invalidarCache();
       this.limparFormulario();
       await this.mostrarToast('Cadastro realizado com sucesso!', 'success');
       this.router.navigate(['/data-parametros']);
@@ -164,12 +186,14 @@ export class CadastroParametrosComponent implements OnInit {
 
   todosCamposPreenchidos(): boolean {
     if (!this.laticinio || !this.mesReferencia) return false;
-    if (!this.valorValido(this.precoLitro))     return false;
-    if (!this.valorValido(this.gordura))         return false;
-    if (!this.valorValido(this.proteina))        return false;
-    if (!this.valorValido(this.producaoLitros))  return false;
-    if (!this.valorValido(this.ccs))             return false;
-    if (!this.valorValido(this.cbt))             return false;
+    if (!this.valorValido(this.precoLitro))    return false;
+    if (!this.valorValido(this.gordura))        return false;
+    if (!this.valorValido(this.proteina))       return false;
+    if (!this.valorValido(this.producaoLitros)) return false;
+    if (!this.valorValido(this.ccs))            return false;
+    if (!this.valorValido(this.cbt))            return false;
+    // Admin precisa preencher município e região
+    if (this.isAdmin && (!this.municipio.trim() || !this.regiao.trim())) return false;
     return true;
   }
 
@@ -182,13 +206,14 @@ export class CadastroParametrosComponent implements OnInit {
     this.gordura              = '0.00';
     this.proteina             = '0.00';
     this.mensagemMesDuplicado = '';
+    // Não limpa municipio/regiao para facilitar cadastros em série
   }
 
   async mostrarToast(mensagem: string, cor: 'success' | 'danger') {
     const toast = await this.toastController.create({
-      message: mensagem,
+      message:  mensagem,
       duration: 2500,
-      color: cor,
+      color:    cor,
       position: 'top',
     });
     await toast.present();

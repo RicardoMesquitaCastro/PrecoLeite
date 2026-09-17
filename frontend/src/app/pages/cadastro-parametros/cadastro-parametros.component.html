@@ -18,6 +18,47 @@
     <p class="page-subtitle">Preencha os dados do mês de referência</p>
   </div>
 
+  <!-- ── Bloco Admin: Localização ── -->
+  @if (isAdmin) {
+    <div class="section-label admin-label">
+      <ion-icon name="shield-checkmark-outline"></ion-icon>
+      Localização <span class="admin-badge">Admin</span>
+    </div>
+
+    <div class="card-group">
+      <ion-item lines="none" class="custom-item">
+        <ion-icon name="location-outline" slot="start" class="field-icon"></ion-icon>
+        <div class="field-wrap">
+          <ion-label class="field-label">Município</ion-label>
+          <ion-input
+            [(ngModel)]="municipio"
+            type="text"
+            placeholder="Ex: Gameleira de Goiás"
+            class="custom-input">
+          </ion-input>
+        </div>
+      </ion-item>
+
+      <div class="item-divider"></div>
+
+      <ion-item lines="none" class="custom-item">
+        <ion-icon name="map-outline" slot="start" class="field-icon"></ion-icon>
+        <div class="field-wrap">
+          <ion-label class="field-label">Região</ion-label>
+          <ion-select
+            interface="alert"
+            [(ngModel)]="regiao"
+            placeholder="Selecione a região"
+            class="custom-select">
+            @for (r of regioes; track r) {
+              <ion-select-option [value]="r">{{ r }}</ion-select-option>
+            }
+          </ion-select>
+        </div>
+      </ion-item>
+    </div>
+  }
+
   <!-- ── Bloco 1: Identificação ── -->
   <div class="section-label">
     <ion-icon name="information-circle-outline"></ion-icon>

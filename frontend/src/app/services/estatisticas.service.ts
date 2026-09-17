@@ -18,16 +18,12 @@ export interface DadoDetalhe {
 
 export interface FiltroDetalhe {
   tipo: 'laticinio' | 'mes' | 'regiao';
-  // Para laticínio
   laticinio?: string;
   faixaMin?: number;
   faixaMax?: number;
-  // Para mês
   mesNumero?: number;
   mesNome?: string;
-  // Para região
   regiao?: string;
-  // Comuns
   municipio?: string;
   ano?: number;
 }
@@ -53,25 +49,31 @@ const MESES = [
 @Injectable({ providedIn: 'root' })
 export class EstatisticasService {
 
-  /** Cache único da requisição — compartilhado com DataParametrosPage */
   private dados$!: Observable<DadoLeite[]>;
 
   constructor(private dadosService: DadosService) {}
 
-  /** Retorna (e cacheia) a lista completa de dados já mapeados */
   getDados(): Observable<DadoLeite[]> {
     if (!this.dados$) {
       this.dados$ = this.dadosService.getAll().pipe(
         map((res: any) => {
-          const propriedades = res.cadastroPropriedade;
-          const parametros   = res.cadastroParametros;
+          const propriedades = res.cadastroPropriedade as any[];
+          const parametros   = res.cadastroParametros  as any[];
 
           return parametros.map((p: any) => {
+            // Busca a propriedade pelo contaId (dados de produtores cadastrados)
             const prop = propriedades.find((pr: any) => pr.contaId === p.contaId) || {};
+
+            // Prioridade:
+            // 1. municipio/regiao salvos direto no parâmetro (dados coletados pelo admin)
+            // 2. municipio/regiao da propriedade vinculada ao contaId (dados de produtores)
+            const municipio = p.municipio?.trim() || prop.municipio || '';
+            const regiao    = p.regiao?.trim()    || prop.regiao    || '';
+
             return {
               laticinio:      p.laticinio,
-              regiao:         prop.regiao    ?? '',
-              municipio:      prop.municipio ?? '',
+              regiao,
+              municipio,
               mesReferencia:  Number(p.mesReferencia),
               anoReferencia:  new Date(p.createdAt).getFullYear(),
               producaoLitros: Number(p.producaoLitros),
@@ -83,20 +85,21 @@ export class EstatisticasService {
             } as DadoLeite;
           });
         }),
-        shareReplay(1)   // ← uma só requisição HTTP para toda a sessão
+        shareReplay(1)
       );
     }
     return this.dados$;
   }
 
-  /** Filtra a lista conforme o FiltroDetalhe e retorna as estatísticas */
-  calcularEstatisticas(
-    dados: DadoLeite[],
-    filtro: FiltroDetalhe
-  ): EstatisticasDetalhe {
+  // Invalida o cache — chame após cadastrar novos parâmetros para forçar recarga
+  invalidarCache() {
+    this.dados$ = undefined as any;
+  }
+
+  calcularEstatisticas(dados: DadoLeite[], filtro: FiltroDetalhe): EstatisticasDetalhe {
     let itens = dados.filter(d => {
       if (filtro.municipio && filtro.municipio !== 'geral' && d.municipio !== filtro.municipio) return false;
-      if (filtro.ano        && d.anoReferencia !== filtro.ano)                                   return false;
+      if (filtro.ano && d.anoReferencia !== filtro.ano) return false;
       return true;
     });
 
@@ -110,19 +113,17 @@ export class EstatisticasService {
       }
     }
 
-    if (filtro.tipo === 'mes') {
-      if (filtro.mesNumero != null) {
-        itens = itens.filter(d => d.mesReferencia === filtro.mesNumero);
-      }
+    if (filtro.tipo === 'mes' && filtro.mesNumero != null) {
+      itens = itens.filter(d => d.mesReferencia === filtro.mesNumero);
     }
 
-    if (filtro.tipo === 'regiao') {
-      if (filtro.regiao) itens = itens.filter(d => d.regiao === filtro.regiao);
+    if (filtro.tipo === 'regiao' && filtro.regiao) {
+      itens = itens.filter(d => d.regiao === filtro.regiao);
     }
 
-    const precos   = itens.map(d => d.precoLitro);
-    const soma     = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
-    const media    = (arr: number[]) => arr.length ? soma(arr) / arr.length : 0;
+    const precos = itens.map(d => d.precoLitro);
+    const soma   = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
+    const media  = (arr: number[]) => arr.length ? soma(arr) / arr.length : 0;
 
     return {
       totalRegistros: itens.length,
@@ -138,7 +139,6 @@ export class EstatisticasService {
     };
   }
 
-  /** Utilitário: nome do mês a partir do índice 0-based */
   nomeMes(indice: number): string {
     return MESES[indice] ?? 'Desconhecido';
   }

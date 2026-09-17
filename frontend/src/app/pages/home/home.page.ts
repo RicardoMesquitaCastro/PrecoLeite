@@ -1,7 +1,4 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Chart, registerables } from 'chart.js';
 import { AuthService } from 'src/app/services/auth.service';
@@ -16,7 +13,7 @@ Chart.register(...registerables);
   styleUrls: ['home.page.scss'],
   standalone: false,
 })
-export class HomePage implements OnInit, AfterViewInit {
+export class HomePage implements OnInit {
 
   isAdmin = false;
   cotacoes: any[] = [];
@@ -50,17 +47,17 @@ export class HomePage implements OnInit, AfterViewInit {
     this.verificarCadastroPendente();
   }
 
-  ngAfterViewInit(): void {
-    const container = document.getElementById('cepea-widget');
-    if (container) {
-      container.innerHTML = '';
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = 'https://www.cepea.org.br/br/widgetproduto.js.php?fonte=arial&tamanho=10&largura=400px&corfundo=dbd6b2&cortexto=333333&corlinha=ede7bf&id_indicador%5B%5D=leitep';
-      script.async = true;
-      container.appendChild(script);
-    }
-  }
+  // ngAfterViewInit(): void {
+  //   const container = document.getElementById('cepea-widget');
+  //   if (container) {
+  //     container.innerHTML = '';
+  //     const script = document.createElement('script');
+  //     script.type = 'text/javascript';
+  //     script.src = 'https://www.cepea.org.br/br/widgetproduto.js.php?fonte=arial&tamanho=10&largura=400px&corfundo=dbd6b2&cortexto=333333&corlinha=ede7bf&id_indicador%5B%5D=leitep';
+  //     script.async = true;
+  //     container.appendChild(script);
+  //   }
+  // }
 
  private verificarCadastroPendente() {
   if (!this.authService.isProdutor()) {

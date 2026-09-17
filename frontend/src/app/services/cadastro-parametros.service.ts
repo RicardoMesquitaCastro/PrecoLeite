@@ -14,6 +14,8 @@ export interface CadastroParametros {
   cbt: number;
   gordura: number;
   proteina: number;
+  municipio?: string;   // preenchido pelo admin
+  regiao?: string;      // preenchido pelo admin
   createdAt?: string;
 }
 
@@ -29,7 +31,6 @@ export class CadastroParametrosService {
     return new HttpHeaders({ 'Content-Type': 'application/json' });
   }
 
-  // Cria parâmetro vinculado ao usuário logado
   create(data: CadastroParametros): Observable<CadastroParametros> {
     const user = this.authService.getUser();
     const payload = { ...data, contaId: user?.id ?? '' };
@@ -40,7 +41,6 @@ export class CadastroParametrosService {
     );
   }
 
-  // Busca parâmetros do usuário logado
   getMeus(): Observable<{ count: number; rows: CadastroParametros[] }> {
     const user = this.authService.getUser();
     const params = new HttpParams().set('contaId', user?.id ?? '');
